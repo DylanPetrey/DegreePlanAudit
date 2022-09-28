@@ -2,7 +2,6 @@ import PyPDF2
 import nltk
 import textract
 import sys
-import time
 from nltk.tokenize import word_tokenize
 
 # TODO
@@ -177,6 +176,6 @@ if __name__ == '__main__':
                     for c in course_tokens:
                         get_course_details(c)
 
-                    # Stops from looping a second time
+                    # Stops from looping a second 
                     left = i
-    endTime = time.perf_counter()
+
