@@ -49,7 +49,7 @@ public class Course {
             tokens = Arrays.copyOfRange(tokens, tokens.length - 4, tokens.length);
         } else {
             courseDescription = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3));
-            letterGrade = "x";
+            letterGrade = "X";
             tokens = Arrays.copyOfRange(tokens, tokens.length - 3, tokens.length);
         }
 
@@ -72,7 +72,7 @@ public class Course {
      */
     @Override
     public String toString() {
-        String semesterOutput = (isTransfer) ? "x " + semester : semester + " x";
+        String semesterOutput = (isTransfer) ? "X " + semester : semester + " X";
 
         return  courseNumber + " " +
                 courseDescription + " " +
@@ -82,7 +82,6 @@ public class Course {
 
     /**
      * This method can be used to see if two course objects share the same courseName
-     *
      *
      * @return true if the courses have the same course number
      */
@@ -117,6 +116,4 @@ public class Course {
     public void setAttempted(float attempted) { this.attempted = attempted; }
     public void setPoints(float points) { this.points = points; }
     public void setEarned(float earned) { this.earned = earned; }
-
-
 }
