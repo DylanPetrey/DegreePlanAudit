@@ -81,19 +81,6 @@ public class Course {
     }
 
     /**
-     * This method can be used to see if two course objects share the same courseName
-     *
-     * @return true if the courses have the same course number
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Course course = (Course) o;
-        return courseNumber.equals(course.courseNumber);
-    }
-
-    /**
      * Accessor methods to be used outside the class.
      */
     public String getCourseNumber(){ return courseNumber; }

@@ -3,12 +3,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Student {
+    // Student Variables
     private String studentName;
     private String studentId;
     private String startDate;
     public List<Course> courseList;
 
-
+    // GPA variables
     private HashMap<String, List<Course>> gpaClasses;
     private float utdAttemptedHours;
     private float utdEarnedHours;
@@ -47,13 +48,12 @@ public class Student {
 
         this.gpaClasses = new HashMap<>();
         this.transferClasses = new HashMap<>();
-
         this.courseList = new ArrayList<Course>();
     }
 
     /**
      * This function creates a course from the input on the transcript and adds it to the
-     * list of the student's courses.
+     * list of the student's courses. Then it cals a method to add to the gpa counters.
      *
      * @param line This is the line of the course as read on the transcript.
      * @param semester String identifying the semester.
@@ -63,10 +63,19 @@ public class Student {
         Course newCourse = new Course(line, semester, transfer);
         courseList.add(newCourse);
 
+        addToGpaTotals(newCourse);
+    }
+
+    /**
+     * This function takes a course object and adjusts the gpa counters accordingly
+     *
+     * @param newCourse a course object.
+     */
+    private void addToGpaTotals(Course newCourse){
         Pattern stringPattern = Pattern.compile("(^[A-F]{1})(?=\\+|-|$)");
         Matcher m = stringPattern.matcher(newCourse.getLetterGrade());
 
-        // Don't calculate grades for current semester or transfer courses
+        // Transfer students have different totals
         if(newCourse.isTransfer()) {
             transferAttemptedHours += newCourse.getAttempted();
             if (m.find())
@@ -80,11 +89,12 @@ public class Student {
             else
                 utdEarnedHours += newCourse.getEarned();
         }
-
-
     }
 
-    // this code is messy because its 2am so ill clean it up later
+    /**
+     * This function calculates the students current gpa given their course record
+     * with the highest gpa totals
+     */
     public void calculateGpa(){
         gpaClasses.forEach((number, l) -> {
             Course best = l.get(getMaxIndex(l));
@@ -95,26 +105,25 @@ public class Student {
         });
 
         transferClasses.forEach((number, l) -> {
-            transferEarnedHours += l.get(l.size()-1).getEarned();
+            Course best = l.get(getMaxEarned(l));
+
+            utdEarnedHours += best.getEarned();
         });
 
         totalEarnedHours = utdEarnedHours + transferEarnedHours;
         totalAttemptedHours = utdAttemptedHours + transferAttemptedHours;
 
-        System.out.println(utdAttemptedHours +  " " +
-                            utdEarnedHours +  " " +
-                            utdGpaUnits + " " +
-                            utdPoints);
-
-        System.out.println(transferAttemptedHours + " " +  transferEarnedHours);
-
-        System.out.println(totalAttemptedHours + " " + totalEarnedHours);
-
-        gpa = utdPoints /utdGpaUnits;
+        gpa = utdPoints / utdGpaUnits;
 
         System.out.println(gpa);
-
     }
+
+    /**
+     * This function takes in a list of courses with the same course number
+     * and returns the index with the highest gpa score
+     *
+     * @param identicalCourses List of courses that has been retaken
+     */
     public int getMaxIndex(List<Course> identicalCourses){
         if(identicalCourses.size() == 1)   {
             return 0;
@@ -131,6 +140,34 @@ public class Student {
         }
 
         if(maxPoints == 0)
+            maxIndex = identicalCourses.size()-1;
+
+        return maxIndex;
+    }
+
+    /**
+     * This function takes in a list of courses with the same course number
+     * and returns the index with the highest earned value. This is for transfer
+     * students because transfer courses do not have gpa totals
+     *
+     * @param identicalCourses List of courses that has been retaken
+     */
+    public int getMaxEarned(List<Course> identicalCourses){
+        if(identicalCourses.size() == 1)   {
+            return 0;
+        }
+
+        float maxEarned = 0;
+        int maxIndex = 0;
+
+        for(int i = 0; i < identicalCourses.size() && i < 3; i++){
+            if(maxEarned <= identicalCourses.get(i).getEarned()){
+                maxEarned = identicalCourses.get(i).getEarned();
+                maxIndex = i;
+            }
+        }
+
+        if(maxEarned == 0)
             maxIndex = identicalCourses.size()-1;
 
         return maxIndex;
