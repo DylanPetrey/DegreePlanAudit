@@ -1,7 +1,7 @@
 import java.util.Arrays;
 
 public class Course {
-    private String courseName;
+    private String courseNumber;
     private String courseDescription;
     private boolean isTransfer;
     private String letterGrade;
@@ -18,7 +18,7 @@ public class Course {
      * @param transfer true if the course is transfer credit, false if utd credit.
      */
     public Course(String input, String semester, boolean transfer) {
-        this.courseName = "";
+        this.courseNumber = "";
         this.courseDescription = "";
         this.attempted = 0;
         this.earned = 0;
@@ -39,7 +39,7 @@ public class Course {
     private void processInput(String input) {
         // Course name
         String[] tokens = input.split("\\s+");
-        courseName = tokens[0] + " " + tokens[1];
+        courseNumber = tokens[0] + " " + tokens[1];
 
         // Fills in the course title and checks if there is a letter grade.
         // If there is not a letter grade, then the course is in the current semester
@@ -59,26 +59,45 @@ public class Course {
     }
 
     /**
-     * Prints the information in the course object.
-     * The format is similar to how it will look on the final audit pdf.
+     * Prints the course to the console
      */
     public void printCourse() {
-        System.out.print(courseName + " ");
-        System.out.print(courseDescription + " ");
+        System.out.println(this.toString());
+    }
 
-        if (isTransfer) {
-            System.out.print("x " + semester + " ");
-        } else {
-            System.out.print(semester + " x ");
-        }
+    /**
+     * Creates a string of the course similar to how it will look on the final audit pdf
+     *
+     * @return returns a string of the course
+     */
+    @Override
+    public String toString() {
+        String semesterOutput = (isTransfer) ? "x " + semester : semester + " x";
 
-        System.out.println(letterGrade);
+        return  courseNumber + " " +
+                courseDescription + " " +
+                semesterOutput + " " +
+                letterGrade;
+    }
+
+    /**
+     * This method can be used to see if two course objects share the same courseName
+     *
+     *
+     * @return true if the courses have the same course number
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Course course = (Course) o;
+        return courseNumber.equals(course.courseNumber);
     }
 
     /**
      * Accessor methods to be used outside the class.
      */
-    public String getCourseName(){ return courseName; }
+    public String getCourseNumber(){ return courseNumber; }
     public String getCourseDescription() { return courseDescription; }
     public String getSemester() { return semester; }
     public boolean isTransfer() { return isTransfer; }
@@ -90,7 +109,7 @@ public class Course {
     /**
      * Mutator methods to be used outside the class.
      */
-    public void setCourseName(String courseName) { this.courseName = courseName; }
+    public void setCourseNumber(String courseNumber) { this.courseNumber = courseNumber; }
     public void setCourseDescription(String courseDescription) { this.courseDescription = courseDescription; }
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(boolean transfer) { isTransfer = transfer; }
@@ -98,4 +117,6 @@ public class Course {
     public void setAttempted(float attempted) { this.attempted = attempted; }
     public void setPoints(float points) { this.points = points; }
     public void setEarned(float earned) { this.earned = earned; }
+
+
 }
