@@ -1,21 +1,101 @@
-public class Course {
-    String courseName;
-    String courseDescription;
-    boolean isTransfer;
-    float gpa;
-    String semester;
+import java.util.Arrays;
 
-    public Course(String input, String semester, boolean transfer){
+public class Course {
+    private String courseName;
+    private String courseDescription;
+    private boolean isTransfer;
+    private String letterGrade;
+    private String semester;
+    private float attempted;
+    private float earned;
+    private float points;
+
+    /**
+     * Initializes the course object and then fills in the information.
+     *
+     * @param input    This is the line of the course as read on the transcript.
+     * @param semester String identifying the semester.
+     * @param transfer true if the course is transfer credit, false if utd credit.
+     */
+    public Course(String input, String semester, boolean transfer) {
+        this.courseName = "";
+        this.courseDescription = "";
+        this.attempted = 0;
+        this.earned = 0;
+        this.letterGrade = "";
+        this.points = 0;
+
         this.semester = semester;
-        this.isTransfer = isTransfer;
+        this.isTransfer = transfer;
 
         processInput(input);
     }
 
-    private void processInput(String input){
+    /**
+     * Parses through the text and fills in the course information into the object.
+     *
+     * @param input This is the line of the course as read on the transcript.
+     */
+    private void processInput(String input) {
+        // Course name
+        String[] tokens = input.split("\\s+");
+        courseName = tokens[0] + " " + tokens[1];
 
+        // Fills in the course title and checks if there is a letter grade.
+        // If there is not a letter grade, then the course is in the current semester
+        if (!tokens[tokens.length - 2].matches("[-+]?[0-9]*\\.?[0-9]+")) {
+            courseDescription = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 4));
+            letterGrade = tokens[tokens.length - 2];
+            tokens = Arrays.copyOfRange(tokens, tokens.length - 4, tokens.length);
+        } else {
+            courseDescription = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3));
+            letterGrade = "x";
+            tokens = Arrays.copyOfRange(tokens, tokens.length - 3, tokens.length);
+        }
 
+        attempted = Float.parseFloat(tokens[0]);
+        earned = Float.parseFloat(tokens[1]);
+        points = Float.parseFloat(tokens[tokens.length - 1]);
     }
 
+    /**
+     * Prints the information in the course object.
+     * The format is similar to how it will look on the final audit pdf.
+     */
+    public void printCourse() {
+        System.out.print(courseName + " ");
+        System.out.print(courseDescription + " ");
 
+        if (isTransfer) {
+            System.out.print("x " + semester + " ");
+        } else {
+            System.out.print(semester + " x ");
+        }
+
+        System.out.println(letterGrade);
+    }
+
+    /**
+     * Accessor methods to be used outside the class.
+     */
+    public String getCourseName(){ return courseName; }
+    public String getCourseDescription() { return courseDescription; }
+    public String getSemester() { return semester; }
+    public boolean isTransfer() { return isTransfer; }
+    public String getLetterGrade() { return letterGrade; }
+    public float getAttempted() { return attempted; }
+    public float getEarned() { return earned; }
+    public float getPoints() {return points; }
+
+    /**
+     * Mutator methods to be used outside the class.
+     */
+    public void setCourseName(String courseName) { this.courseName = courseName; }
+    public void setCourseDescription(String courseDescription) { this.courseDescription = courseDescription; }
+    public void setSemester(String semester) { this.semester = semester; }
+    public void setTransfer(boolean transfer) { isTransfer = transfer; }
+    public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
+    public void setAttempted(float attempted) { this.attempted = attempted; }
+    public void setPoints(float points) { this.points = points; }
+    public void setEarned(float earned) { this.earned = earned; }
 }
