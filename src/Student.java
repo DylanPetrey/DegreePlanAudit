@@ -23,7 +23,7 @@ public class Student {
         this.studentId = studentId;
         this.startDate = startDate;
 
-
+        courseList = new ArrayList<>();
     }
 
     /**
