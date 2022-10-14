@@ -2,7 +2,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GPA {
+/*
+ * TODO:
+ *   1. Separate courses into core and elective
+ *        - Implement into existing GPA functions
+ *   2. Evaluate requirements still needed to graduate
+ *        - Find remaining classes in plan
+ *        - Average GPA needed in remaining classes to meet minimum GPA
+ */
+
+public class Audit {
     final double MIN_CORE_GPA = 3.19;
     final double MIN_ELECT_GPA = 3.0;
     final double MIN_OVRALL_GPA = MIN_ELECT_GPA;
@@ -14,11 +23,11 @@ public class GPA {
     private double combinedGPA;
 
     /**
-     * GPA constructor
+     * Audit constructor
      *
      * @param courseList List of all courses that a student has taken
      */
-    public GPA(List<Course> courseList){
+    public Audit(List<Course> courseList){
         this.courseList = courseList;
         this.utdClasses = new HashMap<>();
     }

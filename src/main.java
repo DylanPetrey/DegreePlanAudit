@@ -2,12 +2,12 @@ import java.io.IOException;
 
 public class main {
     public static void main(String args[]) throws IOException {
-        ReadTranscript transcript =  new ReadTranscript(args[0]);
-        Student curr = transcript.getCurrentStudent();
+        transcriptParser transcript =  new transcriptParser(args[0]);
+        Student curr = transcript.getStudent();
 
-        GPA gpaCalc = new GPA(curr.getCourseList());
-        gpaCalc.calculateGPA();
+        Audit auditHelper = new Audit(curr.getCourseList());
+        auditHelper.calculateGPA();
 
-        System.out.println(gpaCalc.getCombinedGPA());
+        System.out.println(auditHelper.getCombinedGPA());
     }
 }

@@ -2,12 +2,23 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+ * TODO:
+ *   1. Parse Major, Track, and Plan from transcript
+ *
+ */
+
 public class Student {
     // Student Variables
     private String studentName;
     private String studentId;
     private String startDate;
     private List<Course> courseList;
+
+    // Outputted on the Audit
+    private String major;
+    private String track;
+    private String plan;
 
 
     /**
@@ -57,10 +68,13 @@ public class Student {
    /**
     * Accessor methods to be used outside the class.
     */
+   public List<Course> getCourseList() { return courseList; }
     public String getStudentName(){ return studentName; }
     public String getStudentId(){ return studentId; }
     public String getStartDate(){ return startDate; }
-    public List<Course> getCourseList() { return courseList; }
+    public String getMajor() { return major; }
+    public String getTrack() { return track; }
+    public String getPlan() { return plan; }
 
     /**
      * Mutator methods to be used outside the class.
@@ -68,5 +82,7 @@ public class Student {
     public void setStudentName(String studentName){ this.studentName = studentName; }
     public void setStudentId(String studentId){ this.studentId = studentId; }
     public void setStartDate(String startDate){ this.startDate = startDate; }
-
+    public void setMajor(String major) { this.major = major; }
+    public void setTrack(String track) { this.track = track; }
+    public void setPlan(String plan) {this.plan = plan; }
 }

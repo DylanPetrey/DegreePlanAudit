@@ -66,6 +66,7 @@ public class Course {
         points = Double.parseDouble(tokens[tokens.length - 1]);
     }
 
+
     /**
      * Prints the course to the console
      */
@@ -112,7 +113,13 @@ public class Course {
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
-    public void setWaved(boolean waved) { isWaved = waved; }
+
+    /**
+     * Methods to toggle the isWaved boolean
+     * can be used on the form as checkboxes
+     */
+    public void waive(){ isWaved = true; }
+    public void unwaive(){ isWaved = false; }
 
 
 }

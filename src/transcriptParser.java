@@ -8,10 +8,13 @@ import java.util.regex.Pattern;
 
 /*
  * TODO:
- *      Separate the undergraduate courses with the graduate courses: I do not have an example of what this looks like
+ *    1. Separate the undergraduate courses with the graduate courses:
+ *        - Edge case for students that attend UTD for undergrad and graduate degrees
+ *        - I do not have an example of what this looks like
+ *
  */
 
-public class ReadTranscript {
+public class transcriptParser {
     Student currentStudent;
 
     /**
@@ -22,7 +25,7 @@ public class ReadTranscript {
      * @param fileName This will need to be changed to a file whenever we implement file uploading
      * @throws IOException The readPDF function throws an exception if the PDF can not be read
      */
-    public ReadTranscript(String fileName) throws IOException {
+    public transcriptParser(String fileName) throws IOException {
 
         String transcript[] = readPDF(fileName);
 
@@ -150,5 +153,8 @@ public class ReadTranscript {
         }
     }
 
-    public Student getCurrentStudent() { return currentStudent; }
+    /**
+     * Accessor methods to be used outside the class.
+     */
+    public Student getStudent() { return currentStudent; }
 }
