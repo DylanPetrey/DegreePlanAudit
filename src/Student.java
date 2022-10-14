@@ -7,7 +7,7 @@ public class Student {
     private String studentName;
     private String studentId;
     private String startDate;
-    public List<Course> courseList;
+    private List<Course> courseList;
 
 
     /**

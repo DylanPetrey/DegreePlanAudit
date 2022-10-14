@@ -12,28 +12,28 @@ import java.util.regex.Pattern;
  */
 
 public class ReadTranscript {
+    Student currentStudent;
+
     /**
      * This is the main function. Once we create the UI, this will be called as an object.
      * Ideally this would return a filled student object which would then be used in other
      * parts of the project
      *
-     * @param args This will need to be changed to a file whenever we implement file uploading
+     * @param fileName This will need to be changed to a file whenever we implement file uploading
      * @throws IOException The readPDF function throws an exception if the PDF can not be read
      */
-    public static void main(String args[]) throws IOException {
+    public ReadTranscript(String fileName) throws IOException {
 
-        String transcript[] = readPDF(args[0]);
+        String transcript[] = readPDF(fileName);
 
         // Create the student Object
-        Student currentStudent = createStudent(transcript);
+        this.currentStudent = createStudent(transcript);
 
         // Fill the course information
         fillCourseInformation(currentStudent, transcript);
 
         // Just to test the output
         currentStudent.printStudentInformation();
-
-        //currentStudent.calculateGpa();
 
     }
 
@@ -44,7 +44,7 @@ public class ReadTranscript {
      * @throws IOException If there is an error reading in the PDF
      * @return An array that is seperated by each line in the transcript
      */
-    private static String[] readPDF(String filename) throws IOException{
+    private String[] readPDF(String filename) throws IOException{
         File inputFile = new File(filename);
         PDDocument document = PDDocument.load(inputFile);
 
@@ -64,7 +64,7 @@ public class ReadTranscript {
      *
      * @return true/false if the regex matches the input string
      */
-    private static boolean checkRegex(String input, String regex){
+    private boolean checkRegex(String input, String regex){
         Pattern stringPattern = Pattern.compile(regex);
         Matcher m = stringPattern.matcher(input);
         return m.find();
@@ -78,7 +78,7 @@ public class ReadTranscript {
      *
      * @return A student object with identifying information filled out
      */
-    private static Student createStudent(String transcript[]) {
+    private Student createStudent(String transcript[]) {
         // Create initial variables
         String studentName = "";
         String studentId = "";
@@ -120,7 +120,7 @@ public class ReadTranscript {
      * @param currentStudent The current student object.
      * @param transcript The entire transcript split up by lines
      */
-    private static void fillCourseInformation(Student currentStudent, String[] transcript){
+    private void fillCourseInformation(Student currentStudent, String[] transcript){
         boolean transfer = false;
         String semester = "";
 
@@ -149,4 +149,6 @@ public class ReadTranscript {
             }
         }
     }
+
+    public Student getCurrentStudent() { return currentStudent; }
 }

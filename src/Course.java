@@ -5,11 +5,17 @@ public class Course {
     private String courseDescription;
     private String letterGrade;
     private String semester;
-    private float attempted;
-    private float earned;
-    private float points;
+
+    private double attempted;
+    private double earned;
+    private double points;
+
     private boolean isTransfer;
     private boolean isWaved;
+
+    private boolean isCore;
+    private boolean isElective;
+    private boolean isPre;
 
     /**
      * Initializes the course object and then fills in the information.
@@ -55,9 +61,9 @@ public class Course {
             tokens = Arrays.copyOfRange(tokens, tokens.length - 3, tokens.length);
         }
 
-        attempted = Float.parseFloat(tokens[0]);
-        earned = Float.parseFloat(tokens[1]);
-        points = Float.parseFloat(tokens[tokens.length - 1]);
+        attempted = Double.parseDouble(tokens[0]);
+        earned = Double.parseDouble(tokens[1]);
+        points = Double.parseDouble(tokens[tokens.length - 1]);
     }
 
     /**
@@ -89,9 +95,9 @@ public class Course {
     public String getCourseDescription() { return courseDescription; }
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
-    public float getAttempted() { return attempted; }
-    public float getEarned() { return earned; }
-    public float getPoints() {return points; }
+    public double getAttempted() { return attempted; }
+    public double getEarned() { return earned; }
+    public double getPoints() {return points; }
     public boolean isTransfer() { return isTransfer; }
     public boolean isWaved() { return isWaved; }
 
@@ -103,9 +109,9 @@ public class Course {
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(boolean transfer) { isTransfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
-    public void setAttempted(float attempted) { this.attempted = attempted; }
-    public void setPoints(float points) { this.points = points; }
-    public void setEarned(float earned) { this.earned = earned; }
+    public void setAttempted(double attempted) { this.attempted = attempted; }
+    public void setPoints(double points) { this.points = points; }
+    public void setEarned(double earned) { this.earned = earned; }
     public void setWaved(boolean waved) { isWaved = waved; }
 
 
