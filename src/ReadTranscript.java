@@ -33,8 +33,6 @@ public class ReadTranscript {
         // Just to test the output
         currentStudent.printStudentInformation();
 
-        currentStudent.calculateGpa();
-
     }
 
     /**
