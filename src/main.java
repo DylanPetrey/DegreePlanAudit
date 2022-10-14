@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class main {
     public static void main(String args[]) throws IOException {
-        transcriptParser transcript =  new transcriptParser(args[0]);
+        TranscriptParser transcript =  new TranscriptParser(args[0]);
         Student curr = transcript.getStudent();
 
         Audit auditHelper = new Audit(curr.getCourseList());

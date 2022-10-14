@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  *
  */
 
-public class transcriptParser {
+public class TranscriptParser {
     Student currentStudent;
 
     /**
@@ -25,7 +25,7 @@ public class transcriptParser {
      * @param fileName This will need to be changed to a file whenever we implement file uploading
      * @throws IOException The readPDF function throws an exception if the PDF can not be read
      */
-    public transcriptParser(String fileName) throws IOException {
+    public TranscriptParser(String fileName) throws IOException {
 
         String transcript[] = readPDF(fileName);
 
