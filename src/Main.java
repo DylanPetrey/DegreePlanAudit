@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-public class main {
+public class Main {
     public static void main(String args[]) throws IOException {
         TranscriptParser transcript =  new TranscriptParser(args[0]);
         Student curr = transcript.getStudent();
