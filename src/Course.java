@@ -11,7 +11,6 @@ public class Course {
 
     private boolean isTransfer;
     private boolean isWaved;
-
     private boolean isCore;
     private boolean isElective;
     private boolean isPre;

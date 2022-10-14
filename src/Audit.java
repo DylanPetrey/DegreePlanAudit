@@ -62,7 +62,7 @@ public class Audit {
      *
      * @param identicalCourses List of identical courses. This is the value in the hashmap
      */
-    public int getMaxGradeIndex(List<Course> identicalCourses){
+    private int getMaxGradeIndex(List<Course> identicalCourses){
         if(identicalCourses.size() == 1)   {
             return 0;
         }
