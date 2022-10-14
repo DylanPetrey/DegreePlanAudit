@@ -3,12 +3,13 @@ import java.util.Arrays;
 public class Course {
     private String courseNumber;
     private String courseDescription;
-    private boolean isTransfer;
     private String letterGrade;
     private String semester;
     private float attempted;
     private float earned;
     private float points;
+    private boolean isTransfer;
+    private boolean isWaved;
 
     /**
      * Initializes the course object and then fills in the information.
@@ -27,6 +28,7 @@ public class Course {
 
         this.semester = semester;
         this.isTransfer = transfer;
+        this.isWaved = false;
 
         processInput(input);
     }
@@ -86,11 +88,12 @@ public class Course {
     public String getCourseNumber(){ return courseNumber; }
     public String getCourseDescription() { return courseDescription; }
     public String getSemester() { return semester; }
-    public boolean isTransfer() { return isTransfer; }
     public String getLetterGrade() { return letterGrade; }
     public float getAttempted() { return attempted; }
     public float getEarned() { return earned; }
     public float getPoints() {return points; }
+    public boolean isTransfer() { return isTransfer; }
+    public boolean isWaved() { return isWaved; }
 
     /**
      * Mutator methods to be used outside the class.
@@ -103,4 +106,7 @@ public class Course {
     public void setAttempted(float attempted) { this.attempted = attempted; }
     public void setPoints(float points) { this.points = points; }
     public void setEarned(float earned) { this.earned = earned; }
+    public void setWaved(boolean waved) { isWaved = waved; }
+
+
 }
