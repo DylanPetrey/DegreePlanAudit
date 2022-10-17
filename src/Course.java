@@ -10,11 +10,15 @@ public class Course {
     private double points;
 
     private boolean isTransfer;
-    private boolean isWaved;
-    private boolean isCore;
-    private boolean isElective;
-    private boolean isPre;
+    private boolean isWaived;
+    private CourseType type;
 
+    public enum CourseType {
+        CORE,
+        ELECTIVE, 
+        PRE,
+        OTHER;
+    }
     /**
      * Initializes the course object and then fills in the information.
      *
@@ -32,7 +36,7 @@ public class Course {
 
         this.semester = semester;
         this.isTransfer = transfer;
-        this.isWaved = false;
+        this.isWaived = false;
 
         processInput(input);
     }
@@ -97,7 +101,8 @@ public class Course {
     public double getEarned() { return earned; }
     public double getPoints() {return points; }
     public boolean isTransfer() { return isTransfer; }
-    public boolean isWaved() { return isWaved; }
+    public boolean isWaived() { return isWaived; }
+    public CourseType getType() {return type;}
 
     /**
      * Mutator methods to be used outside the class.
@@ -110,11 +115,12 @@ public class Course {
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
+    public void setType(Course.CourseType type) { this.type = type; }
 
     /**
-     * Methods to toggle the isWaved boolean
+     * Methods to toggle the isWaived boolean
      * can be used on the form as checkboxes
      */
-    public void waive(){ isWaved = true; }
-    public void unwaive(){ isWaved = false; }
+    public void waive(){ isWaived = true; }
+    public void unwaive(){ isWaived = false; }
 }
