@@ -1,4 +1,3 @@
-import java.net.ConnectException;
 import java.util.*;
 
 
@@ -11,9 +10,8 @@ public class Form {
     private String anticipatedGraduation;
     private boolean isFastTrack;
     private boolean thesis;
-    private List<Course> coreCourses;
-    private List<Course> electiveCourses;
-    private List<Course> addlCourses;
+    private List<Course> courseList;
+
     
 
     /** 
@@ -27,7 +25,24 @@ public class Form {
         this.anticipatedGraduation = "";
         this.isFastTrack = false;
         this.thesis = false;
+        this.courseList = currentStudent.getCourseList();
     }
+
+    /**
+     * This function returns a list of Courses of a specified Course Type
+     * @param type The type of courses requested
+     * @return A list of courses of specified type
+     */
+    public List<Course> getCourseOfType(Course.CourseType type){
+        List<Course> courses = new ArrayList<>();
+        for (Course course : courseList) {
+            if (course.getType() == type) {
+                courses.add(course);
+            }
+        }
+        return courses;
+    }
+
 
     /**
      * Accessor methods to be used outside the class.
@@ -39,9 +54,7 @@ public class Form {
     public String getAnticipatedGraduation(){ return anticipatedGraduation; }
     public boolean isFastTrack(){ return isFastTrack; }
     public boolean isThesis(){ return thesis; }
-    public List<Course> getCoreCourses(){ return coreCourses; }
-    public List<Course> getElectiveCourses(){ return electiveCourses; }
-    public List<Course> getAdditionalCourses(){ return addlCourses; }
+    public List<Course> getCourseList() {return courseList; }
 
     /**
      * Mutator methods to be used outside the class.
@@ -55,7 +68,7 @@ public class Form {
     public void setThesis(boolean thesis) { this.thesis = thesis; }
     
     public void addCourse(List<Course> courseList, Course course) { courseList.add(course); }
-    public void removeCourse(List<Course> courseList, Course course) { this.courseList.remove(course); }
+    public void removeCourse(List<Course> courseList, Course course) { courseList.remove(course); }
 
 }
 
