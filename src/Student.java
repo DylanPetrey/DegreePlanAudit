@@ -2,12 +2,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * TODO:
- *   1. Parse Major and plan from transcript
- *
- */
-
 public class Student {
     // Student Variables
     private String studentName;
