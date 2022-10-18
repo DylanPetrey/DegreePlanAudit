@@ -75,7 +75,7 @@ public class TranscriptParser {
 
     /**
      * This method creates the initial student object. The only information that will be filled is the
-     * student name, student id, and the date that the student was admitted to the program.
+     * student name, student id, date that the student was admitted to the program, and the current plan.
      *
      * @param transcript The entire transcript split up by lines
      *
@@ -86,6 +86,7 @@ public class TranscriptParser {
         String studentName = "";
         String studentId = "";
         String startDate = "";
+        String currentPlan = "";
 
         for(int i = 0; i < transcript.length; i++){
             // End the loop as soon as all the information has been filled
@@ -111,10 +112,11 @@ public class TranscriptParser {
             // Checks for the first major start date
             if(checkRegex(transcript[i], "Active in Program")) {
                 startDate = transcript[i].substring(0, 10);      // The date format in the transcript is 10 characters long
+                currentPlan = transcript[i-1].substring(9);
             }
         }
 
-        return new Student(studentName,studentId,startDate);
+        return new Student(studentName,studentId,startDate, currentPlan);
     }
 
     /**

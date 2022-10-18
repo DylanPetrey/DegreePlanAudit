@@ -13,6 +13,7 @@ public class Student {
     private String studentName;
     private String studentId;
     private String startDate;
+    private String currentPlan;
     private Concentration currentTrack;
     private List<Course> courseList;
 
@@ -24,10 +25,11 @@ public class Student {
      * @param studentId ID number of the student
      * @param startDate Date the student was enrolled to the masters program
      */
-    public Student(String studentName, String studentId, String startDate){
+    public Student(String studentName, String studentId, String startDate, String currentPlan){
         this.studentName = studentName;
         this.studentId = studentId;
         this.startDate = startDate;
+        this.currentPlan = currentPlan;
 
         courseList = new ArrayList<>();
     }
@@ -54,6 +56,7 @@ public class Student {
         System.out.println(studentName);
         System.out.println(studentId);
         System.out.println(startDate);
+        System.out.println(currentPlan);
         System.out.println();
 
         courseList.forEach((c) -> c.printCourse());
@@ -67,6 +70,7 @@ public class Student {
     public String getStudentName(){ return studentName; }
     public String getStudentId(){ return studentId; }
     public String getStartDate(){ return startDate; }
+    public String getCurrentPlan() { return currentPlan; }
     public Concentration getCurrentTrack() { return currentTrack; }
 
     /**
@@ -75,5 +79,6 @@ public class Student {
     public void setStudentName(String studentName){ this.studentName = studentName; }
     public void setStudentId(String studentId){ this.studentId = studentId; }
     public void setStartDate(String startDate){ this.startDate = startDate; }
+    public void setCurrentPlan(String currentPlan) { this.currentPlan = currentPlan; }
     public void setCurrentTrack(Concentration currentTrack) { this.currentTrack = currentTrack; }
 }
