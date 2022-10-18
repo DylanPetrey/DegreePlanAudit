@@ -104,5 +104,9 @@ public class Audit {
         combinedGPA = Math.round(combinedGPA * scale) / scale;
     }
 
+    public void evaluateDegreePlan(Concentration currentConcentration){
+
+    }
+
     public double getCombinedGPA() { return combinedGPA; }
 }

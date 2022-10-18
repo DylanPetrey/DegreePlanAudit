@@ -18,6 +18,7 @@ public class Student {
      * @param studentName Name of the student
      * @param studentId ID number of the student
      * @param startDate Date the student was enrolled to the masters program
+     * @param currentPlan current plan of the student (undergraduate, masters, etc.)
      */
     public Student(String studentName, String studentId, String startDate, String currentPlan){
         this.studentName = studentName;
