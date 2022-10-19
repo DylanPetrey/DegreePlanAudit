@@ -75,7 +75,6 @@ public class TranscriptParser {
      * student name, student id, date that the student was admitted to the program, and the current plan.
      *
      * @param transcript The entire transcript split up by lines
-     *
      * @return A student object with identifying information filled out
      */
     private Student createStudent(String transcript[]) {

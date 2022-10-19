@@ -39,6 +39,7 @@ public class Audit {
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
+
     /**
      * Audit constructor
      *
@@ -55,6 +56,7 @@ public class Audit {
         electiveGPA = 0;
     }
 
+
     /**
      * Performs all three parts of the audit. Basically to a main method for the class
      */
@@ -62,6 +64,7 @@ public class Audit {
         evaluateDegreePlan();
         calculateGPA();
     }
+
 
     /**
      * This function creates a hashmap of the input courseList based on the unique course
@@ -79,6 +82,7 @@ public class Audit {
 
         return currentMap;
     }
+
 
     /**
      * Finds the course with the highest GPA. This method specifically used for a list of courses.
@@ -138,7 +142,7 @@ public class Audit {
      * This function evaluates the courses based on the degree plan and fills in the
      * variables for the completed requirements
      */
-    public void evaluateDegreePlan(){
+    private void evaluateDegreePlan(){
         Plan currentPlan = createDegreePlan();
 
         fillCoreCourses(currentPlan);
@@ -170,6 +174,7 @@ public class Audit {
         }
     }
 
+
     /**
      * Finds the courses that a student has taken
      *
@@ -189,23 +194,6 @@ public class Audit {
         return currentList;
     }
 
-    /**
-     * Calculates the number of hours a student has taken in the hashmap
-     *
-     * @param currentCourses List of course numbers
-     * @return number of hours
-     */
-    private double getCourseHours(List<String> currentCourses){
-        AtomicReference<Double> currentHours = new AtomicReference<>((double) 0);
-
-        currentCourses.forEach(course -> {
-            List<Course> currentCourseList = courseMap.get(course);
-            int highestIndex = getMaxCourseIndex(currentCourseList);
-            currentHours.updateAndGet(v -> v + currentCourseList.get(highestIndex).getEarned());
-        });
-
-        return currentHours.get();
-    }
 
     /**
      * Fills the electives. The electives are basically anything that is not a core course
@@ -262,10 +250,11 @@ public class Audit {
     /**
      * This function runs the gpa calculation
      */
-    public void calculateGPA(){
+    private void calculateGPA(){
         validateGPACourses();
         calculateGPAValues();
     }
+
 
     /**
      * This function fills in a hashmap of all courses completed at utd with a
@@ -328,6 +317,7 @@ public class Audit {
         electiveGPA = calcGPA(electGradePoints, electGpaHours);
     }
 
+
     /**
      * Calculates the GPA
      *
@@ -341,6 +331,7 @@ public class Audit {
         double scale = Math.pow(10, 3);
         return Math.round(GPA * scale) / scale;
     }
+
 
     /**
      * Prints the GPA as seen on the sample audit
