@@ -4,10 +4,12 @@ public class Main {
     public static void main(String args[]) throws IOException {
         TranscriptParser transcript =  new TranscriptParser(args[0]);
         Student curr = transcript.getStudent();
+        curr.printStudentInformation();
 
-        Audit auditHelper = new Audit(curr.getCourseList());
-        auditHelper.calculateGPA();
+        curr.setCurrentTrack(Concentration.DATA);
 
-        System.out.println(auditHelper.getCombinedGPA());
+        Audit auditHelper = new Audit(curr);
+        auditHelper.runAudit();
+        auditHelper.printGPA();
     }
 }

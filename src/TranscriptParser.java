@@ -35,9 +35,6 @@ public class TranscriptParser {
         // Fill the course information
         fillCourseInformation(currentStudent, transcript);
 
-        // Just to test the output
-        currentStudent.printStudentInformation();
-
     }
 
     /**
