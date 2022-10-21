@@ -1,4 +1,15 @@
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.apache.pdfbox.pdmodel.interactive.form.PDFieldTree;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 
 
 public class Form {
@@ -42,6 +53,35 @@ public class Form {
         }
         return courses;
     }
+    /**
+     
+     * @param fileName
+     * @throws IOException
+     */
+
+    public void fillForm(String fileName) throws IOException {
+
+        PDDocument pdfDocument = new PDDocument().load(new File(fileName));
+        PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
+        PDAcroForm acroForm = docCatalog.getAcroForm();
+        PDFieldTree fieldTree = acroForm.getFieldTree();
+        Iterator<PDField> fieldTreeIterator = fieldTree.iterator();
+        while (fieldTreeIterator.hasNext()) {
+            PDField f = fieldTreeIterator.next(); 
+            System.out.println(f);
+            System.out.println(f.getClass());
+            if (f.getClass().equals(PDTextField.class)){
+                f.setValue("test");
+            }
+            System.out.println(f);
+        }
+        PDAcroForm finalForm =new PDAcroForm(pdfDocument);
+        pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
+        pdfDocument.save(new File(".", "test.pdf"));
+        
+        
+    }
+
 
 
     /**
