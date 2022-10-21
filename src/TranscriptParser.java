@@ -82,7 +82,7 @@ public class TranscriptParser {
         String studentName = "";
         String studentId = "";
         String startDate = "";
-        String currentPlan = "";
+        String currentMajor = "";
 
         for(int i = 0; i < transcript.length; i++){
             // End the loop as soon as all the information has been filled
@@ -108,11 +108,11 @@ public class TranscriptParser {
             // Checks for the first major start date
             if(checkRegex(transcript[i], "Active in Program")) {
                 startDate = transcript[i].substring(0, 10);      // The date format in the transcript is 10 characters long
-                currentPlan = transcript[i-1].substring(9);
+                currentMajor = transcript[i-1].substring(9);
             }
         }
 
-        return new Student(studentName,studentId,startDate, currentPlan);
+        return new Student(studentName,studentId,startDate, currentMajor);
     }
 
     /**

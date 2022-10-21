@@ -1,7 +1,4 @@
-import DegreePlans.*;
-
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,15 +15,15 @@ import java.util.regex.Pattern;
 public class Audit {
     // Student variables
     private Student currentStudent;
-    private Concentration degreeTrack;
+    private Plan degreePlan;
 
     // Course Hashmaps
     private HashMap<String, List<StudentCourse>> courseMap;
     private HashMap<String, List<StudentCourse>> utdGPAMap;
 
     // GPA Variables
-    private List<String> coreCourseNumbers;
-    private List<String> electCourseNumbers;
+    private List<String> coreCourseList;
+    private List<String> electCourseList;
     private double combinedGPA;
     private double coreGPA;
     private double electiveGPA;
@@ -47,7 +44,7 @@ public class Audit {
      */
     public Audit(Student currentStudent){
         this.currentStudent = currentStudent;
-        degreeTrack = currentStudent.getCurrentTrack();
+        degreePlan = currentStudent.getCurrentTrack();
         courseMap = getClassMap(currentStudent.getCourseList());
         utdGPAMap = new HashMap<>();
 
@@ -143,9 +140,7 @@ public class Audit {
      * variables for the completed requirements
      */
     private void evaluateDegreePlan(){
-        Plan currentPlan = createDegreePlan();
-
-        fillCoreCourses(currentPlan);
+        fillCoreCourses();
         fillElectives();
     }
 
@@ -154,10 +149,15 @@ public class Audit {
      * This function retrieves all the core courses that the student has taken and populates
      * coreCourseNumbers with the mandatory core courses with the highest GPA value
      *
-     * @param currentPlan The current degree plan as it is represented on the form
+     *
      */
-    private void fillCoreCourses(Plan currentPlan){
+    private void fillCoreCourses(){
+        coreCourseList = new ArrayList<>(courseMap.keySet());
 
+        courseMap.forEach((key,value) -> {
+            if(degreePlan.isCore(key))
+                coreCourseList.add(key);
+        });
     }
 
 
@@ -179,51 +179,12 @@ public class Audit {
      * Fills the electives. The electives are basically anything that is not a core course
      */
     private void fillElectives(){
-        electCourseNumbers = new ArrayList<>(courseMap.keySet());
+        electCourseList = new ArrayList<>(courseMap.keySet());
 
-        coreCourseNumbers.forEach(course -> {
-            electCourseNumbers.remove(course);
+        electCourseList.forEach(course -> {
+            electCourseList.remove(course);
         });
 
-    }
-
-
-    /**
-     * Creates a degree plan object with the corresponding subclass
-     *
-     * @return Plan object that holds the degree requirements
-     */
-    private Plan createDegreePlan(){
-        Plan currentPlan = new Plan();
-
-        switch (degreeTrack){
-            case TRADITIONAL:
-                currentPlan = new TraditionalComputerScience();
-                break;
-            case NETWORKS:
-                currentPlan = new NetworksAndTelecommunication();
-                break;
-            case INTEL:
-                currentPlan = new IntelligentSystems();
-                break;
-            case INTERACTIVE:
-                currentPlan = new InteractiveComputing();
-                break;
-            case SYSTEMS:
-                currentPlan = new SystemsTrack();
-                break;
-            case DATA:
-                currentPlan = new DataScience();
-                break;
-            case CYBER:
-                currentPlan = new CyberSecurity();
-                break;
-            case SOFTWARE:
-                currentPlan = new SoftwareEngineering();
-                break;
-        }
-
-        return currentPlan;
     }
 
 
@@ -282,11 +243,11 @@ public class Audit {
             cumGradePoints += current.getPoints();
             cumGpaHours += current.getAttempted();
 
-            if(coreCourseNumbers.contains(current.getCourseNumber())){
+            if(coreCourseList.contains(current.getCourseNumber())){
                 coreGradePoints += current.getPoints();
                 coreGpaHours += current.getAttempted();
             }
-            else if(electCourseNumbers.contains(current.getCourseNumber())){
+            else if(electCourseList.contains(current.getCourseNumber())){
                 electGradePoints += current.getPoints();
                 electGpaHours += current.getAttempted();
             }

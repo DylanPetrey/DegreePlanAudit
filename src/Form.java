@@ -2,8 +2,6 @@ import java.util.*;
 
 
 public class Form {
-    
-    private Concentration concentration;
     private String studentName;
     private String studentID;
     private String semesterAdmitted;
@@ -47,7 +45,6 @@ public class Form {
     /**
      * Accessor methods to be used outside the class.
      */
-    public Concentration getConcentration(){ return this.concentration; }
     public String getStudenName(){return studentName; }
     public String getStudentID(){ return studentID; }
     public String getSemesterAdmitted(){ return semesterAdmitted; }
@@ -59,7 +56,6 @@ public class Form {
     /**
      * Mutator methods to be used outside the class.
      */
-    public void setConcentration(Concentration concentration){ this.concentration = concentration; }
     public void setStudenName(String studentName){ this.studentName = studentName; }
     public void setStudentID(String studentID){this.studentID = studentID; }
     public void setSemesterAdmitted(String semesterAdmitted){ this.semesterAdmitted = semesterAdmitted; }

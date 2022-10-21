@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Course {
     protected String courseNumber;
@@ -6,7 +7,9 @@ public class Course {
     protected CourseType type;
     public enum CourseType {
         CORE,
-        ELECTIVE, 
+        OPTIONAL,
+        ELECTIVE,
+        TRACK,
         PRE,
         OTHER;
     }
@@ -41,6 +44,14 @@ public class Course {
     public String toString() {
         return  courseNumber + " " +
                 courseDescription + " ";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Course)) return false;
+        Course course = (Course) o;
+        return Objects.equals(courseNumber, course.courseNumber);
     }
 
     /**
