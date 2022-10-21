@@ -7,8 +7,8 @@ public class Plan {
     protected String[] trackPrerequisites = new String[] {};
     protected int numOptional = 0;
 
-    public Plan(){
-
+    public Plan(type){
+        fillVariables(type)
     }
 
     public String[] getCore() { return core;}

@@ -1,6 +1,4 @@
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Student {
     // Student Variables
@@ -9,7 +7,7 @@ public class Student {
     private String startDate;
     private String currentPlan;
     private Concentration currentTrack;
-    private List<Course> courseList;
+    private List<StudentCourse> courseList;
 
     /**
      * Initializes the student object using basic information and creating a
@@ -38,7 +36,7 @@ public class Student {
      * @param transfer true if the course is transfer credit, false if utd credit.
      */
     public void addCourse(String line, String semester, boolean transfer){
-        Course newCourse = new Course(line, semester, transfer);
+        StudentCourse newCourse = new StudentCourse(line, semester, transfer);
         courseList.add(newCourse);
     }
 
@@ -61,12 +59,13 @@ public class Student {
    /**
     * Accessor methods to be used outside the class.
     */
-    public List<Course> getCourseList() { return courseList; }
+    public List<StudentCourse> getCourseList() { return courseList; }
     public String getStudentName(){ return studentName; }
     public String getStudentId(){ return studentId; }
     public String getStartDate(){ return startDate; }
     public String getCurrentPlan() { return currentPlan; }
     public Concentration getCurrentTrack() { return currentTrack; }
+
 
     /**
      * Mutator methods to be used outside the class.

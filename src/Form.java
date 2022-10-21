@@ -10,7 +10,7 @@ public class Form {
     private String anticipatedGraduation;
     private boolean isFastTrack;
     private boolean thesis;
-    private List<Course> courseList;
+    private List<StudentCourse> courseList;
 
     
 
@@ -54,7 +54,7 @@ public class Form {
     public String getAnticipatedGraduation(){ return anticipatedGraduation; }
     public boolean isFastTrack(){ return isFastTrack; }
     public boolean isThesis(){ return thesis; }
-    public List<Course> getCourseList() {return courseList; }
+    public List<StudentCourse> getCourseList() {return courseList; }
 
     /**
      * Mutator methods to be used outside the class.

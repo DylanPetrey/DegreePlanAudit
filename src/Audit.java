@@ -21,8 +21,8 @@ public class Audit {
     private Concentration degreeTrack;
 
     // Course Hashmaps
-    private HashMap<String, List<Course>> courseMap;
-    private HashMap<String, List<Course>> utdGPAMap;
+    private HashMap<String, List<StudentCourse>> courseMap;
+    private HashMap<String, List<StudentCourse>> utdGPAMap;
 
     // GPA Variables
     private List<String> coreCourseNumbers;
@@ -73,8 +73,8 @@ public class Audit {
      * @param classList List of courses
      * @return Hashmap of each unique course
      */
-    private HashMap<String, List<Course>> getClassMap(List<Course> classList){
-        HashMap<String, List<Course>> currentMap = new HashMap<>();
+    private HashMap<String, List<StudentCourse>> getClassMap(List<StudentCourse> classList){
+        HashMap<String, List<StudentCourse>> currentMap = new HashMap<>();
 
         classList.forEach(course -> {
             currentMap.computeIfAbsent(course.getCourseNumber(), k -> new ArrayList<>()).add(course);
@@ -91,7 +91,7 @@ public class Audit {
      * @param listOfCourses List of courses
      * @return index of the course with the highest GPA
      */
-    private int getMaxCourseIndex(List<Course> listOfCourses){
+    private int getMaxCourseIndex(List<StudentCourse> listOfCourses){
         if(listOfCourses.size() == 1){
             return 0;
         }
@@ -117,7 +117,7 @@ public class Audit {
      * @param listOfCourseNums List of courses numbers
      * @return index of the course with the highest GPA
      */
-    private int getMaxStringIndex(List<String> listOfCourseNums){
+    private int getMaxStringIndex(List<StudentCourse> listOfCourseNums){
         if(listOfCourseNums.size() == 1){
             return 0;
         }
@@ -126,7 +126,7 @@ public class Audit {
 
         for(int i = 1; i < listOfCourseNums.size(); i++){
             int maxCourseIndex = getMaxCourseIndex(courseMap.get(listOfCourseNums.get(i)));
-            Course maxCourse = courseMap.get(listOfCourseNums.get(i)).get(maxCourseIndex);
+            StudentCourse maxCourse = courseMap.get(listOfCourseNums.get(i)).get(maxCourseIndex);
 
             if(maxGrade < maxCourse.getPoints()){
                 maxIndex = i;
@@ -157,21 +157,7 @@ public class Audit {
      * @param currentPlan The current degree plan as it is represented on the form
      */
     private void fillCoreCourses(Plan currentPlan){
-        String[] totalCore = currentPlan.getCore();
-        List<String> corePlanNum = getIntersectionNumbers(courseMap, totalCore);
-        List<String> optPlanNum = getIntersectionNumbers(courseMap, currentPlan.getOptionalCore());
 
-        // Fill in core courses
-        coreCourseNumbers = new ArrayList<>(corePlanNum);
-        int fillOpt = currentPlan.getNumOptional();
-
-        while(fillOpt != 0 && optPlanNum.size() != 0){
-            int maxIndex = getMaxStringIndex(optPlanNum);
-            coreCourseNumbers.add(optPlanNum.get(maxIndex));
-            optPlanNum.remove(maxIndex);
-
-            fillOpt--;
-        }
     }
 
 
@@ -184,12 +170,6 @@ public class Audit {
      */
     private List<String> getIntersectionNumbers(HashMap<String, List<Course>> original, String[]  compare){
         List<String> currentList = new ArrayList<>();
-
-        for(String currentCourseNumber : compare){
-            if(original.containsKey(currentCourseNumber)){
-                currentList.add(currentCourseNumber);
-            }
-        }
 
         return currentList;
     }
@@ -266,7 +246,7 @@ public class Audit {
 
         // Loop over Hashmap
         courseMap.forEach((courseNumber, courseList) -> {
-            List<Course> currentCourseList = new ArrayList<>();
+            List<StudentCourse> currentCourseList = new ArrayList<>();
 
             // Loop over each repeated class
             courseList.forEach(course -> {
@@ -296,8 +276,8 @@ public class Audit {
         double electGpaHours = 0;
 
         // Looping over each key in the HashMap
-        for (Map.Entry<String, List<Course>> mapElement : utdGPAMap.entrySet()) {
-            Course current = mapElement.getValue().get(getMaxCourseIndex(mapElement.getValue()));
+        for (Map.Entry<String, List<StudentCourse>> mapElement : utdGPAMap.entrySet()) {
+            StudentCourse current = mapElement.getValue().get(getMaxCourseIndex(mapElement.getValue()));
 
             cumGradePoints += current.getPoints();
             cumGpaHours += current.getAttempted();
