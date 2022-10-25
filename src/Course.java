@@ -9,6 +9,7 @@ public class Course {
         CORE,
         OPTIONAL,
         ELECTIVE,
+        ADDITIONAL,
         TRACK,
         PRE,
         OTHER;
@@ -25,7 +26,6 @@ public class Course {
         this.courseDescription = courseDescription;
         this.type = type;
     }
-
 
 
     /**
@@ -47,10 +47,12 @@ public class Course {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Course)) return false;
-        Course course = (Course) o;
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!obj.getClass().isAssignableFrom(this.getClass())) {
+            return false;
+        }
+        Course course = (Course) obj;
         return Objects.equals(courseNumber, course.courseNumber);
     }
 

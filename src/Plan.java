@@ -19,15 +19,17 @@ public class Plan {
     }
 
 
-    public Plan(String degreePlan) throws Exception {
+    public Plan(String degreePlan) {
         setConcentration(degreePlan);
     }
 
-    public void setDegreePlan(String degreePlan) throws Exception {
+    public void setDegreePlan(String degreePlan) {
         setConcentration(degreePlan);
     }
 
-    private void setConcentration(String degreePlan) throws Exception {
+
+
+    private void setConcentration(String degreePlan) {
         switch (degreePlan) {
             case "Traditional":
                 currentPlan = concentration.TRADITIONAL;
@@ -61,8 +63,6 @@ public class Plan {
                 currentPlan = concentration.SOFTWARE;
                 softwareEngineering();
                 break;
-            default:
-                throw new Exception("Exception message");
         }
     }
 
@@ -249,14 +249,38 @@ public class Plan {
         };
     }
 
-    public boolean isCore(String courseNumber){
-        for(Course currentCore : requiredCore){
-            if(courseNumber.equals(currentCore.getCourseNumber()))
+    public boolean isCore(Course courseNumber){
+        for(Course currentClass : requiredCore){
+            if(courseNumber.equals(currentClass))
                 return true;
         }
-
         return false;
     }
+
+    public boolean isOpt(Course courseNumber){
+        for(Course currentClass : optionalCore){
+            if(courseNumber.equals(currentClass))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isTrack(Course courseNumber){
+        for(Course currentClass : trackPrerequisites){
+            if(courseNumber.equals(currentClass))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isPre(Course courseNumber){
+        for(Course currentClass : admissionPrerequisites){
+            if(courseNumber.equals(currentClass))
+                return true;
+        }
+        return false;
+    }
+
 
     public int getNumOptional() { return numOptional; }
     public Course[] getCore() { return requiredCore;}

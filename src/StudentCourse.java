@@ -1,23 +1,21 @@
 import java.util.Arrays;
 
 public class StudentCourse extends Course {
-    private String letterGrade;
-    private String semester;
-    private double attempted;
-    private double earned;
-    private double points;
-    private boolean isTransfer;
-    private boolean isWaived;
+    private String letterGrade = "";
+    private String semester = "";
+    private double attempted = 0;
+    private double earned = 0;
+    private double points = 0;
+    private boolean isTransfer = false;
+    private boolean isWaived = false;
+
+    public StudentCourse(){
+
+    }
 
     public StudentCourse(String input, String semester, boolean transfer) {
-        this.attempted = 0;
-        this.earned = 0;
-        this.letterGrade = "";
-        this.points = 0;
-
         this.semester = semester;
         this.isTransfer = transfer;
-        this.isWaived = false;
 
         processInput(input);
     }
