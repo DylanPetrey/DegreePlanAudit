@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * TODO:
@@ -16,14 +18,14 @@ public class Audit {
     private Plan degreePlan;
 
     // Course Hashmaps
-    private HashMap<String, List<StudentCourse>> courseMap;
-    private HashMap<String, List<StudentCourse>> utdGPAMap;
+    private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();;
+    private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();;
 
 
     // GPA Variables
-    private double combinedGPA;
-    private double coreGPA;
-    private double electiveGPA;
+    private double combinedGPA = 0;
+    private double coreGPA = 0;
+    private double electiveGPA = 0;
 
     // Requirement Variables
     private final double MIN_CORE_GPA = 3.19;
@@ -43,11 +45,6 @@ public class Audit {
         this.currentStudent = currentStudent;
         degreePlan = currentStudent.getCurrentTrack();
         courseMap = getClassMap(currentStudent.getCourseList());
-        utdGPAMap = new HashMap<>();
-
-        combinedGPA = 0;
-        coreGPA = 0;
-        electiveGPA = 0;
     }
 
 
@@ -55,7 +52,8 @@ public class Audit {
      * Performs all three parts of the audit. Basically to a main method for the class
      */
     public void runAudit(){
-        //calculateGPA();
+        calculateGPA();
+        printGPA();
     }
 
 
@@ -78,10 +76,9 @@ public class Audit {
 
 
 
-/*
     /**
      * This function runs the gpa calculation
-     *
+     */
     private void calculateGPA(){
         validateGPACourses();
         calculateGPAValues();
@@ -91,7 +88,7 @@ public class Audit {
     /**
      * This function fills in a hashmap of all courses completed at utd with a
      * valid grade A-F
-     *
+     */
     private void validateGPACourses(){
         // validate correct grade values
         Pattern stringPattern = Pattern.compile("(^[A-F])(?=\\+|-|$)");
@@ -118,7 +115,7 @@ public class Audit {
     /**
      * This function calculates the GPA given the utd classes and updates the GPA
      * value rounded to 3 decimal places for core, elective and combined
-     *
+     */
     private void calculateGPAValues(){
         double cumGradePoints = 0;
         double cumGpaHours = 0;
@@ -129,16 +126,16 @@ public class Audit {
 
         // Looping over each key in the HashMap
         for (Map.Entry<String, List<StudentCourse>> mapElement : utdGPAMap.entrySet()) {
-            StudentCourse current = mapElement.getValue().get(getMaxCourseIndex(mapElement.getValue()));
+            StudentCourse current = currentStudent.getMaxCourseGPA(mapElement.getValue());
 
             cumGradePoints += current.getPoints();
             cumGpaHours += current.getAttempted();
 
-            if(coreReqList.contains(current.getCourseNumber())){
+            if(current.type == Course.CourseType.CORE){
                 coreGradePoints += current.getPoints();
                 coreGpaHours += current.getAttempted();
             }
-            else if(electCourseList.contains(current.getCourseNumber())){
+            else if(current.type == Course.CourseType.ELECTIVE || current.type == Course.CourseType.ADDITIONAL){
                 electGradePoints += current.getPoints();
                 electGpaHours += current.getAttempted();
             }

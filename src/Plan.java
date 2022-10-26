@@ -27,8 +27,6 @@ public class Plan {
         setConcentration(degreePlan);
     }
 
-
-
     private void setConcentration(String degreePlan) {
         switch (degreePlan) {
             case "Traditional":

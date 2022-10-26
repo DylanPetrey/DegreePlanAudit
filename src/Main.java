@@ -9,7 +9,7 @@ public class Main {
         Plan track = new Plan("Data Science");
         curr.setCurrentTrack(track);
 
-        //Audit auditHelper = new Audit(curr);
-        //auditHelper.runAudit();
+        Audit auditHelper = new Audit(curr);
+        auditHelper.runAudit();
     }
 }

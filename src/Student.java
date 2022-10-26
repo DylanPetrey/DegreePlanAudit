@@ -102,14 +102,19 @@ public class Student {
 
         for(int i = 0; i < otherList.size(); i++){
             StudentCourse currentCourse = otherList.get(i);
-            int currentNum = Integer.parseInt(currentCourse.getCourseNumber().split(" ")[1]);
-
-            if(currentNum >= 6000 && numElectHours > 0){
-                setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ELECTIVE);
-                numElectHours -= currentCourse.getAttempted();
-            } else if (5000 <= currentNum && currentNum < 6000) {
+            try {
+                int currentNum = Integer.parseInt(currentCourse.getCourseNumber().split(" ")[1]);
+                if(currentNum >= 6000 && numElectHours > 0){
+                    setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ELECTIVE);
+                    numElectHours -= currentCourse.getAttempted();
+                } else if (5000 <= currentNum && currentNum < 6000) {
+                    setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ADDITIONAL);
+                }
+            } catch (NumberFormatException e){
                 setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ADDITIONAL);
             }
+
+
         }
     }
 
@@ -120,7 +125,7 @@ public class Student {
      * @param listOfCourses List of courses that the function will loop through.
      * @return Course object that has the highest GPA
      */
-    private StudentCourse getMaxCourseGPA(List<StudentCourse> listOfCourses){
+    public StudentCourse getMaxCourseGPA(List<StudentCourse> listOfCourses){
         double maxGPA = 0;
         StudentCourse maxCourse = new StudentCourse();
 
@@ -144,7 +149,7 @@ public class Student {
      * @param gpaHours number of hours
      * @return returns the gpa rounded to 3 decimal places
      */
-    private double calcGPA(double gpaPoints, double gpaHours ){
+    private double calcGPA(double gpaPoints, double gpaHours){
         double GPA = gpaPoints / gpaHours;
 
         double scale = Math.pow(10, 3);
@@ -153,7 +158,7 @@ public class Student {
 
 
     /**
-     * Modifies the type of a course in the courseList
+     * Modifies the courseType of a course in the courseList
      *
      * @param number String of the course number
      * @param type Type to set the course type to
