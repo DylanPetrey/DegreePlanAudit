@@ -2,15 +2,13 @@ import java.util.*;
 
 
 public class Form {
-    
-    private Concentration concentration;
     private String studentName;
     private String studentID;
     private String semesterAdmitted;
     private String anticipatedGraduation;
     private boolean isFastTrack;
     private boolean thesis;
-    private List<Course> courseList;
+    private List<StudentCourse> courseList;
 
     
 
@@ -47,19 +45,17 @@ public class Form {
     /**
      * Accessor methods to be used outside the class.
      */
-    public Concentration getConcentration(){ return this.concentration; }
     public String getStudenName(){return studentName; }
     public String getStudentID(){ return studentID; }
     public String getSemesterAdmitted(){ return semesterAdmitted; }
     public String getAnticipatedGraduation(){ return anticipatedGraduation; }
     public boolean isFastTrack(){ return isFastTrack; }
     public boolean isThesis(){ return thesis; }
-    public List<Course> getCourseList() {return courseList; }
+    public List<StudentCourse> getCourseList() {return courseList; }
 
     /**
      * Mutator methods to be used outside the class.
      */
-    public void setConcentration(Concentration concentration){ this.concentration = concentration; }
     public void setStudenName(String studentName){ this.studentName = studentName; }
     public void setStudentID(String studentID){this.studentID = studentID; }
     public void setSemesterAdmitted(String semesterAdmitted){ this.semesterAdmitted = semesterAdmitted; }
