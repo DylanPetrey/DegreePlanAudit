@@ -1,0 +1,21 @@
+{
+    "numOptional":3,
+    "requiredCore":[
+        {"courseNumber":"CS 6326", "courseDescription":"Human Computer Interaction"},
+        {"courseNumber":"CS 6363", "courseDescription":"Design and Analysis of Computer Algorithms"}
+    ],
+    "optionalCore":[
+        {"courseNumber":"CS 6323", " courseDescription":"Computer Animation and Gaming"},
+        {"courseNumber":"CS 6328", " courseDescription":"Modeling and Simulation"},
+        {"courseNumber":"CS 6331", " courseDescription":"Multimedia Systems"},
+        {"courseNumber":"CS 6334", " courseDescription":"Virtual Reality"},
+        {"courseNumber":"CS 6366", " courseDescription":"Computer Graphics"}
+    ],
+    "admissionPrerequisites":[
+        {"courseNumber":"CS 5303", "courseDescription":"Computer Science I"},
+        {"courseNumber":"CS 5330", "courseDescription":"Computer Science II"},
+        {"courseNumber":"CS 5333", "courseDescription":"Discrete Structures"},
+        {"courseNumber":"CS 5343", "courseDescription":"Algorithm Analysis & Data Structures"},
+        {"courseNumber":"CS 5348", "courseDescription":"Operating System Concepts"}
+    ]
+}

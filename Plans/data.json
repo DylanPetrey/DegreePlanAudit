@@ -1,0 +1,24 @@
+{
+    "numOptional":1,
+    "requiredCore":[
+        {"courseNumber":"CS 6313", "courseDescription":"Statistical Methods for Data Sciences"},
+        {"courseNumber":"CS 6350", "courseDescription":"Big Data Management and Analytics"},
+        {"courseNumber":"CS 6363", "courseDescription":"Design and Analysis of Computer Algorithms"},
+        {"courseNumber":"CS 6375", "courseDescription":"Machine Learning"}
+    ],
+    "optionalCore":[
+        {"courseNumber":"CS 6301", "courseDescription":"Social Network Analytics"},
+        {"courseNumber":"CS 6320", "courseDescription":"Natural Language Processing"},
+        {"courseNumber":"CS 6327", "courseDescription":"Video Analytics"},
+        {"courseNumber":"CS 6347", "courseDescription":"Statistics for Machine Learning"},
+        {"courseNumber":"CS 6360", "courseDescription":"Database Design"}
+    ],
+    "admissionPrerequisites":[
+        {"courseNumber":"CS 5303", "courseDescription":"Computer Science I"},
+        {"courseNumber":"CS 5330", "courseDescription":"Computer Science II"},
+        {"courseNumber":"CS 5333", "courseDescription":"Discrete Structures"},
+        {"courseNumber":"CS 5343", "courseDescription":"Algorithm Analysis & Data Structures"},
+        {"courseNumber":"CS 5348", "courseDescription":"Operating System Concepts"},
+        {"courseNumber":"CS 3341", "courseDescription":"Probability & Statistics in CS"}
+    ]
+}

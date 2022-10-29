@@ -1,0 +1,22 @@
+{
+    "numOptional":2,
+    "requiredCore": [
+        {"courseNumber": "CS 6363", "courseDescription": "Design and Analysis of Computer Algorithms"},
+        {"courseNumber": "CS 6378", "courseDescription": "Advanced Operating Systems"},
+        {"courseNumber": "CS 6390", "courseDescription": "Advanced Computer Networks"}
+    ],
+    "optionalCore": [
+        {"courseNumber": "CS 6353", "courseDescription": "Compiler Construction"},
+        {"courseNumber": "CS 6360", "courseDescription": "Database Design"},
+        {"courseNumber": "CS 6371","courseDescription": "Advanced Programming Languages"}
+    ],
+    "admissionPrerequisites": [
+        {"courseNumber": "CS 5303","courseDescription": "Computer Science I"},
+        {"courseNumber": "CS 5330", "courseDescription": "Computer Science II"},
+        {"courseNumber": "CS 5333", "courseDescription": "Discrete Structures"},
+        {"courseNumber": "CS 5343", "courseDescription": "Algorithm Analysis & Data Structures"},
+        {"courseNumber": "CS 5348", "courseDescription": "Operating System Concepts"},
+        {"courseNumber": "CS 5349", "courseDescription": "Automata Theory"},
+        {"courseNumber": "CS 5390", "courseDescription": "Computer Networks"}
+    ]
+}

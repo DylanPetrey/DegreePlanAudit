@@ -1,0 +1,19 @@
+{
+    "requiredCore":[
+        {"courseNumber":"CS 6352", "courseDescription":"Perf. of Computer Systems and Networks"},
+        {"courseNumber":"CS 6363", "courseDescription":"Design and Analysis of Computer Algorithms"},
+        {"courseNumber":"CS 6378", "courseDescription":"Advanced Operating Systems"},
+        {"courseNumber":"CS 6385", "courseDescription":"Algorithmic Aspects of Telecomm. Networks"},
+        {"courseNumber":"CS 6390", "courseDescription":"Advanced Computer Networks"}
+    ],
+    "admissionPrerequisites":[
+        {"courseNumber":"CS 5303", "courseDescription":"Computer Science I"}, 
+        {"courseNumber":"CS 5330", "courseDescription":"Computer Science II"},
+        {"courseNumber":"CS 5333", "courseDescription":"Discrete Structures"},
+        {"courseNumber":"CS 5343", "courseDescription":"Algorithm Analysis & Data Structures"},
+        {"courseNumber":"CS 5348", "courseDescription":"Operating System Concepts"},
+        {"courseNumber":"CS 5390", "courseDescription":"Computer Networks"},
+        {"courseNumber":"CS 3341", "courseDescription":"Probability & Statistics in CS"}
+    ]
+
+}
