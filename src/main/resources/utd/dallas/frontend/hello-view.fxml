@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.HelloController">
+   <content>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="865.0" prefWidth="600.0">
+         <children>
+            <Button layoutX="49.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#onSWEButtonClick" prefHeight="70.0" prefWidth="200.0" text="Software Engineering" />
+            <Button layoutX="347.0" layoutY="49.0" mnemonicParsing="false" onMouseClicked="#onCSButtonClick" prefHeight="70.0" prefWidth="200.0" text="Computer Science" />
+            <ChoiceBox fx:id="trackBox" layoutX="225.0" layoutY="158.0" prefWidth="150.0" value="Track" />
+            <Pane layoutX="49.0" layoutY="199.0" prefHeight="155.0" prefWidth="200.0">
+               <children>
+                  <TextField fx:id="studentName" layoutX="14.0" layoutY="8.0" />
+                  <TextField fx:id="studentID" layoutX="14.0" layoutY="65.0" />
+                  <TextField fx:id="studentSemAdmitted" layoutX="14.0" layoutY="108.0" />
+                  <Label layoutX="14.0" layoutY="40.0" prefHeight="18.0" prefWidth="119.0" text="Name of utd.dallas.backend.Student" />
+                  <Label layoutX="14.0" layoutY="90.0" prefHeight="18.0" prefWidth="101.0" text="utd.dallas.backend.Student ID" />
+                  <Label layoutX="14.0" layoutY="132.0" prefHeight="18.0" prefWidth="152.0" text="Semester Admitted" />
+               </children>
+            </Pane>
+            <Pane layoutX="347.0" layoutY="199.0" prefHeight="155.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="14.0" layoutY="123.0" text="Anticipated Graduation" />
+                  <TextField fx:id="anticipatedGrad" layoutX="14.0" layoutY="98.0" />
+                  <CheckBox fx:id="fastTrack" layoutX="14.0" layoutY="28.0" mnemonicParsing="false" text="FT" />
+                  <CheckBox fx:id="thesis" layoutX="14.0" layoutY="69.0" mnemonicParsing="false" text="Thesis" />
+               </children>
+            </Pane>
+            <Button fx:id="printButton" layoutX="472.0" layoutY="389.0" mnemonicParsing="false" text="Print" onMouseClicked="#onPrintButtonClick"/>
+         </children>
+      </AnchorPane>
+   </content>
+</ScrollPane>
