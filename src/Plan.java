@@ -35,63 +35,75 @@ public class Plan {
 
     };
 
-    private int numOptional = 0;
+    private JSONObject obj = new JSONObject();
+    private long numOptional = 0;
     private Concentration concentration;
     private List<Course> requiredCore = new ArrayList<Course>();
     private List<Course> optionalCore = new ArrayList<Course>();
     private List<Course> admissionPrerequisites = new ArrayList<Course>();
     private List<Course> trackPrerequisites = new ArrayList<Course>();
-    private List<Course> excludedElectives = new ArrayList<Course>();
+    private List<String> excludedElectives = new ArrayList<String>();
 
     Plan(Concentration concentration) {
         this.concentration = concentration;
         setConcentration(concentration);
     }
 
-    private static Course parseCourse(JSONObject obj) {
-        Course course = new Course();
-        course.setCourseNumber((String) obj.get("courseNumber"));
-        course.setCourseDescription((String) obj.get("courseDescription"));
-        return course;
+    private List<String> toList(List<String> obj) {
+        List<String> list = new ArrayList<>();
+        if(obj.size() == 0)
+            return list;
+
+        Iterator<?> it = obj.iterator();
+        while (it.hasNext()) {
+            String currentNum = (String) it.next();
+            if(currentNum != "")
+                list.add(currentNum );
+        }
+        return list;
     }
 
     private List<Course> toList(JSONArray array, Course.CourseType type) {
         List<Course> list = new ArrayList<>();
+        if(array == null)
+            return list;
+
         Iterator<?> it = array.iterator();
         while (it.hasNext()) {
-            list.add(parseCourse((JSONObject) it.next()));
+            JSONObject currentCourse = (JSONObject) it.next();
+            String num = (String) currentCourse.get("courseNumber");
+            String title = (String) currentCourse.get("courseDescription");
+            list.add(new Course(num, title, type));
         }
         return list;
     }
 
     public void setConcentration(Concentration type) {
-        String s = "Plans/" + type.toString().toLowerCase() + ".json";
-        System.out.println(s);
+        String JSONfilename = "JSONobjects/degreeRequirements.json";
         JSONParser parser = new JSONParser();
 
         try {
-            Object obj = parser.parse(new FileReader(s));
+            Object obj = parser.parse(new FileReader(JSONfilename));
 
             JSONObject jsonObject = (JSONObject) obj;
-            Integer temp = (Integer) jsonObject.get("numOptional");
-            if (temp != null) {
-                this.numOptional = temp;
-            }
+            JSONObject jsonCurrentPlan = (JSONObject) jsonObject.get(type.toString());
+            this.numOptional = (long) jsonCurrentPlan.get("numOptional");
 
-            JSONArray requiredCore = (JSONArray) jsonObject.get("requiredCore");
+            JSONArray requiredCore = (JSONArray) jsonCurrentPlan.get("requiredCore");
             this.requiredCore = toList(requiredCore, Course.CourseType.CORE);
 
-            JSONArray optionalCore = (JSONArray) jsonObject.get("optionalCore");
+            JSONArray optionalCore = (JSONArray) jsonCurrentPlan.get("optionalCore");
             this.optionalCore = toList(optionalCore, Course.CourseType.OPTIONAL);
 
-            JSONArray admissionPrerequisite = (JSONArray) jsonObject.get("admissionPrerequisite");
+            JSONArray admissionPrerequisite = (JSONArray) jsonCurrentPlan.get("admissionPrerequisites");
             this.admissionPrerequisites = toList(admissionPrerequisite, Course.CourseType.PRE);
 
-            JSONArray trackPrerequisite = (JSONArray) jsonObject.get("trackPrerequisite");
+            JSONArray trackPrerequisite = (JSONArray) jsonCurrentPlan.get("trackPrerequisites");
             this.trackPrerequisites = toList(trackPrerequisite, Course.CourseType.TRACK);
 
-            JSONArray excludedElective = (JSONArray) jsonObject.get("excludedElective");
-            this.excludedElectives = toList(excludedElective, Course.CourseType.ELECTIVE);
+            List<String> excludedElective = (List) jsonCurrentPlan.get("excludedElectives");
+            this.excludedElectives = toList(excludedElective);
+            System.out.println();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -134,22 +146,18 @@ public class Plan {
         return false;
     }
 
-    public int getNumOptional() {
+    public long getNumOptional() {
         return numOptional;
     }
-
     public List<Course> getCore() {
         return requiredCore;
     }
-
     public List<Course> getOptionalCore() {
         return optionalCore;
     }
-
     public List<Course> getAdmissionPrerequisites() {
         return admissionPrerequisites;
     }
-
     public List<Course> getTrackPrerequisites() {
         return trackPrerequisites;
     }
