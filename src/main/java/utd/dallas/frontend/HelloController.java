@@ -28,7 +28,7 @@ public class HelloController {
 
     @FXML
     protected void initialize() {
-
+        onSWEButtonClick();
     }
 
     @FXML
@@ -38,6 +38,7 @@ public class HelloController {
 
         trackBox.getItems().clear();
         trackBox.getItems().addAll(list);
+        trackBox.setValue(list.get(0));
     }
 
     @FXML
@@ -53,6 +54,7 @@ public class HelloController {
 
         trackBox.getItems().clear();
         trackBox.getItems().addAll(list);
+        trackBox.setValue(list.get(0));
     }
 
     @FXML

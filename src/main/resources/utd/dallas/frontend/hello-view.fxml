@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 
-<ScrollPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.HelloController">
+<ScrollPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.HelloController">
    <content>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="865.0" prefWidth="600.0">
          <children>
@@ -21,8 +21,8 @@
                   <TextField fx:id="studentName" layoutX="14.0" layoutY="8.0" />
                   <TextField fx:id="studentID" layoutX="14.0" layoutY="65.0" />
                   <TextField fx:id="studentSemAdmitted" layoutX="14.0" layoutY="108.0" />
-                  <Label layoutX="14.0" layoutY="40.0" prefHeight="18.0" prefWidth="119.0" text="Name of utd.dallas.backend.Student" />
-                  <Label layoutX="14.0" layoutY="90.0" prefHeight="18.0" prefWidth="101.0" text="utd.dallas.backend.Student ID" />
+                  <Label layoutX="14.0" layoutY="40.0" prefHeight="18.0" prefWidth="119.0" text="Name of Student" />
+                  <Label layoutX="14.0" layoutY="90.0" prefHeight="18.0" prefWidth="101.0" text="Student ID" />
                   <Label layoutX="14.0" layoutY="132.0" prefHeight="18.0" prefWidth="152.0" text="Semester Admitted" />
                </children>
             </Pane>
