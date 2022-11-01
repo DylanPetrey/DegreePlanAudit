@@ -6,7 +6,7 @@ public class Main {
         Student curr = transcript.getStudent();
         curr.printStudentInformation();
 
-        Plan track = new Plan("Data Science");
+        Plan track = new Plan(Plan.Concentration.DATA);
         curr.setCurrentTrack(track);
 
         Audit auditHelper = new Audit(curr);

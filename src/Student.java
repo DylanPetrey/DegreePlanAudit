@@ -74,7 +74,7 @@ public class Student {
      */
     private void setOptionalCore(){
         List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
-        int numOpt = currentTrack.getNumOptional();
+        long numOpt = currentTrack.getNumOptional();
 
         // Optional courses to be changed into core
         while (numOpt > 0 && coreOptList.size() != 0){
