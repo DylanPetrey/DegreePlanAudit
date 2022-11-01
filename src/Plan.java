@@ -13,7 +13,6 @@ import org.json.simple.parser.ParseException;
 public class Plan {
 
     public enum Concentration {
-
         TRADITIONAL("Traditional"),
         NETWORKS("Networks and Telecommunications"),
         INTEL("Intelligent Systems"),
@@ -44,11 +43,21 @@ public class Plan {
     private List<Course> trackPrerequisites = new ArrayList<Course>();
     private List<String> excludedElectives = new ArrayList<String>();
 
+    /**
+     * Initializes the plan object and sets the objects to the initial value
+     *
+     * @param concentration List of courses
+     */
     Plan(Concentration concentration) {
         this.concentration = concentration;
         setConcentration(concentration);
     }
 
+    /**
+     * Sets a
+     *
+     * @param obj List of course numbers from the JSON
+     */
     private List<String> toList(List<String> obj) {
         List<String> list = new ArrayList<>();
         if(obj.size() == 0)
@@ -58,11 +67,18 @@ public class Plan {
         while (it.hasNext()) {
             String currentNum = (String) it.next();
             if(currentNum != "")
-                list.add(currentNum );
+                list.add(currentNum);
         }
         return list;
     }
 
+    /**
+     * Creates a list of courses from a JSON object
+     *
+     * @param array JSON object of a courses from the degreeRequirements json
+     * @param type The course type to initialize the courses with
+     * @return a list of courses
+     */
     private List<Course> toList(JSONArray array, Course.CourseType type) {
         List<Course> list = new ArrayList<>();
         if(array == null)
@@ -78,6 +94,11 @@ public class Plan {
         return list;
     }
 
+    /**
+     * Parses the JSON and fills in the plan variables
+     *
+     * @param type The course type to get the degree requirements from the json
+     */
     public void setConcentration(Concentration type) {
         String JSONfilename = "JSONobjects/degreeRequirements.json";
         JSONParser parser = new JSONParser();
@@ -114,6 +135,12 @@ public class Plan {
         }
     }
 
+    /**
+     * Checks if a course is a core course
+     *
+     * @param courseNumber Course number to identify the course
+     * @return true/false if the course is a core course
+     */
     public boolean isCore(Course courseNumber) {
         for (Course currentClass : requiredCore) {
             if (courseNumber.equals(currentClass))
@@ -122,6 +149,12 @@ public class Plan {
         return false;
     }
 
+    /**
+     * Checks if a course is an optional core course
+     *
+     * @param courseNumber Course number to identify the course
+     * @return true/false if the course is an optional core course
+     */
     public boolean isOpt(Course courseNumber) {
         for (Course currentClass : optionalCore) {
             if (courseNumber.equals(currentClass))
@@ -130,6 +163,12 @@ public class Plan {
         return false;
     }
 
+    /**
+     * Checks if a course is a track course
+     *
+     * @param courseNumber Course number to identify the course
+     * @return true/false if the course is a track course
+     */
     public boolean isTrack(Course courseNumber) {
         for (Course currentClass : trackPrerequisites) {
             if (courseNumber.equals(currentClass))
@@ -138,6 +177,12 @@ public class Plan {
         return false;
     }
 
+    /**
+     * Checks if a course is a prerequisite
+     *
+     * @param courseNumber Course number to identify the course
+     * @return true/false if the course is a prerequisite
+     */
     public boolean isPre(Course courseNumber) {
         for (Course currentClass : admissionPrerequisites) {
             if (courseNumber.equals(currentClass))
@@ -146,6 +191,9 @@ public class Plan {
         return false;
     }
 
+    /**
+     * Accessor methods to be used outside the class.
+     */
     public long getNumOptional() {
         return numOptional;
     }
@@ -161,5 +209,5 @@ public class Plan {
     public List<Course> getTrackPrerequisites() {
         return trackPrerequisites;
     }
-
+    public List<String> getExcludedElectives() { return excludedElectives; }
 }
