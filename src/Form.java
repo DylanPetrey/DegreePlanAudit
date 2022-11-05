@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
@@ -17,6 +19,7 @@ public class Form {
     private String studentID;
     private String semesterAdmitted;
     private String anticipatedGraduation;
+    private Plan.Concentration concentration;
     private boolean isFastTrack;
     private boolean thesis;
     private List<StudentCourse> courseList;
@@ -32,6 +35,7 @@ public class Form {
         this.studentID = currentStudent.getStudentId();
         this.semesterAdmitted = "";
         this.anticipatedGraduation = "";
+        //this.concentration = currentStudent.concentration;
         this.isFastTrack = false;
         this.thesis = false;
         this.courseList = currentStudent.getCourseList();
@@ -57,21 +61,20 @@ public class Form {
      * @throws IOException
      */
 
-    public void fillForm(String fileName) throws IOException {
+    public void fillForm(Plan.Concentration concentration) throws IOException {
 
-        PDDocument pdfDocument = new PDDocument().load(new File(fileName));
+        String loc = "Forms/DP-" + concentration.toString() + ".pdf"; 
+        PDDocument pdfDocument = PDDocument.load(new File(loc));
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
         PDAcroForm acroForm = docCatalog.getAcroForm();
-        PDFieldTree fieldTree = acroForm.getFieldTree();
-        Iterator<PDField> fieldTreeIterator = fieldTree.iterator();
+        Iterator<PDField> fieldTreeIterator = acroForm.getFieldIterator();
+        
         while (fieldTreeIterator.hasNext()) {
             PDField f = fieldTreeIterator.next(); 
-            System.out.println(f);
-            System.out.println(f.getClass());
+            COSDictionary obj = f.getCOSObject();
             if (f.getClass().equals(PDTextField.class)){
-                f.setValue("test");
+                f.setValue("run");
             }
-            System.out.println(f);
         }
         PDAcroForm finalForm =new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);

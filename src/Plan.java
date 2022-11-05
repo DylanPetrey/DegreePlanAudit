@@ -14,13 +14,13 @@ public class Plan {
 
     public enum Concentration {
         TRADITIONAL("Traditional"),
-        NETWORKS("Networks and Telecommunications"),
-        INTEL("Intelligent Systems"),
-        CYBER("Cyber Security"),
-        INTERACTIVE("Interactive Computing"),
+        NETWORKS("Networks-and-Telecommunications"),
+        INTEL("Intelligent-Systems"),
+        CYBER("Cyber-Security"),
+        INTERACTIVE("Interactive-Computing"),
         SYSTEMS("Systems"),
-        DATA("Data Science"),
-        SOFTWARE("Software Engineering");
+        DATA("Data-Science"),
+        SOFTWARE("Software-Engineering");
 
         private String concenString;
 
