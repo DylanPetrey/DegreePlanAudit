@@ -2,7 +2,8 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String args[]) throws Exception {
-        TranscriptParser transcript =  new TranscriptParser(args[0]);
+        String inputFilePath = "SampleTranscripts/Sample3.pdf";
+        TranscriptParser transcript =  new TranscriptParser(inputFilePath);
         Student curr = transcript.getStudent();
         curr.printStudentInformation();
 

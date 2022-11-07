@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,7 +101,7 @@ public class Audit {
             // Loop over each repeated class
             courseList.forEach(course -> {
                 Matcher m = stringPattern.matcher(course.getLetterGrade());
-                if(!m.find() || course.isTransfer())
+                if(!m.find() || (course.isTransfer() && !course.isFast()))
                     return;
 
                 currentCourseList.add(course);
@@ -131,6 +132,12 @@ public class Audit {
             cumGradePoints += current.getPoints();
             cumGpaHours += current.getAttempted();
 
+            List<Course> coreList = new ArrayList<>();
+            currentStudent.getCourseList().stream()
+                    .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
+                    .forEach(coreList::add);
+
+
             if(current.type == Course.CourseType.CORE){
                 coreGradePoints += current.getPoints();
                 coreGpaHours += current.getAttempted();
@@ -147,6 +154,44 @@ public class Audit {
     }
 
 
+    private double calcGPA(List<StudentCourse> courseList){
+        final double A_GRADEPTS = 4.000;
+        final double A_MINUS_GRADEPTS = 3.670;
+        final double B_PLUS_GRADEPTS = 3.330;
+        final double B_GRADEPTS = 3.000;
+        final double B_MINUS_GRADEPTS = 2.670;
+        final double C_PLUS_GRADEPTS = 2.330;
+        final double C_GRADEPTS = 2.000;
+        final double F_GRADEPTS = 0.000;
+        AtomicReference<Double> totalPoints = new AtomicReference<>((double) 0);
+        double totalHours = 0;
+
+        courseList.forEach(studentCourse -> {
+                    String letterGrade = studentCourse.getLetterGrade();
+                    if (letterGrade.equalsIgnoreCase("A"))
+                        totalPoints.updateAndGet(v -> (v+A_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("A-"))
+                        totalPoints.updateAndGet(v -> (v+A_MINUS_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("B+"))
+                        totalPoints.updateAndGet(v -> (v+B_PLUS_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("B"))
+                        totalPoints.updateAndGet(v -> (v+B_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("B-"))
+                        totalPoints.updateAndGet(v -> (v+B_MINUS_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("C+"))
+                        totalPoints.updateAndGet(v -> (v+C_PLUS_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("C"))
+                        totalPoints.updateAndGet(v -> (v+C_GRADEPTS));
+                    else if (letterGrade.equalsIgnoreCase("F"))
+                        totalPoints.updateAndGet(v -> (v+F_GRADEPTS));
+                }
+                );
+
+        double GPA = totalPoints.get() / totalHours;
+        double scale = Math.pow(10, 3);
+        return Math.round(GPA * scale) / scale;
+    }
+
     /**
      * Calculates the GPA
      *
@@ -156,7 +201,6 @@ public class Audit {
      */
     private double calcGPA(double gpaPoints, double gpaHours ){
         double GPA = gpaPoints / gpaHours;
-
         double scale = Math.pow(10, 3);
         return Math.round(GPA * scale) / scale;
     }

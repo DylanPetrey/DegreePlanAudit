@@ -35,8 +35,8 @@ public class Student {
      * @param semester String identifying the semester.
      * @param transfer true if the course is transfer credit, false if utd credit.
      */
-    public void addCourse(String line, String semester, boolean transfer){
-        StudentCourse newCourse = new StudentCourse(line, semester, transfer);
+    public void addCourse(String line, String semester, boolean transfer, boolean fastTrack){
+        StudentCourse newCourse = new StudentCourse(line, semester, transfer, fastTrack);
         courseList.add(newCourse);
     }
 

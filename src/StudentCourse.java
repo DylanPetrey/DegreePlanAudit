@@ -8,14 +8,16 @@ public class StudentCourse extends Course {
     private double points = 0;
     private boolean isTransfer = false;
     private boolean isWaived = false;
+    private boolean isFast = false;
 
     public StudentCourse(){
 
     }
 
-    public StudentCourse(String input, String semester, boolean transfer) {
+    public StudentCourse(String input, String semester, boolean transfer, boolean fastTrack) {
         this.semester = semester;
         this.isTransfer = transfer;
+        this.isFast = fastTrack;
 
         processInput(input);
     }
@@ -70,6 +72,7 @@ public class StudentCourse extends Course {
     public double getPoints() {return points; }
     public boolean isTransfer() { return isTransfer; }
     public boolean isWaived() { return isWaived; }
+    public boolean isFast() { return isWaived; }
 
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(boolean transfer) { isTransfer = transfer; }
@@ -77,4 +80,6 @@ public class StudentCourse extends Course {
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
+    public void setWaived(boolean waived) { isWaived = waived;}
+    public void setFast(boolean fast) { isFast = fast;}
 }

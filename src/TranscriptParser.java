@@ -106,7 +106,7 @@ public class TranscriptParser {
             }
 
             // Checks for the first major start date
-            if(checkRegex(transcript[i], "Active in Program")) {
+            if(checkRegex(transcript[i], "Active in Program") && checkRegex(transcript[i-1], "Master")) {
                 startDate = transcript[i].substring(0, 10);      // The date format in the transcript is 10 characters long
                 currentMajor = transcript[i-1].substring(9);
             }
@@ -123,17 +123,34 @@ public class TranscriptParser {
      */
     private void fillCourseInformation(Student currentStudent, String[] transcript){
         boolean transfer = false;
+        boolean fastTrack = false;
+        boolean graduateCourse = false;
         String semester = "";
 
         for(int i = 0; i < transcript.length; i++){
             // Check for transfer
-            if(transcript[i].indexOf("Transfer Credits") != -1){
-                transfer = true;
+            if(transcript[i].contains("Transfer Credits") && !transcript[i].contains("Fast Track")) {
+                if(transcript[i + 1].contains("Master Program"))
+                    graduateCourse = true;
+                if(graduateCourse){
+                    transfer = true;
+                    fastTrack = false;
+                }
                 continue;
-            } else if(transcript[i].indexOf("Beginning of") != -1 && transcript[i].indexOf("Record") != 1){
+            }else if(transcript[i].contains("Transfer Credit from UT Dallas Fast Track")){
+                graduateCourse = true;
+                transfer = true;
+                fastTrack = true;
+                continue;
+            } else if(transcript[i].contains("Beginning of Graduate Record")){
+                graduateCourse = true;
                 transfer = false;
+                fastTrack = false;
                 continue;
             }
+
+            if(!graduateCourse)
+                continue;
 
 
             // Regex to check for semester
@@ -146,7 +163,7 @@ public class TranscriptParser {
 
             // Check for class number in the line
             if(checkRegex(transcript[i], "(\\s[0-9]{4}\\s)|(\\s[0-9][vV]([0-9]{2})\\s)|(\\s[0-9]-{3}\\s)")){
-                currentStudent.addCourse(transcript[i], semester, transfer);
+                currentStudent.addCourse(transcript[i], semester, transfer, fastTrack);
             }
         }
     }
