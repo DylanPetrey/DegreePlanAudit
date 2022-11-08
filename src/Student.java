@@ -149,8 +149,7 @@ public class Student {
     }
 
     /**
-     * Gets the course object that has the highest GPA. This is used when deciding which optional
-     * class is core or elective
+     * Gets the course object that has the lowest GPA.
      *
      * @param listOfCourses List of courses that the function will loop through.
      * @return Course object that has the highest GPA

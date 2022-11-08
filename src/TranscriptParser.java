@@ -6,13 +6,6 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * TODO:
- *    1. Separate the undergraduate courses with the graduate courses:
- *        - Edge case for students that attend UTD for undergrad and graduate degrees
- *        - I do not have an example of what this looks like
- *
- */
 
 public class TranscriptParser {
     Student currentStudent;

@@ -6,12 +6,10 @@ import java.util.regex.Pattern;
 
 /*
  * TODO:
- *   1. Create better test PDFs
- *        - I'm not sure if repeated classes calculate correctly
- *        - The provided samples aren't enough
- *   2. Evaluate requirements still needed to graduate
+ *   1. Evaluate requirements still needed to graduate
  *        - Find remaining classes in plan
  *        - Average GPA needed in remaining classes to meet minimum GPA
+ *   2. Configure to include repeated courses (Need to make a custom transcript for this)
  */
 
 public class Audit {
@@ -20,8 +18,8 @@ public class Audit {
     private Plan degreePlan;
 
     // Course Hashmaps
-    private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();;
-    private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();;
+    private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();
+    private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();
 
 
     // GPA Variables
@@ -117,8 +115,7 @@ public class Audit {
 
 
     /**
-     * This function calculates the GPA given the utd classes and updates the GPA
-     * value rounded to 3 decimal places for core, elective and combined
+     * This function calculates the core, elective, and cumulative GPA values
      */
     private void calculateGPAValues(){
         List<StudentCourse> coreList = new ArrayList<>();
@@ -129,14 +126,19 @@ public class Audit {
 
         List<StudentCourse> electList = new ArrayList<>();
         currentStudent.getCourseList().stream()
-                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE)
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL)
                 .forEach(electList::add);
         electiveGPA = calcGPA(electList);
 
         combinedGPA = calcGPA(currentStudent.getCourseList());
     }
 
-
+    /**
+     * Calculates the gpa for the courseList
+     *
+     * @param courseList list of courses to get the GPA from
+     * @return gpa value rounded to 3 digits
+     */
     private double calcGPA(List<StudentCourse> courseList){
         final double A_GRADEPTS = 4.000;
         final double A_MINUS_GRADEPTS = 3.670;

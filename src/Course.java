@@ -15,12 +15,17 @@ public class Course {
         OTHER;
     }
 
+    /**
+     * Empty constructor. Used for the blank forms.
+     */
     public Course() {
         this.courseNumber = "";
         this.courseDescription = "";
     }
 
-
+    /**
+     * Filled constructor. Used for parsing the transcript.
+     */
     public Course(String courseNumber, String courseDescription, CourseType type) {
         this.courseNumber = courseNumber;
         this.courseDescription = courseDescription;
@@ -46,6 +51,12 @@ public class Course {
                 courseDescription + " ";
     }
 
+    /**
+     * Compares if two objects are courses and have the same course num
+     *
+     * @param obj Object to compare to
+     * @return returns true if the object is the same num and type
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -59,7 +70,6 @@ public class Course {
     /**
      * Accessor methods to be used outside the class.
      */
-
     public CourseType getType() {return type;}
     public String getCourseNumber() { return courseNumber; }
     public String getCourseDescription() { return courseDescription; }
