@@ -3,6 +3,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 /*
  * TODO:
  *   1. Create better test PDFs
@@ -42,10 +43,12 @@ public class Audit {
      *
      * @param currentStudent current student object
      */
-    public Audit(Student currentStudent){
+    public Audit(Student currentStudent) {
         this.currentStudent = currentStudent;
         degreePlan = currentStudent.getCurrentTrack();
         courseMap = getClassMap(currentStudent.getCourseList());
+
+
     }
 
 
@@ -118,39 +121,19 @@ public class Audit {
      * value rounded to 3 decimal places for core, elective and combined
      */
     private void calculateGPAValues(){
-        double cumGradePoints = 0;
-        double cumGpaHours = 0;
-        double coreGradePoints = 0;
-        double coreGpaHours = 0;
-        double electGradePoints = 0;
-        double electGpaHours = 0;
+        List<StudentCourse> coreList = new ArrayList<>();
+        currentStudent.getCourseList().stream()
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
+                .forEach(coreList::add);
+        coreGPA = calcGPA(coreList);
 
-        // Looping over each key in the HashMap
-        for (Map.Entry<String, List<StudentCourse>> mapElement : utdGPAMap.entrySet()) {
-            StudentCourse current = currentStudent.getMaxCourseGPA(mapElement.getValue());
+        List<StudentCourse> electList = new ArrayList<>();
+        currentStudent.getCourseList().stream()
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE)
+                .forEach(electList::add);
+        electiveGPA = calcGPA(electList);
 
-            cumGradePoints += current.getPoints();
-            cumGpaHours += current.getAttempted();
-
-            List<Course> coreList = new ArrayList<>();
-            currentStudent.getCourseList().stream()
-                    .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
-                    .forEach(coreList::add);
-
-
-            if(current.type == Course.CourseType.CORE){
-                coreGradePoints += current.getPoints();
-                coreGpaHours += current.getAttempted();
-            }
-            else if(current.type == Course.CourseType.ELECTIVE || current.type == Course.CourseType.ADDITIONAL){
-                electGradePoints += current.getPoints();
-                electGpaHours += current.getAttempted();
-            }
-        }
-
-        combinedGPA = calcGPA(cumGradePoints, cumGpaHours);
-        coreGPA = calcGPA(coreGradePoints, coreGpaHours);
-        electiveGPA = calcGPA(electGradePoints, electGpaHours);
+        combinedGPA = calcGPA(currentStudent.getCourseList());
     }
 
 
@@ -164,43 +147,35 @@ public class Audit {
         final double C_GRADEPTS = 2.000;
         final double F_GRADEPTS = 0.000;
         AtomicReference<Double> totalPoints = new AtomicReference<>((double) 0);
-        double totalHours = 0;
+        AtomicReference<Integer> totalHours = new AtomicReference<>((Integer) 0);
 
         courseList.forEach(studentCourse -> {
                     String letterGrade = studentCourse.getLetterGrade();
+                    int currentHour = currentStudent.getCurrentTrack().getCourseHours(studentCourse.getCourseNumber());
                     if (letterGrade.equalsIgnoreCase("A"))
-                        totalPoints.updateAndGet(v -> (v+A_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(A_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("A-"))
-                        totalPoints.updateAndGet(v -> (v+A_MINUS_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("B+"))
-                        totalPoints.updateAndGet(v -> (v+B_PLUS_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("B"))
-                        totalPoints.updateAndGet(v -> (v+B_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("B-"))
-                        totalPoints.updateAndGet(v -> (v+B_MINUS_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("C+"))
-                        totalPoints.updateAndGet(v -> (v+C_PLUS_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("C"))
-                        totalPoints.updateAndGet(v -> (v+C_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("F"))
-                        totalPoints.updateAndGet(v -> (v+F_GRADEPTS));
+                        totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*currentHour)));
+                    else
+                        return;
+
+                    totalHours.updateAndGet(v -> (v+currentHour));
                 }
                 );
 
-        double GPA = totalPoints.get() / totalHours;
-        double scale = Math.pow(10, 3);
-        return Math.round(GPA * scale) / scale;
-    }
-
-    /**
-     * Calculates the GPA
-     *
-     * @param gpaPoints Total number of points
-     * @param gpaHours Total number of hours
-     * @return returns the gpa rounded to 3 decimal places
-     */
-    private double calcGPA(double gpaPoints, double gpaHours ){
-        double GPA = gpaPoints / gpaHours;
+        double GPA = totalPoints.get() / totalHours.get();
         double scale = Math.pow(10, 3);
         return Math.round(GPA * scale) / scale;
     }

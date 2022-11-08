@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -5,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -43,6 +46,12 @@ public class Plan {
     private List<Course> trackPrerequisites = new ArrayList<Course>();
     private List<String> excludedElectives = new ArrayList<String>();
 
+    File jsonFile = new File("JSONobjects/utd_catalog.json").getAbsoluteFile();
+    DocumentContext CatalogFile;
+
+
+
+
     /**
      * Initializes the plan object and sets the objects to the initial value
      *
@@ -51,6 +60,13 @@ public class Plan {
     Plan(Concentration concentration) {
         this.concentration = concentration;
         setConcentration(concentration);
+
+
+        try {
+            CatalogFile = JsonPath.parse(jsonFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -189,6 +205,26 @@ public class Plan {
                 return true;
         }
         return false;
+    }
+
+
+    public int getCourseHours(String courseNum){
+        String path = "$.['" + courseNum + "'].Hours";
+        try {
+            int hours = Integer.parseInt(CatalogFile.read(path));
+            return hours;
+        }catch (NumberFormatException e){
+            return 3;
+        }
+    }
+
+    public String getCourseDescription(String courseNum){
+        String path = "$.['" + courseNum + "'].Description";
+        try {
+            return CatalogFile.read(path);
+        }catch (NumberFormatException e){
+            return "";
+        }
     }
 
     /**
