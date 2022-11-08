@@ -1,10 +1,14 @@
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,9 +38,11 @@ public class Plan {
 
     };
 
-    private JSONObject obj = new JSONObject();
     private long numOptional = 0;
-    private Concentration concentration;
+
+    File jsonFile = new File("JSONobjects/utd_catalog.json").getAbsoluteFile();
+    DocumentContext CatalogFile;
+
     private List<Course> requiredCore = new ArrayList<Course>();
     private List<Course> optionalCore = new ArrayList<Course>();
     private List<Course> admissionPrerequisites = new ArrayList<Course>();
@@ -44,17 +50,22 @@ public class Plan {
     private List<String> excludedElectives = new ArrayList<String>();
 
     /**
-     * Initializes the plan object and sets the objects to the initial value
+     * Initializes the plan object and sets the objects to the initial value. Creates an object for the cs catalog.
      *
      * @param concentration List of courses
      */
     Plan(Concentration concentration) {
-        this.concentration = concentration;
         setConcentration(concentration);
+
+        try {
+            CatalogFile = JsonPath.parse(jsonFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Sets a
+     * Creates a list of course objects from the list of course numbers
      *
      * @param obj List of course numbers from the JSON
      */
@@ -63,10 +74,8 @@ public class Plan {
         if(obj.size() == 0)
             return list;
 
-        Iterator<?> it = obj.iterator();
-        while (it.hasNext()) {
-            String currentNum = (String) it.next();
-            if(currentNum != "")
+        for (String currentNum : obj) {
+            if (!Objects.equals(currentNum, ""))
                 list.add(currentNum);
         }
         return list;
@@ -84,9 +93,8 @@ public class Plan {
         if(array == null)
             return list;
 
-        Iterator<?> it = array.iterator();
-        while (it.hasNext()) {
-            JSONObject currentCourse = (JSONObject) it.next();
+        for (Object o : array) {
+            JSONObject currentCourse = (JSONObject) o;
             String num = (String) currentCourse.get("courseNumber");
             String title = (String) currentCourse.get("courseDescription");
             list.add(new Course(num, title, type));
@@ -122,7 +130,7 @@ public class Plan {
             JSONArray trackPrerequisite = (JSONArray) jsonCurrentPlan.get("trackPrerequisites");
             this.trackPrerequisites = toList(trackPrerequisite, Course.CourseType.TRACK);
 
-            List<String> excludedElective = (List) jsonCurrentPlan.get("excludedElectives");
+            List<String> excludedElective = (List<String>) jsonCurrentPlan.get("excludedElectives");
             this.excludedElectives = toList(excludedElective);
             System.out.println();
 
@@ -192,22 +200,43 @@ public class Plan {
     }
 
     /**
+     * Parse number of credit hours from the JSON
+     *
+     * @param courseNum Course number to identify the course
+     * @return number of credit hours
+     */
+    public int getCourseHours(String courseNum){
+        String path = "$.['" + courseNum + "'].Hours";
+        try {
+            int hours = Integer.parseInt(CatalogFile.read(path));
+            return hours;
+        }catch (NumberFormatException e){
+            return 3;
+        }
+    }
+
+    /**
+     * Parse course description from the JSON
+     *
+     * @param courseNum Course number to identify the course
+     * @return Course description
+     */
+    public String getCourseDescription(String courseNum){
+        String path = "$.['" + courseNum + "'].Description";
+        try {
+            return CatalogFile.read(path);
+        }catch (NumberFormatException e){
+            return "";
+        }
+    }
+
+    /**
      * Accessor methods to be used outside the class.
      */
-    public long getNumOptional() {
-        return numOptional;
-    }
-    public List<Course> getCore() {
-        return requiredCore;
-    }
-    public List<Course> getOptionalCore() {
-        return optionalCore;
-    }
-    public List<Course> getAdmissionPrerequisites() {
-        return admissionPrerequisites;
-    }
-    public List<Course> getTrackPrerequisites() {
-        return trackPrerequisites;
-    }
+    public long getNumOptional() { return numOptional; }
+    public List<Course> getCore() { return requiredCore; }
+    public List<Course> getOptionalCore() { return optionalCore; }
+    public List<Course> getAdmissionPrerequisites() { return admissionPrerequisites; }
+    public List<Course> getTrackPrerequisites() { return trackPrerequisites; }
     public List<String> getExcludedElectives() { return excludedElectives; }
 }

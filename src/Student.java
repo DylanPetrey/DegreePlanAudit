@@ -35,8 +35,8 @@ public class Student {
      * @param semester String identifying the semester.
      * @param transfer true if the course is transfer credit, false if utd credit.
      */
-    public void addCourse(String line, String semester, boolean transfer){
-        StudentCourse newCourse = new StudentCourse(line, semester, transfer);
+    public void addCourse(String line, String semester, boolean transfer, boolean fastTrack){
+        StudentCourse newCourse = new StudentCourse(line, semester, transfer, fastTrack);
         courseList.add(newCourse);
     }
 
@@ -98,16 +98,22 @@ public class Student {
      */
     private void setElectives(){
         List<StudentCourse> otherList = getCourseType(Course.CourseType.OTHER);
-        double numElectHours = 15.0;
+        int numElectHours = 15;
+        int currentElectHours = 0;
 
         for(int i = 0; i < otherList.size(); i++){
             StudentCourse currentCourse = otherList.get(i);
             try {
                 int currentNum = Integer.parseInt(currentCourse.getCourseNumber().split(" ")[1]);
-                if(currentNum >= 6000 && numElectHours > 0){
+
+                if(currentNum >= 6000 && currentNum < 7000){
+                    if (currentElectHours > numElectHours) {
+                        StudentCourse min = getLeastCourseGPA(getCourseType(Course.CourseType.ELECTIVE));
+                        setCourseType(min.getCourseNumber(), Course.CourseType.ADDITIONAL);
+                    }
                     setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ELECTIVE);
-                    numElectHours -= currentCourse.getAttempted();
-                } else if (5000 <= currentNum && currentNum < 6000) {
+                    currentElectHours += currentTrack.getCourseHours(currentCourse.getCourseNumber());
+                } else {
                     setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ADDITIONAL);
                 }
             } catch (NumberFormatException e){
@@ -140,6 +146,33 @@ public class Student {
 
         }
         return maxCourse;
+    }
+
+    /**
+     * Gets the course object that has the lowest GPA.
+     *
+     * @param listOfCourses List of courses that the function will loop through.
+     * @return Course object that has the highest GPA
+     */
+    public StudentCourse getLeastCourseGPA(List<StudentCourse> listOfCourses){
+        StudentCourse minCourse = new StudentCourse();
+
+        if(listOfCourses.size() == 0)
+            return minCourse;
+
+        double minGPA = calcGPA(currentTrack.getCourseHours(listOfCourses.get(0).getCourseNumber()), listOfCourses.get(0).getAttempted());
+
+        for(int i = 0; i < listOfCourses.size(); i++){
+            StudentCourse currentCourse = listOfCourses.get(i);
+
+            double currentGPA = calcGPA(currentCourse.getEarned(), currentCourse.getAttempted());
+            if(currentGPA < minGPA){
+                minGPA = currentGPA;
+                minCourse = currentCourse;
+            }
+
+        }
+        return minCourse;
     }
 
     /**
