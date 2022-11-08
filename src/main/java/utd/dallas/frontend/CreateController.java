@@ -1,82 +1,221 @@
 package utd.dallas.frontend;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import utd.dallas.backend.Course;
+import utd.dallas.backend.Plan;
+import utd.dallas.backend.Student;
+import utd.dallas.backend.StudentCourse;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class CreateController {
+    @FXML private MainAppFX main;
+    @FXML private Button backButton;
+    @FXML private TextField studentName;
+    @FXML private TextField studentID;
+    @FXML private TextField studentSemAdmitted;
+    @FXML private CheckBox fastTrack;
+    @FXML private CheckBox thesis;
+    @FXML private TextField anticipatedGrad;
+    @FXML private GridPane coreGrid;
+    @FXML private VBox coreVBox;
+    @FXML private VBox approvedVBox;
+    @FXML private VBox additionalVBox;
+    @FXML private VBox preReqVBox;
+
+
+
+    public Student currentStudent;
+
     @FXML
     private ChoiceBox<String> trackBox;
-    @FXML
-    private Button printButton;
-    @FXML
-    private Button backButton;
-    @FXML
-    private TextField studentName;
-    @FXML
-    private TextField studentID;
-    @FXML
-    private TextField studentSemAdmitted;
-    @FXML
-    private CheckBox fastTrack;
-    @FXML
-    private CheckBox thesis;
-    @FXML
-    private TextField anticipatedGrad;
+    ObservableList<String>
+            csTracks = FXCollections.observableArrayList(
+                    "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
+            softwareTracks = FXCollections.observableArrayList(
+                    "Software Engineering");
+
+
 
     @FXML
     protected void initialize() {
+        try {
+            currentStudent = Mediator.getInstance().getStudent();
+            setInitalFields();
+        } catch (Exception e){
+            currentStudent = new Student();
+        }
 
+        trackBox.setItems(csTracks);
+
+        setListeners();
+
+        if(currentStudent.getCurrentMajor().equals("Software Engineering"))
+            onSWEButtonClick();
+        else
+            onCSButtonClick();
+    }
+
+    protected void setInitalFields(){
+        studentName.setText(currentStudent.getStudentName());
+        studentID.setText(currentStudent.getStudentId());
+        studentSemAdmitted.setText(currentStudent.getStartDate());
+        fastTrack.setSelected(currentStudent.isFastTrack());
     }
 
     @FXML
     protected void onSWEButtonClick() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("Software Engineering");
-
-        trackBox.getItems().clear();
-        trackBox.getItems().addAll(list);
+        trackBox.setItems(FXCollections.observableArrayList(softwareTracks));
+        trackBox.setValue(softwareTracks.get(0));
+        currentStudent.setCurrentMajor("Software Engineering");
+        resetAllVBox();
     }
 
     @FXML
     protected void onCSButtonClick() {
-        ArrayList<String> list = new ArrayList<>();
-        list.add("Traditional Computer Science");
-        list.add("Network Telecommunications");
-        list.add("Intelligent Systems");
-        list.add("Interactive Computing");
-        list.add("Systems");
-        list.add("Data Science");
-        list.add("Cyber Security");
+        trackBox.setItems(FXCollections.observableArrayList(csTracks));
+        trackBox.setValue(csTracks.get(0));
 
-        trackBox.getItems().clear();
-        trackBox.getItems().addAll(list);
+        currentStudent.setCurrentMajor("Computer Science");
     }
 
     @FXML
     protected void onPrintButtonClick() {
-        System.out.println("trackBox.getValue() == " + trackBox.getValue());
-        System.out.println("student name: " + studentName.getText());
-        System.out.println("student id: " + studentID.getText());
-        System.out.println("semester admitted: " + studentSemAdmitted.getText());
-        System.out.println("Full time? " + fastTrack.isSelected());
-        System.out.println("Thesis? " + thesis.isSelected());
-        System.out.println("Anticipated Graduation: " + anticipatedGrad.getText());
+        currentStudent.printStudentInformation();
+    }
+
+    @FXML
+    protected void setTrackBox(){
+        Object value = trackBox.getValue();
+        currentStudent.newFormList();
+        if ("Traditional Computer Science".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.TRADITIONAL);
+        } else if ("Network Telecommunications".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.NETWORKS);
+        } else if ("Intelligent Systems".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.INTEL);
+        } else if ("Interactive Computing".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.INTERACTIVE);
+        } else if ("Systems".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.SYSTEMS);
+        } else if ("Data Science".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.DATA);
+        } else if ("Cyber Security".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.CYBER);
+        } else if ("Software Engineering".equals(value)) {
+            currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
+        }
+
+        resetAllVBox();
+    }
+
+    private void resetAllVBox(){
+        //currentStudent.cleanCourseList();
+        resetVbox(coreVBox, Course.CourseType.CORE, 5);
+        resetVbox(approvedVBox, Course.CourseType.ELECTIVE,5);
+        resetVbox(additionalVBox, Course.CourseType.ADDITIONAL,3);
+        resetVbox(preReqVBox, Course.CourseType.PRE,9);
+        //currentStudent.fillFormList();
+    }
+
+
+    private void resetVbox(VBox current, Course.CourseType t, int numRows){
+        current.getChildren().remove(current.lookup("GridPane"));
+
+        GridObject g = new GridObject(t);
+        List<StudentCourse> courseOfType = currentStudent.getCourseType(t);
+        for(int i = 0; i < numRows; i++){
+            StudentCourse currentCourse;
+            try{
+                currentCourse = courseOfType.get(i);
+            } catch (IndexOutOfBoundsException e){
+                currentCourse = new StudentCourse();
+            }
+
+            g.addRow(currentCourse);
+        }
+
+        current.getChildren().add(g.getGrid());
+    }
+
+    protected void setListeners(){
+        trackBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                setTrackBox();
+            } catch (NullPointerException e){
+                setTrackBox();
+            }
+        });
+
+        studentName.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentStudent.setStudentName((String) newValue);
+            } catch (NullPointerException e){
+                currentStudent.setStudentName((String) oldValue);
+            }
+        });
+
+        studentID.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentStudent.setStudentId((String) newValue);
+            } catch (NullPointerException e){
+                currentStudent.setStudentId((String) oldValue);
+            }
+        });
+
+        studentSemAdmitted.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentStudent.setStartDate((String) newValue);
+            } catch (NullPointerException e){
+                currentStudent.setStartDate((String) oldValue);
+            }
+        });
+
+        anticipatedGrad.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentStudent.setGraduation((String) newValue);
+            } catch (NullPointerException e){
+                currentStudent.setGraduation((String) oldValue);
+            }
+        });
+
+        fastTrack.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            currentStudent.setFastTrack(fastTrack.isSelected());
+        });
+
+        thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            currentStudent.setThesis(thesis.isSelected());
+        });
+
     }
 
     @FXML
     protected void onBackButtonClick() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("IntroScreen.fxml"));
+        Mediator.getInstance().setStudent(new Student());
+
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("IntroScreen.fxml")));
         Stage stage = (Stage) backButton.getScene().getWindow();
         stage.setScene(new Scene(root, 600, 600));
+    }
+
+    @FXML protected void setStudentName(){
+        currentStudent.setStudentName(studentName.getText());
+    }
+    @FXML protected void setStudentID(){
+        currentStudent.setStudentId(studentID.getText());
+    }
+    @FXML protected void setStudentSemAdmitted(){
+        currentStudent.setStartDate(studentSemAdmitted.getText());
     }
 }

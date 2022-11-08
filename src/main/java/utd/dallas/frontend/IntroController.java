@@ -5,9 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class IntroController {
     @FXML
@@ -25,7 +25,7 @@ public class IntroController {
 
     @FXML
     protected void onUploadButtonClick() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("UploadScreen.fxml"));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("UploadScreen.fxml")));
         Stage stage = (Stage) uploadButton.getScene().getWindow();
         stage.setScene(new Scene(root, 600, 600));
     }

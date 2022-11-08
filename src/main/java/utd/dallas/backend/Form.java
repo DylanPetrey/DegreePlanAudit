@@ -12,11 +12,11 @@ public class Form {
     private boolean thesis;
     private List<StudentCourse> courseList;
 
-    
 
-    /** 
-     * Initializes utd.dallas.backend.Form object to be used to fill out PDF
-     * @param currentStudent utd.dallas.backend.Student object that the form is generated for
+
+    /**
+     * Initializes Form object to be used to fill out PDF
+     * @param currentStudent Student object that the form is generated for
      */
     public Form(Student currentStudent) {
         this.studentName = currentStudent.getStudentName();
@@ -29,7 +29,7 @@ public class Form {
     }
 
     /**
-     * This function returns a list of Courses of a specified utd.dallas.backend.Course Type
+     * This function returns a list of Courses of a specified Course Type
      * @param type The type of courses requested
      * @return A list of courses of specified type
      */
@@ -64,7 +64,7 @@ public class Form {
     public void setAnticipatedGraduation(String anticipatedGraduation){ this.anticipatedGraduation = anticipatedGraduation; }
     public void setFastTrack(boolean isFastTrack){this.isFastTrack = isFastTrack; }
     public void setThesis(boolean thesis) { this.thesis = thesis; }
-    
+
     public void addCourse(List<Course> courseList, Course course) { courseList.add(course); }
     public void removeCourse(List<Course> courseList, Course course) { courseList.remove(course); }
 

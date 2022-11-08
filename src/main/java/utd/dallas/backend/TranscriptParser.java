@@ -5,17 +5,9 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * TODO:
- *    1. Separate the undergraduate courses with the graduate courses:
- *        - Edge case for students that attend UTD for undergrad and graduate degrees
- *        - I do not have an example of what this looks like
- *
- */
 
 public class TranscriptParser {
     Student currentStudent;
@@ -25,12 +17,11 @@ public class TranscriptParser {
      * Ideally this would return a filled student object which would then be used in other
      * parts of the project
      *
-     * @param fileName This will need to be changed to a file whenever we implement file uploading
+     * @param inputFile Transcript
      * @throws IOException The readPDF function throws an exception if the PDF can not be read
      */
-    public TranscriptParser(String fileName) throws IOException {
-
-        String transcript[] = readPDF(fileName);
+    public TranscriptParser(File inputFile) throws IOException {
+        String transcript[] = readPDF(inputFile);
 
         // Create the student Object
         this.currentStudent = createStudent(transcript);
@@ -38,17 +29,18 @@ public class TranscriptParser {
         // Fill the course information
         fillCourseInformation(currentStudent, transcript);
 
+        if(currentStudent.getTranscriptList().size() == 0)
+            throw new IOException();
     }
 
     /**
      * This function reads in PDF file and splits the text by lines
      *
-     * @param filename name of the file (might need to be changed into a file object)
+     * @param inputFile file object
      * @throws IOException If there is an error reading in the PDF
      * @return An array that is seperated by each line in the transcript
      */
-    private String[] readPDF(String filename) throws IOException{
-        File inputFile = new File(filename);
+    private String[] readPDF(File inputFile) throws IOException{
         PDDocument document = PDDocument.load(inputFile);
 
         PDFTextStripper pdfStripper = new PDFTextStripper();
@@ -98,8 +90,8 @@ public class TranscriptParser {
                 continue;
             }
 
-            if(checkRegex(transcript[i], "utd.dallas.backend.Student ID:")){
-                studentId = transcript[i].substring("utd.dallas.backend.Student ID:".length());
+            if(checkRegex(transcript[i], "Student ID:")){
+                studentId = transcript[i].substring("Student ID:".length());
                 studentId = studentId.trim();
 
                 // Regex to check if valid student id
@@ -109,7 +101,7 @@ public class TranscriptParser {
             }
 
             // Checks for the first major start date
-            if(checkRegex(transcript[i], "Active in Program")) {
+            if(checkRegex(transcript[i], "Active in Program") && checkRegex(transcript[i-1], "Master")) {
                 startDate = transcript[i].substring(0, 10);      // The date format in the transcript is 10 characters long
                 currentMajor = transcript[i-1].substring(9);
             }
@@ -126,17 +118,40 @@ public class TranscriptParser {
      */
     private void fillCourseInformation(Student currentStudent, String[] transcript){
         boolean transfer = false;
+        boolean fastTrack = false;
+        boolean graduateCourse = false;
+        String transfer_text = "";
         String semester = "";
 
         for(int i = 0; i < transcript.length; i++){
             // Check for transfer
-            if(transcript[i].indexOf("Transfer Credits") != -1){
-                transfer = true;
+            if(transcript[i].contains("Transfer Credits") && !transcript[i].contains("Fast Track")) {
+                if(transcript[i + 1].contains("Master Program"))
+                    graduateCourse = true;
+                if(graduateCourse){
+                    transfer = true;
+                    fastTrack = false;
+                    transfer_text = "T";
+                }
                 continue;
-            } else if(transcript[i].indexOf("Beginning of") != -1 && transcript[i].indexOf("Record") != 1){
+            }else if(transcript[i].contains("Transfer Credit from UT Dallas Fast Track")){
+                graduateCourse = true;
+                transfer = true;
+                fastTrack = true;
+                transfer_text = "F/T";
+                currentStudent.setFastTrack(true);
+
+                continue;
+            } else if(transcript[i].contains("Beginning of Graduate Record")){
+                graduateCourse = true;
                 transfer = false;
+                fastTrack = false;
+                transfer_text = "";
                 continue;
             }
+
+            if(!graduateCourse)
+                continue;
 
 
             // Regex to check for semester
@@ -149,7 +164,7 @@ public class TranscriptParser {
 
             // Check for class number in the line
             if(checkRegex(transcript[i], "(\\s[0-9]{4}\\s)|(\\s[0-9][vV]([0-9]{2})\\s)|(\\s[0-9]-{3}\\s)")){
-                currentStudent.addCourse(transcript[i], semester, transfer);
+                currentStudent.addCourse(transcript[i], semester, transfer_text);
             }
         }
     }

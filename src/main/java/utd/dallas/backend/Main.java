@@ -1,14 +1,16 @@
 package utd.dallas.backend;
 
+import java.io.File;
+
 public class Main {
     public static void main(String args[]) throws Exception {
-        String transcriptFilename = "src/main/resources/utd/dallas/backend/SampleTranscripts/Sample.pdf";
-        TranscriptParser transcript =  new TranscriptParser(transcriptFilename);
+        String inputFilePath = "src/main/resources/utd/dallas/backend/SampleTranscripts/Sample3.pdf";
+        File inputFile = new File(inputFilePath);
+        TranscriptParser transcript =  new TranscriptParser(inputFile);
         Student curr = transcript.getStudent();
+        curr.setCurrentPlan(Plan.Concentration.DATA);
         curr.printStudentInformation();
 
-        Plan track = new Plan("Data Science");
-        curr.setCurrentTrack(track);
 
         Audit auditHelper = new Audit(curr);
         auditHelper.runAudit();
