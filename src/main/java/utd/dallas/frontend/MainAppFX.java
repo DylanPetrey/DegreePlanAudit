@@ -18,10 +18,12 @@ public class MainAppFX extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(MainAppFX.class.getResource("IntroScreen.fxml"));
         this.primaryStage = stage;
-        Scene scene = new Scene(fxmlLoader.load(), 600, 600);
+        Scene scene = new Scene(fxmlLoader.load(), 700, 700);
         this.primaryStage.setTitle("Select Track");
         this.primaryStage.setScene(scene);
-        this.primaryStage.setMinWidth(600);
+        this.primaryStage.setMinWidth(700);
+        this.primaryStage.setMinHeight(600);
+        this.primaryStage.setMinHeight(600);
         this.primaryStage.show();
     }
 

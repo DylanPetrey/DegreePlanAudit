@@ -208,15 +208,6 @@ public class Student {
                 c.add(current);
         return c;
     }
-
-    public void cleanCourseList(){
-        List<StudentCourse> tempList = courseList;
-        courseList.forEach(studentCourse -> {
-            if (studentCourse.isFromTranscript())
-                tempList.add(studentCourse);
-        });
-        courseList = tempList;
-    }
     public void fillPlan(){
         currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {
             courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));

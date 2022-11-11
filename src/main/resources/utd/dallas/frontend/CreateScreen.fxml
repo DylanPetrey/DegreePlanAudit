@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="600.0" scaleShape="false" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.CreateController">
+<AnchorPane fx:id="basePane" prefHeight="600.0" prefWidth="600.0" scaleShape="false" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.CreateController">
    <children>
       <ScrollPane fitToWidth="true" hbarPolicy="NEVER" layoutY="7.0" maxWidth="800.0" minHeight="650.0" minViewportWidth="645.0" minWidth="600.0" prefHeight="600.0" prefWidth="645.0" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <content>
@@ -29,7 +29,7 @@
                         <Insets />
                      </VBox.margin>
                   </HBox>
-                      <ChoiceBox fx:id="trackBox" onDragExited="#setTrackBox" prefWidth="200.0" value="Track" />
+                      <ChoiceBox fx:id="trackBox" onDragExited="#setTrackBox" value="Track" />
                   <HBox alignment="CENTER" prefHeight="130.0" spacing="100.0">
                      <children>
                         <BorderPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="130.0" prefWidth="200.0">

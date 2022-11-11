@@ -7,9 +7,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import utd.dallas.backend.Course;
 import utd.dallas.backend.Plan;
 import utd.dallas.backend.Student;
@@ -20,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CreateController {
-    @FXML private MainAppFX main;
+    @FXML private AnchorPane basePane;
     @FXML private Button backButton;
     @FXML private TextField studentName;
     @FXML private TextField studentID;
@@ -121,12 +124,10 @@ public class CreateController {
     }
 
     private void resetAllVBox(){
-        //currentStudent.cleanCourseList();
         resetVbox(coreVBox, Course.CourseType.CORE, 5);
         resetVbox(approvedVBox, Course.CourseType.ELECTIVE,5);
         resetVbox(additionalVBox, Course.CourseType.ADDITIONAL,3);
         resetVbox(preReqVBox, Course.CourseType.PRE,9);
-        //currentStudent.fillFormList();
     }
 
 
@@ -206,7 +207,8 @@ public class CreateController {
 
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("IntroScreen.fxml")));
         Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.setScene(new Scene(root, 600, 600));
+        Scene currentStage = basePane.getScene();
+        stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
     }
 
     @FXML protected void setStudentName(){

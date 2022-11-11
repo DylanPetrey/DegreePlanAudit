@@ -67,9 +67,9 @@ public class GridObject extends CreateController{
 
         number.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
-                currentCourse.setCourseTitle(newValue);
+                currentCourse.setCourseNumber(newValue);
             } catch (NullPointerException e){
-                currentCourse.setCourseTitle(oldValue);
+                currentCourse.setCourseNumber(oldValue);
             }
         });
 

@@ -2,14 +2,20 @@ package utd.dallas.frontend;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import utd.dallas.backend.Student;
@@ -22,14 +28,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UploadController {
+    @FXML private AnchorPane basePane;
     @FXML private Button backButton;
     @FXML private Button continueButton;
     @FXML private Group fileWindow;
     @FXML private Label continueErrorLabel;
-    @FXML private Label filenameLabel;
     @FXML private Rectangle uploadFileBox;
-    @FXML private Group uploadFileButton;
-    @FXML private Rectangle fileButtonBackground;
+    @FXML private Label uploadButtonLabel;
+
+    @FXML private Text filenameText;
 
     File inputFile;
     TranscriptParser parser;
@@ -39,6 +46,30 @@ public class UploadController {
     protected void initialize() {
         // Extensions that are valid to be drag-n-dropped
         List<String> validExtensions = Arrays.asList("pdf");
+
+
+        uploadButtonLabel.heightProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                uploadButtonLabel.setAlignment(Pos.CENTER);
+                double diff = uploadFileBox.getY()+(uploadFileBox.getHeight() - newValue.doubleValue()) / 2;
+                uploadButtonLabel.setLayoutY(diff);
+
+                filenameText.setLayoutX(uploadButtonLabel.getWidth()+5);
+                filenameText.setWrappingWidth(uploadFileBox.getWidth()-uploadButtonLabel.getWidth()-10);
+
+            } catch (Exception e){
+                uploadButtonLabel.setLayoutY(oldValue.doubleValue());
+            }
+        });
+
+        filenameText.textProperty().addListener((observable, oldValue, newValue) -> {
+            try{
+                double boxHeight = uploadFileBox.getLayoutBounds().getHeight()/2;
+                filenameText.setLayoutY(boxHeight);
+            }catch (Exception ignored){
+            }
+        });
+
         fileWindow.setOnDragOver(event -> {
             // On drag over if the DragBoard has files
             if (event.getGestureSource() != fileWindow && event.getDragboard().hasFiles()) {
@@ -65,13 +96,12 @@ public class UploadController {
                     continueErrorLabel.setVisible(false);
                     uploadFileBox.setFill(Paint.valueOf("#f5f5f5"));
                     inputFile = event.getDragboard().getFiles().get(0);
-                    filenameLabel.setText(inputFile.getName());
+                    filenameText.setText(inputFile.getName());
                     parser = new TranscriptParser(inputFile);
                 } catch (Exception e) {
                     parser = null;
-                    e.printStackTrace();
                     uploadFileBox.setFill(Paint.valueOf("#ff8080"));
-                    filenameLabel.setText("Not a valid transcript");
+                    filenameText.setText("Not a valid transcript");
                 }
                 success = true;
             }
@@ -80,8 +110,8 @@ public class UploadController {
         });
 
 
-        uploadFileButton.setOnMouseEntered(event -> fileButtonBackground.setFill(Paint.valueOf("#c6c6c6")));
-        uploadFileButton.setOnMouseExited(event -> fileButtonBackground.setFill(Paint.valueOf("#ffffff")));
+        uploadButtonLabel.setOnMouseEntered(event -> uploadButtonLabel.setStyle("-fx-background-color: #c6c6c6; -fx-text-fill: black;-fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
+        uploadButtonLabel.setOnMouseExited(event -> uploadButtonLabel.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
     }
 
 
@@ -94,16 +124,15 @@ public class UploadController {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PDFs", "*.pdf"));
             fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
-            Stage stage = (Stage) uploadFileButton.getScene().getWindow();
+            Stage stage = (Stage) uploadButtonLabel.getScene().getWindow();
             inputFile = fileChooser.showOpenDialog(stage);
-            filenameLabel.setText(inputFile.getName());
+            filenameText.setText(inputFile.getName());
             parser = new TranscriptParser(inputFile);
             Mediator.getInstance().setDefaultDirectory(inputFile.getParent());
         } catch (Exception e) {
             parser = null;
-            e.printStackTrace();
             uploadFileBox.setFill(Paint.valueOf("#ff8080"));
-            filenameLabel.setText("Not a valid transcript");
+            filenameText.setText("Not a valid transcript");
         }
     }
 
@@ -131,14 +160,16 @@ public class UploadController {
 
         Parent root = FXMLLoader.load(getClass().getResource("CreateScreen.fxml"));
         Stage stage = (Stage) continueButton.getScene().getWindow();
-        stage.setScene(new Scene(root, 600, 600));
+        Scene currentStage = basePane.getScene();
+        stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
     }
 
     @FXML
     protected void onBackButtonClick() throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("IntroScreen.fxml"));
         Stage stage = (Stage) backButton.getScene().getWindow();
-        stage.setScene(new Scene(root, 600, 600));
+        Scene currentStage = basePane.getScene();
+        stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
     }
 
 
