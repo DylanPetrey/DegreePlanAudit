@@ -1,23 +1,15 @@
-<<<<<<< HEAD:src/Form.java
+package utd.dallas.backend;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSObject;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
-import org.apache.pdfbox.pdmodel.interactive.form.PDFieldTree;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
-=======
-package utd.dallas.backend;
-
-import java.util.*;
->>>>>>> origin/mavenFrontend:src/main/java/utd/dallas/backend/Form.java
 
 
 public class Form {
@@ -41,7 +33,7 @@ public class Form {
         this.studentID = currentStudent.getStudentId();
         this.semesterAdmitted = "";
         this.anticipatedGraduation = "";
-        //this.concentration = currentStudent.concentration;
+        this.concentration = currentStudent.getCurrentPlan().getConcentration();
         this.isFastTrack = false;
         this.thesis = false;
         this.courseList = currentStudent.getCourseList();
@@ -51,7 +43,7 @@ public class Form {
      * This function returns a list of Courses of a specified Course Type
      * @param type The type of courses requested
      * @return A list of courses of specified type
-     */
+    
     public List<Course> getCourseOfType(Course.CourseType type){
         List<Course> courses = new ArrayList<>();
         for (Course course : courseList) {
@@ -61,16 +53,24 @@ public class Form {
         }
         return courses;
     }
+    */
     /**
      
      * @param fileName
      * @throws IOException
      */
 
-    public void fillForm(Plan.Concentration concentration) throws IOException {
+    public void print() throws IOException{
 
-        String loc = "Forms/DP-" + concentration.toString() + ".pdf"; 
-        PDDocument pdfDocument = PDDocument.load(new File(loc));
+        String loc = "";
+        PDDocument pdfDocument = null;
+        try {
+            loc = Form.class.getResource("Forms/DP-" + concentration.toString() + ".pdf").getFile().replace("%20", " ");
+            pdfDocument = PDDocument.load(new File(loc));
+
+        } catch (NullPointerException | IOException e) {
+            e.printStackTrace();
+        }
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
         PDAcroForm acroForm = docCatalog.getAcroForm();
         Iterator<PDField> fieldTreeIterator = acroForm.getFieldIterator();
@@ -79,12 +79,14 @@ public class Form {
             PDField f = fieldTreeIterator.next(); 
             COSDictionary obj = f.getCOSObject();
             if (f.getClass().equals(PDTextField.class)){
-                f.setValue("run");
+            f.setValue("run");
+
             }
         }
-        PDAcroForm finalForm =new PDAcroForm(pdfDocument);
+        PDAcroForm finalForm = new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         pdfDocument.save(new File(".", "test.pdf"));
+
         
         
     }

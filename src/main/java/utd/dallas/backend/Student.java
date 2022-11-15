@@ -1,5 +1,6 @@
 package utd.dallas.backend;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -13,6 +14,7 @@ public class Student {
     private Plan currentPlan;
     private boolean fastTrack;
     private boolean thesis;
+    private Form form;
 
     private List<StudentCourse> courseList;
     private final List<StudentCourse> transcriptList;
@@ -99,11 +101,7 @@ public class Student {
      */
     private void setOptionalCore(){
         List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
-<<<<<<< HEAD:src/Student.java
-        long numOpt = currentTrack.getNumOptional();
-=======
         long numOpt = currentPlan.getNumOptional();
->>>>>>> origin/mavenFrontend:src/main/java/utd/dallas/backend/Student.java
 
         // Optional courses to be changed into core
         while (numOpt > 0 && coreOptList.size() != 0){
@@ -240,14 +238,20 @@ public class Student {
     /**
      * Outputs all the information to the console in a similar style to how it will
      * be displayed the final Audit PDF.
+     * @throws IOException
      */
-    public void printStudentInformation(){
+    public void printStudentInformation() throws IOException{
         System.out.println(studentName);
         System.out.println(studentId);
         System.out.println(startDate);
         System.out.println(currentMajor);
 
         courseList.forEach(Course::printCourse);
+
+        //1. TODO: Print Audit PDF
+        //2. TODO: Print Form PDF
+        form = new Form(this);
+        form.print();
     }
 
 

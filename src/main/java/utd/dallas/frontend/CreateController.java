@@ -43,11 +43,9 @@ public class CreateController {
 
     @FXML
     private ChoiceBox<String> trackBox;
-    ObservableList<String>
-            csTracks = FXCollections.observableArrayList(
-                    "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
-            softwareTracks = FXCollections.observableArrayList(
-                    "Software Engineering");
+    ObservableList<String> csTracks = FXCollections.observableArrayList(
+                    "Traditional", "Network-Telecommunications", "Intelligent-Systems", "Interactive-Computing", "Systems", "Data-Science", "Cyber-Security");
+    ObservableList<String> softwareTracks = FXCollections.observableArrayList("Software Engineering");
 
 
 
@@ -94,7 +92,7 @@ public class CreateController {
     }
 
     @FXML
-    protected void onPrintButtonClick() {
+    protected void onPrintButtonClick() throws IOException {
         currentStudent.printStudentInformation();
     }
 

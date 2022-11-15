@@ -19,14 +19,14 @@ import org.json.simple.parser.ParseException;
 public class Plan {
 
     public enum Concentration {
-        TRADITIONAL("Traditional Computer Science"),
-        NETWORKS("Network Telecommunications"),
-        INTEL("Intelligent Systems"),
-        INTERACTIVE("Interactive Computing"),
+        TRADITIONAL("Traditional"),
+        NETWORKS("Network-Telecommunications"),
+        INTEL("Intelligent-Systems"),
+        INTERACTIVE("Interactive-Computing"),
         SYSTEMS("Systems"),
-        DATA("Data Science"),
-        CYBER("Cyber Security"),
-        SOFTWARE("Software Engineering");
+        DATA("Data-Science"),
+        CYBER("Cyber-Security"),
+        SOFTWARE("Software-Engineering");
 
         private String concenString;
 
@@ -127,7 +127,7 @@ public class Plan {
      */
     public void setConcentration(Concentration type) {
         this.concentration = type;
-        String JSONfilename = "src/main/resources/utd/dallas/backend/JSONobjects/degreeRequirements.json";
+        String JSONfilename = Plan.class.getResource("JSONobjects/degreeRequirements.json").getFile().replace("%20", " ");
         JSONParser parser = new JSONParser();
 
         try {

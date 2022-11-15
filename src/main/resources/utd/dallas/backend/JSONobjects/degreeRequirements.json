@@ -1,5 +1,5 @@
 {
-  "Traditional Computer Science": {
+  "Traditional": {
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -23,7 +23,7 @@
       {"courseNumber": "CS 5390", "courseDescription": "Computer Networks"}
     ]
   },
-  "Network Telecommunications": {
+  "Network-Telecommunications": {
     "numOptional": 0,
     "excludedElectives": [""],
     "requiredCore": [
@@ -45,7 +45,7 @@
       {"courseNumber":"CS 3341", "courseDescription":"Probability & Statistics in CS"}
     ]
   },
-  "Intelligent Systems": {
+  "Intelligent-Systems": {
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -67,7 +67,7 @@
       {"courseNumber":"CS 5348", "courseDescription":"Operating System Concepts"}
     ]
   },
-  "Interactive Computing": {
+  "Interactive-Computing": {
     "numOptional": 3,
     "excludedElectives": [""],
     "requiredCore": [
@@ -116,7 +116,7 @@
       {"courseNumber":"CS 5390", "courseDescription":"Computer Networks"}
     ]
   },
-  "Data Science": {
+  "Data-Science": {
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -142,7 +142,7 @@
       { "courseNumber": "CS 3341", "courseDescription": "Probability & Statistics in CS" }
     ]
   },
-  "Cyber Security": {
+  "Cyber-Security": {
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -170,7 +170,7 @@
       {"courseNumber":"CS 3341", "courseDescription":"Probability & Statistics in CS"}
     ]
   },
-  "Software Engineering": {
+  "Software-Engineering": {
     "numOptional": 0,
     "excludedElectives": ["CS 6359"],
     "requiredCore": [
