@@ -1,3 +1,5 @@
+package utd.dallas.backend;
+
 import java.util.Arrays;
 
 public class StudentCourse extends Course {
@@ -6,16 +8,27 @@ public class StudentCourse extends Course {
     private double attempted = 0;
     private double earned = 0;
     private double points = 0;
-    private boolean isTransfer = false;
+    private String transfer = "";
     private boolean isWaived = false;
+    private boolean fromTranscript = false;
 
     public StudentCourse(){
-
     }
 
-    public StudentCourse(String input, String semester, boolean transfer) {
+    public StudentCourse(CourseType type){
+        this.type = type;
+    }
+
+    public StudentCourse(String id, String title, CourseType type) {
+        this.courseNumber = id;
+        this.courseTitle = title;
+        this.type = type;
+    }
+
+    public StudentCourse(String input, String semester, String transfer) {
         this.semester = semester;
-        this.isTransfer = transfer;
+        this.transfer = transfer;
+        this.fromTranscript = true;
 
         processInput(input);
     }
@@ -33,12 +46,12 @@ public class StudentCourse extends Course {
         // Fills in the course title and checks if there is a letter grade.
         // If there is not a letter grade, then the course is in the current semester
         if (!tokens[tokens.length - 2].matches("[-+]?[0-9]*\\.?[0-9]+")) {
-            courseDescription = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 4));
+            courseTitle = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 4));
             letterGrade = tokens[tokens.length - 2];
             tokens = Arrays.copyOfRange(tokens, tokens.length - 4, tokens.length);
         } else {
-            courseDescription = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3));
-            letterGrade = "X";
+            courseTitle = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3));
+            letterGrade = "";
             tokens = Arrays.copyOfRange(tokens, tokens.length - 3, tokens.length);
         }
 
@@ -54,27 +67,40 @@ public class StudentCourse extends Course {
      */
     @Override
     public String toString() {
-        String semesterOutput = (isTransfer) ? "X " + semester : semester + " X";
-
         return  courseNumber + " " +
-                courseDescription + " " +
-                semesterOutput + " " +
+                courseTitle + " " +
+                transfer + " " +
                 letterGrade;
     }
-
 
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
     public double getAttempted() { return attempted; }
     public double getEarned() { return earned; }
     public double getPoints() {return points; }
-    public boolean isTransfer() { return isTransfer; }
+    public String getTransfer() { return transfer; }
+    public boolean isFromTranscript() { return fromTranscript; }
     public boolean isWaived() { return isWaived; }
 
     public void setSemester(String semester) { this.semester = semester; }
-    public void setTransfer(boolean transfer) { isTransfer = transfer; }
+    public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
+
+    public void setFromTranscript(boolean fromTranscript) {
+        this.fromTranscript = fromTranscript;
+    }
+
+    public void setCourseVariables(StudentCourse newCourse){
+        this.courseNumber = newCourse.getCourseNumber();
+        semester = newCourse.getSemester();
+        attempted = newCourse.getAttempted();
+        points = newCourse.getPoints();
+        earned = newCourse.getEarned();
+        letterGrade = newCourse.getLetterGrade();
+        isWaived = newCourse.isWaived();
+        fromTranscript = newCourse.isFromTranscript();
+    }
 }

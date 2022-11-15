@@ -1,4 +1,7 @@
+package utd.dallas.backend;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Student {
     // Student Variables
@@ -6,8 +9,26 @@ public class Student {
     private String studentId;
     private String startDate;
     private String currentMajor;
-    private Plan currentTrack;
+    private String graduation;
+    private Plan currentPlan;
+    private boolean fastTrack;
+    private boolean thesis;
+
     private List<StudentCourse> courseList;
+    private final List<StudentCourse> transcriptList;
+
+    public Student(){
+        this.studentName = "";
+        this.studentId = "";
+        this.startDate = "";
+        this.currentMajor = "";
+        fastTrack = false;
+        thesis = false;
+
+        courseList = new ArrayList<>();
+        transcriptList = new ArrayList<>();
+        currentPlan = new Plan();
+    }
 
     /**
      * Initializes the student object using basic information and creating a
@@ -25,6 +46,8 @@ public class Student {
         this.currentMajor = currentMajor;
 
         courseList = new ArrayList<>();
+        transcriptList = new ArrayList<>();
+        currentPlan = new Plan();
     }
 
     /**
@@ -35,15 +58,17 @@ public class Student {
      * @param semester String identifying the semester.
      * @param transfer true if the course is transfer credit, false if utd credit.
      */
-    public void addCourse(String line, String semester, boolean transfer){
+    public void addCourse(String line, String semester, String transfer){
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
-        courseList.add(newCourse);
+        transcriptList.add(newCourse);
     }
 
     /**
      * Drives the methods that set the course types for each course
      */
     private void evaluateDegreePlan(){
+        fillPlan();
+        fillFormList();
         setInitialCourseTypes();
         setOptionalCore();
         setElectives();
@@ -55,13 +80,13 @@ public class Student {
      */
     private void setInitialCourseTypes(){
         for(Course course : getCourseList()) {
-            if (currentTrack.isCore(course))
+            if (currentPlan.isCore(course))
                 setCourseType(course.courseNumber, Course.CourseType.CORE);
-            else if (currentTrack.isOpt(course))
+            else if (currentPlan.isOpt(course))
                 setCourseType(course.courseNumber, Course.CourseType.OPTIONAL);
-            else if (currentTrack.isPre(course))
+            else if (currentPlan.isPre(course))
                 setCourseType(course.courseNumber, Course.CourseType.PRE);
-            else if (currentTrack.isTrack(course))
+            else if (currentPlan.isTrack(course))
                 setCourseType(course.courseNumber, Course.CourseType.TRACK);
             else
                 setCourseType(course.courseNumber, Course.CourseType.OTHER);
@@ -74,7 +99,11 @@ public class Student {
      */
     private void setOptionalCore(){
         List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
+<<<<<<< HEAD:src/Student.java
         long numOpt = currentTrack.getNumOptional();
+=======
+        long numOpt = currentPlan.getNumOptional();
+>>>>>>> origin/mavenFrontend:src/main/java/utd/dallas/backend/Student.java
 
         // Optional courses to be changed into core
         while (numOpt > 0 && coreOptList.size() != 0){
@@ -183,32 +212,60 @@ public class Student {
                 c.add(current);
         return c;
     }
+    public void fillPlan(){
+        currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {
+            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));
+        });
+        currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
+            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.ELECTIVE));
+        });
+    }
+    public void fillFormList(){
+        transcriptList.forEach(studentCourse -> {
+                    if (courseList.contains(studentCourse))
+                        setFormListValue(studentCourse);
+                    else
+                        courseList.add(studentCourse);
+                });
+    }
 
+    public void setFormListValue(StudentCourse value){
+        courseList.forEach(studentCourse -> {
+            if (studentCourse.equals(value))
+                studentCourse.setCourseVariables(value);
 
-   /**
-    * Outputs all the information to the console in a similar style to how it will
-    * be displayed the final Audit PDF.
-    */
+        });
+    }
+
+    /**
+     * Outputs all the information to the console in a similar style to how it will
+     * be displayed the final Audit PDF.
+     */
     public void printStudentInformation(){
         System.out.println(studentName);
         System.out.println(studentId);
         System.out.println(startDate);
         System.out.println(currentMajor);
-        System.out.println();
 
-        courseList.forEach((c) -> c.printCourse());
+        courseList.forEach(Course::printCourse);
     }
 
 
-   /**
-    * Accessor methods to be used outside the class.
-    */
+    /**
+     * Accessor methods to be used outside the class.
+     */
     public List<StudentCourse> getCourseList() { return courseList; }
+    public List<StudentCourse> getTranscriptList() { return transcriptList; }
     public String getStudentName(){ return studentName; }
     public String getStudentId(){ return studentId; }
     public String getStartDate(){ return startDate; }
     public String getCurrentMajor() { return currentMajor; }
-    public Plan getCurrentTrack() { return currentTrack; }
+    public String getGraduation() { return graduation;}
+    public boolean isFastTrack() { return fastTrack; }
+    public boolean isThesis() { return thesis; }
+    public Plan getCurrentPlan() { return currentPlan; }
+
+
 
     /**
      * Mutator methods to be used outside the class.
@@ -217,8 +274,16 @@ public class Student {
     public void setStudentId(String studentId){ this.studentId = studentId; }
     public void setStartDate(String startDate){ this.startDate = startDate; }
     public void setCurrentMajor(String currentMajor) { this.currentMajor = currentMajor; }
-    public void setCurrentTrack(Plan currentTrack) {
-        this.currentTrack = currentTrack;
+    public void setGraduation(String graduation) { this.graduation = graduation;}
+    public void setThesis(boolean thesis) { this.thesis = thesis;}
+    public void setFastTrack(boolean fastTrack) { this.fastTrack = fastTrack;}
+    public void setCurrentPlan(Plan.Concentration concentration) {
+        this.currentPlan.setConcentration(concentration);
+        this.courseList = new ArrayList<>();
         evaluateDegreePlan();
+    }
+
+    public void newFormList() {
+        this.courseList = new ArrayList<>();
     }
 }
