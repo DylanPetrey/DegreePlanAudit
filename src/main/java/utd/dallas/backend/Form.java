@@ -85,7 +85,7 @@ public class Form {
             PDField f = fieldTreeIterator.next(); 
             COSDictionary obj = f.getCOSObject();
             if (f.getClass().equals(PDTextField.class)){
-                System.out.println(f.getAlternateFieldName());
+                System.out.println(f.getFullyQualifiedName());
                 f.setValue("run");
 
             }
