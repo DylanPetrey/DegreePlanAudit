@@ -45,7 +45,7 @@ public class CreateController {
     private ChoiceBox<String> trackBox;
     ObservableList<String> csTracks = FXCollections.observableArrayList(
                     "Traditional", "Network-Telecommunications", "Intelligent-Systems", "Interactive-Computing", "Systems", "Data-Science", "Cyber-Security");
-    ObservableList<String> softwareTracks = FXCollections.observableArrayList("Software Engineering");
+    ObservableList<String> softwareTracks = FXCollections.observableArrayList("Software-Engineering");
 
 
 
@@ -62,7 +62,7 @@ public class CreateController {
 
         setListeners();
 
-        if(currentStudent.getCurrentMajor().equals("Software Engineering"))
+        if(currentStudent.getCurrentMajor().equals("Software-Engineering"))
             onSWEButtonClick();
         else
             onCSButtonClick();
@@ -79,7 +79,7 @@ public class CreateController {
     protected void onSWEButtonClick() {
         trackBox.setItems(FXCollections.observableArrayList(softwareTracks));
         trackBox.setValue(softwareTracks.get(0));
-        currentStudent.setCurrentMajor("Software Engineering");
+        currentStudent.setCurrentMajor("Software-Engineering");
         resetAllVBox();
     }
 
@@ -88,7 +88,7 @@ public class CreateController {
         trackBox.setItems(FXCollections.observableArrayList(csTracks));
         trackBox.setValue(csTracks.get(0));
 
-        currentStudent.setCurrentMajor("Computer Science");
+        currentStudent.setCurrentMajor("Computer-Science");
     }
 
     @FXML
@@ -100,21 +100,21 @@ public class CreateController {
     protected void setTrackBox(){
         Object value = trackBox.getValue();
         currentStudent.newFormList();
-        if ("Traditional Computer Science".equals(value)) {
+        if ("Traditional".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.TRADITIONAL);
-        } else if ("Network Telecommunications".equals(value)) {
+        } else if ("Network-Telecommunications".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.NETWORKS);
-        } else if ("Intelligent Systems".equals(value)) {
+        } else if ("Intelligent-Systems".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.INTEL);
-        } else if ("Interactive Computing".equals(value)) {
+        } else if ("Interactive-Computing".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.INTERACTIVE);
         } else if ("Systems".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.SYSTEMS);
-        } else if ("Data Science".equals(value)) {
+        } else if ("Data-Science".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.DATA);
-        } else if ("Cyber Security".equals(value)) {
+        } else if ("Cyber-Security".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.CYBER);
-        } else if ("Software Engineering".equals(value)) {
+        } else if ("Software-Engineering".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
         }
 

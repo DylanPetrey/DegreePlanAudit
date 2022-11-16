@@ -65,10 +65,16 @@ public class Form {
         String loc = "";
         PDDocument pdfDocument = null;
         try {
-            loc = Form.class.getResource("Forms/DP-" + concentration.toString() + ".pdf").getFile().replace("%20", " ");
+            String conString = concentration.toString();
+            StringBuilder sb = new StringBuilder("Forms/DP-");
+            sb.append(conString);
+            if(conString.equals("Software-Engineering"))
+                sb.append("-Program");
+            sb.append(".pdf");
+            loc = Form.class.getResource(sb.toString()).getFile().replace("%20", " ");
             pdfDocument = PDDocument.load(new File(loc));
 
-        } catch (NullPointerException | IOException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
@@ -79,7 +85,8 @@ public class Form {
             PDField f = fieldTreeIterator.next(); 
             COSDictionary obj = f.getCOSObject();
             if (f.getClass().equals(PDTextField.class)){
-            f.setValue("run");
+                System.out.println(f.getAlternateFieldName());
+                f.setValue("run");
 
             }
         }
