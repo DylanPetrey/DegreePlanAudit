@@ -32,11 +32,14 @@ public class Rename {
                 PDField f = fieldTreeIterator.next();
                 COSDictionary obj = f.getCOSObject();
                 if (f.getClass().equals(PDTextField.class)) {
-                    System.out.println(f.getAlternateFieldName());
+                    System.out.println(f.getFullyQualifiedName());
+                    System.out.println(f.getPartialName());
+                    /*
                     System.out.print("Enter new name: ");
                     String s = input.next();
                     if(!s.isEmpty())
                         f.setAlternateFieldName(input.next());
+                    */
                 }
             }
             PDAcroForm finalForm = new PDAcroForm(pdfDocument);
