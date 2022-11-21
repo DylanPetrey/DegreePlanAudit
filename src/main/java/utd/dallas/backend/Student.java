@@ -60,6 +60,15 @@ public class Student {
      */
     public void addCourse(String line, String semester, String transfer){
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
+        String title;
+        String desc;
+        try {
+            title = currentPlan.getCourseTitle(newCourse.getCourseNumber());
+        } catch (Exception e){
+            title = newCourse.getCourseTitle();
+        }
+        newCourse.setCourseTitle(title);
+
         transcriptList.add(newCourse);
     }
 
@@ -70,8 +79,6 @@ public class Student {
         fillPlan();
         fillFormList();
         setInitialCourseTypes();
-        setOptionalCore();
-        setElectives();
     }
 
 
@@ -99,15 +106,6 @@ public class Student {
      */
     private void setOptionalCore(){
         List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
-        long numOpt = currentPlan.getNumOptional();
-
-        // Optional courses to be changed into core
-        while (numOpt > 0 && coreOptList.size() != 0){
-            StudentCourse maxCourse = getMaxCourseGPA(coreOptList);
-            setCourseType(maxCourse.getCourseNumber(), Course.CourseType.CORE);
-            coreOptList.remove(maxCourse);
-            numOpt--;
-        }
 
         // Any extra optional courses
         coreOptList.forEach(StudentCourse -> {
@@ -213,7 +211,7 @@ public class Student {
             courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));
         });
         currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
-            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.ELECTIVE));
+            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.OPTIONAL));
         });
     }
     public void fillFormList(){

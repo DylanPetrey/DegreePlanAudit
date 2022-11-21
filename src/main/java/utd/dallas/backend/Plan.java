@@ -92,13 +92,7 @@ public class Plan {
         return list;
     }
 
-    /**
-     * Creates a list of courses from a JSON object
-     *
-     * @param array JSON object of a courses from the degreeRequirements json
-     * @param type The course type to initialize the courses with
-     * @return a list of courses
-     */
+
     /**
      * Creates a list of courses from a JSON object
      *
@@ -114,7 +108,7 @@ public class Plan {
         for (Object o : array) {
             JSONObject currentCourse = (JSONObject) o;
             String num = (String) currentCourse.get("courseNumber");
-            String title = (String) currentCourse.get("courseDescription");
+            String title = (String) currentCourse.get("courseTitle");
             list.add(new Course(num, title, type));
         }
         return list;
@@ -239,26 +233,12 @@ public class Plan {
      * @param courseNum Course number to identify the course
      * @return Course description
      */
-    public String getCourseDescription(String courseNum){
-        String path = "$.['" + courseNum + "'].Description";
-        try {
-            return CatalogFile.read(path);
-        }catch (NumberFormatException e){
-            return "";
-        }
-    }
-
-    /**
-     * Parse course description from the JSON
-     *
-     * @param courseNum Course number to identify the course
-     * @return Course description
-     */
     public String getCourseTitle(String courseNum){
-        String path = "$.['" + courseNum + "'].Description";
+        String path = "$.['" + courseNum + "'].Title";
         try {
             return CatalogFile.read(path);
         }catch (NumberFormatException e){
+            System.out.print(courseNum);
             return "";
         }
     }
@@ -271,7 +251,7 @@ public class Plan {
         switch (type){
             case CORE:
                 return requiredCore;
-            case ELECTIVE:
+            case OPTIONAL:
                 return optionalCore;
             case PRE:
                 List<Course> prereq = new ArrayList<>();

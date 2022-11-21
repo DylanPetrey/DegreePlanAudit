@@ -69,6 +69,7 @@ public class StudentCourse extends Course {
     public String toString() {
         return  courseNumber + " " +
                 courseTitle + " " +
+                semester + " " +
                 transfer + " " +
                 letterGrade;
     }
@@ -88,7 +89,7 @@ public class StudentCourse extends Course {
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
-
+    public void setWaived(boolean waived) { this.isWaived = waived; }
     public void setFromTranscript(boolean fromTranscript) {
         this.fromTranscript = fromTranscript;
     }

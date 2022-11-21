@@ -190,7 +190,10 @@ public class Audit {
      * Prints the GPA as seen on the sample audit
      */
     public void printGPA(){
+        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.CORE).toString());
         System.out.println("Core GPA: " + coreGPA);
+        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.ELECTIVE).toString());
+        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.ADDITIONAL).toString());
         System.out.println("Elective GPA: " + electiveGPA);
         System.out.println("Combined GPA: " + combinedGPA);
     }

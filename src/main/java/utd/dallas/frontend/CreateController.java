@@ -1,5 +1,6 @@
 package utd.dallas.frontend;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -7,12 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import utd.dallas.backend.Course;
 import utd.dallas.backend.Plan;
 import utd.dallas.backend.Student;
@@ -21,6 +19,11 @@ import utd.dallas.backend.StudentCourse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static utd.dallas.frontend.CourseCard.inHierarchy;
 
 public class CreateController {
     @FXML private AnchorPane basePane;
@@ -31,18 +34,22 @@ public class CreateController {
     @FXML private CheckBox fastTrack;
     @FXML private CheckBox thesis;
     @FXML private TextField anticipatedGrad;
-    @FXML private GridPane coreGrid;
     @FXML private VBox coreVBox;
     @FXML private VBox approvedVBox;
     @FXML private VBox additionalVBox;
     @FXML private VBox preReqVBox;
-
+    @FXML private ScrollPane OptionalPane;
+    @FXML private ScrollPane CorePane;
+    @FXML private VBox optionalVBox;
+    @FXML private VBox transcriptVBox;
+    @FXML private SplitPane CourseSelectionPane;
 
 
     public Student currentStudent;
-
+    int delayTime = 1;
     @FXML
     private ChoiceBox<String> trackBox;
+    private Double cardWidth;
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
@@ -68,6 +75,14 @@ public class CreateController {
             onSWEButtonClick();
         else
             onCSButtonClick();
+
+
+        Platform.runLater(() -> {
+            FlowPane flow = (FlowPane) OptionalPane.getContent().lookup("FlowObject$2");
+            double card = flow.getChildren().get(0).getBoundsInParent().getWidth();
+            OptionalPane.setMinViewportWidth(card+3);
+            CorePane.setMinViewportWidth(card+3);
+        });
     }
 
     protected void setInitalFields(){
@@ -124,19 +139,44 @@ public class CreateController {
     }
 
     private void resetAllVBox(){
-        resetVbox(coreVBox, Course.CourseType.CORE, 5);
-        resetVbox(approvedVBox, Course.CourseType.ELECTIVE,5);
-        resetVbox(additionalVBox, Course.CourseType.ADDITIONAL,3);
-        resetVbox(preReqVBox, Course.CourseType.PRE,9);
+        resetVbox(coreVBox, Course.CourseType.CORE);
+        resetVbox(approvedVBox, Course.CourseType.ELECTIVE);
+        resetVbox(additionalVBox, Course.CourseType.ADDITIONAL);
+        resetVbox(preReqVBox, Course.CourseType.PRE);
+        resetVbox(optionalVBox, Course.CourseType.OPTIONAL);
+        resetVbox(transcriptVBox, Course.CourseType.OTHER);
     }
 
 
-    private void resetVbox(VBox current, Course.CourseType t, int numRows){
-        current.getChildren().remove(current.lookup("GridPane"));
+    private void resetVbox(VBox current, Course.CourseType t){
+        current.getChildren().remove(current.lookup("FlowObject$2"));
 
-        GridObject g = new GridObject(t);
+        FlowObject g = new FlowObject(t);
         List<StudentCourse> courseOfType = currentStudent.getCourseType(t);
-        for(int i = 0; i < numRows; i++){
+        addCoursesToObject(g, courseOfType);
+        current.getChildren().add(g.getFlowPane());
+
+        for(CourseCard c : g.getObservableCard()){
+            final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            Platform.runLater(() -> {
+                createCourseCardListener(c);
+            });
+        }
+    }
+
+    private void createCourseCardListener(CourseCard c){
+        Scene currentScene = basePane.getScene();
+        if(currentScene != null) {
+            currentScene.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
+                if (!inHierarchy(evt.getPickResult().getIntersectedNode(), c.stackContainer)) {
+                    c.card.setVisible(false);
+                }
+            });
+        }
+    }
+
+    private void addCoursesToObject(FlowObject g, List<StudentCourse> courseOfType) {
+        for(int i = 0; i < courseOfType.size(); i++){
             StudentCourse currentCourse;
             try{
                 currentCourse = courseOfType.get(i);
@@ -144,10 +184,10 @@ public class CreateController {
                 currentCourse = new StudentCourse();
             }
 
-            g.addRow(currentCourse);
+            g.addCard(currentCourse);
         }
 
-        current.getChildren().add(g.getGrid());
+
     }
 
     protected void setListeners(){
@@ -198,7 +238,6 @@ public class CreateController {
         thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
             currentStudent.setThesis(thesis.isSelected());
         });
-
     }
 
     @FXML

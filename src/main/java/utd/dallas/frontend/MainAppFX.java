@@ -21,7 +21,7 @@ public class MainAppFX extends Application {
         Scene scene = new Scene(fxmlLoader.load(), 700, 700);
         this.primaryStage.setTitle("Select Track");
         this.primaryStage.setScene(scene);
-        this.primaryStage.setMinWidth(700);
+        this.primaryStage.setMinWidth(650);
         this.primaryStage.setMinHeight(600);
         this.primaryStage.setMinHeight(600);
         this.primaryStage.show();
