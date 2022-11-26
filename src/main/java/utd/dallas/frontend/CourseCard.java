@@ -43,7 +43,6 @@ public class CourseCard {
         summary.visibleProperty().bind(card.visibleProperty().not());
         card.setVisible(false);
 
-
         stackContainer = new StackPane(summary, card);
         stackContainer.getChildren().forEach(child -> VBox.setVgrow(child, Priority.ALWAYS));
         stackContainer.getChildren().forEach(child -> HBox.setHgrow(child, Priority.ALWAYS));

@@ -1,6 +1,8 @@
 package utd.dallas.frontend;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import utd.dallas.backend.Course;
 
 
 public class SummaryCard {
@@ -24,6 +27,7 @@ public class SummaryCard {
 
     private static final int MAX_TITLE_LENGTH = 42;
     private Pane deleteButton = new Pane();
+    private final BooleanProperty isOptionalType = new SimpleBooleanProperty(false);
     BooleanBinding isEmptyCourse;
 
     SummaryCard(){
@@ -48,7 +52,6 @@ public class SummaryCard {
         cardText.setAlignment(Pos.TOP_LEFT);
         summaryCard.getChildren().addAll(cardText);
 
-
         isEmptyCourse =
                 courseNumLabel.textProperty().isNotEmpty().or(
                 titleLabel.textProperty().isNotEmpty().or(
@@ -58,7 +61,7 @@ public class SummaryCard {
                 waiveText.textProperty().isNotEmpty())))));
 
         deleteButton = createDeleteButton();
-        deleteButton.visibleProperty().bind(summaryCard.hoverProperty().and(isEmptyCourse));
+        deleteButton.visibleProperty().bind(summaryCard.hoverProperty().and(isEmptyCourse).and(isOptionalType.not()));
 
         summaryCard.getChildren().add(deleteButton);
         StackPane.setAlignment(deleteButton, Pos.TOP_RIGHT);
@@ -166,6 +169,10 @@ public class SummaryCard {
             waiveText.setText("Waived");
         else
             waiveText.setText("");
+    }
+
+    public void setCourseType(Course.CourseType type){
+        isOptionalType.setValue(type == Course.CourseType.OPTIONAL);
     }
 
 }
