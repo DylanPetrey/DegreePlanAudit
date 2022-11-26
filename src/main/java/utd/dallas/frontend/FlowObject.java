@@ -3,46 +3,70 @@ package utd.dallas.frontend;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
 import utd.dallas.backend.Course;
 import utd.dallas.backend.StudentCourse;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class FlowObject {
     FlowPane flowPane;
+    ObservableList<Node> flowOrder;
     ObservableList<CourseCard> observableCard;
+    Course.CourseType type;
+    StackPane addCard;
 
 
     FlowObject(Course.CourseType type){
-        flowPane = newFlowPane();
+        this.type = type;
+        flowPane = new FlowPane();
         flowPane.setHgap(0);
+        flowPane.setAlignment(Pos.CENTER);
 
         observableCard = FXCollections.observableArrayList(new ArrayList<CourseCard>());
 
         observableCard.addListener(new ListChangeListener<CourseCard>() {
             @Override
             public void onChanged(Change<? extends CourseCard> change) {
-                while (change.next()) {
-                    for (CourseCard removedCard : change.getRemoved()) {
-                        flowPane.getChildren().remove(removedCard.getCard());
-                    }
-                    for (CourseCard addedCard : change.getAddedSubList()) {
-                        flowPane.getChildren().add(addedCard.getCard());
-                    }
-                }
+                updateFlowPane();
             }
         });
     }
 
+    public void updateFlowPane(){
+        flowPane.getChildren().clear();
+        flowOrder = FXCollections.observableArrayList();
+        observableCard.forEach(CourseCard ->{
+            flowOrder.add(CourseCard.getCard());
+        });
+
+        if(addCard != null){
+            flowOrder.add(addCard);
+        }
+
+        flowPane.getChildren().addAll(flowOrder);
+    }
+
+    public boolean hasAddCourse(){
+        return observableCard.get(observableCard.size()-1).getCurrentCourse().isEmpty();
+    }
     public void addCard(StudentCourse currentCourse){
+        currentCourse.setType(type);
         CourseCard currentCard = new CourseCard(currentCourse);
         observableCard.add(currentCard);
     }
+
+    public List<CourseCard> removeEmpty(){
+        List<CourseCard> removeList = new ArrayList<>();
+        for(int i = 0; i < observableCard.size()-1; i++)
+            if(observableCard.get(i).getCurrentCourse().isEmpty())
+                    removeList.add(observableCard.get(i));
+
+        return removeList;
+    }
+
     public FlowPane getFlowPane() {
         return flowPane;
     }
@@ -50,41 +74,8 @@ public class FlowObject {
         return observableCard;
     }
 
-    private FlowPane newFlowPane(){
-        return new FlowPane() {
-            {
-                setAlignment(Pos.TOP_CENTER);
-                setOrientation(Orientation.HORIZONTAL);
-            }
-
-            @Override
-            protected void layoutChildren() {
-                super.layoutChildren();
-
-                final LinkedHashMap<Double, List<Node>> rows = new LinkedHashMap<>();
-                getChildren().forEach(node -> {
-                    final double layoutY = node.getLayoutY();
-                    List<Node> row = rows.get(node.getLayoutY());
-                    if (row == null) {
-                        row = new ArrayList<>();
-                        rows.put(layoutY, row);
-                    }
-
-                    row.add(node);
-                });
-
-                try {
-                    final Object[] keys = rows.keySet().toArray();
-                    final List<Node> firstRow = rows.get(keys[0]);
-                    final List<Node> lastRow = rows.get(keys[keys.length - 1]);
-                    for (int i = 0; i < lastRow.size(); i++) {
-                        lastRow.get(i).setLayoutX(firstRow.get(i).getLayoutX());
-                    }
-                } catch (ArrayIndexOutOfBoundsException e){
-                    return;
-                }
-            }
-        };
+    public Course.CourseType getType() {
+        return type;
     }
 }
 

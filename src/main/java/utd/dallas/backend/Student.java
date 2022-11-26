@@ -10,7 +10,7 @@ public class Student {
     private String startDate;
     private String currentMajor;
     private String graduation;
-    private Plan currentPlan;
+    private final Plan currentPlan;
     private boolean fastTrack;
     private boolean thesis;
 
@@ -71,6 +71,11 @@ public class Student {
 
         transcriptList.add(newCourse);
     }
+
+    public void addCourse(StudentCourse newCourse){
+        courseList.add(newCourse);
+    }
+
 
     /**
      * Drives the methods that set the course types for each course

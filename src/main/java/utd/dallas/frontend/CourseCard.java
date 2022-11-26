@@ -7,8 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -21,10 +20,9 @@ public class CourseCard {
     private final double maxTextWidth;
     StudentCourse currentCourse;
     StackPane stackContainer;
-    Pane card;
-    Pane summary;
+    StackPane card;
+    StackPane summary;
     SummaryCard summaryCard;
-
 
     CourseCard(StudentCourse currentCourse) {
         // Initialize max width
@@ -41,12 +39,15 @@ public class CourseCard {
         card.setMaxWidth(Region.USE_PREF_SIZE);
         summaryCardConstraints();
 
-        card.setStyle("-fx-background-color: white; -fx-border-color: black");
+        card.setStyle("-fx-border-color: black");
+        summary.visibleProperty().bind(card.visibleProperty().not());
         card.setVisible(false);
+
 
         stackContainer = new StackPane(summary, card);
         stackContainer.getChildren().forEach(child -> VBox.setVgrow(child, Priority.ALWAYS));
         stackContainer.getChildren().forEach(child -> HBox.setHgrow(child, Priority.ALWAYS));
+
         stackContainer.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
@@ -56,8 +57,6 @@ public class CourseCard {
                 }
             }
         });
-
-
     }
 
     private void summaryCardConstraints(){
@@ -67,13 +66,12 @@ public class CourseCard {
 
         summary.setLayoutX(card.getLayoutX());
         summary.setLayoutY(card.getLayoutY());
-        summary.visibleProperty().bind(card.visibleProperty().not());
         summary.setStyle("-fx-border-color: black; -fx-border-radius: 5; -fx-padding: 5");
 
         summary.setOnMouseEntered(event -> {
-            if(!card.isVisible())
-                summary.setStyle("-fx-background-color: #c6c6c6; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5; -fx-padding: 5; -fx-cursor: hand");
-
+            if(!card.isVisible()) {
+                summary.setStyle("-fx-background-color: #c6c6c6; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5; -fx-padding: 5");
+            }
         });
         summary.setOnMouseExited(event -> {
             if(!card.isVisible())
@@ -238,8 +236,8 @@ public class CourseCard {
         return current;
     }
 
-    private Pane createCard(){
-        Pane current_card = new Pane();
+    private StackPane createCard(){
+        StackPane current_card = new StackPane();
         VBox vAlign = new VBox();
         vAlign.setAlignment(Pos.CENTER);
         vAlign.setSpacing(10);
@@ -257,12 +255,11 @@ public class CourseCard {
 
         return current_card;
     }
-
-    public Pane getCard() {
+    public StackPane getCard() {
         return stackContainer;
     }
 
-    public Double getCardWidth() {
-        return stackContainer.getLayoutBounds().getWidth();
+    public StudentCourse getCurrentCourse() {
+        return currentCourse;
     }
 }

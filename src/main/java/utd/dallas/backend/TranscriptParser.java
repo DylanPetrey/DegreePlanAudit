@@ -119,6 +119,7 @@ public class TranscriptParser {
     private void fillCourseInformation(Student currentStudent, String[] transcript){
         boolean transfer = false;
         boolean fastTrack = false;
+        boolean thesis = false;
         boolean graduateCourse = false;
         String transfer_text = "";
         String semester = "";

@@ -67,11 +67,20 @@ public class StudentCourse extends Course {
      */
     @Override
     public String toString() {
+        String transferText;
+        if(isWaived)
+            transferText = "Waived";
+        else
+            transferText = transfer;
         return  courseNumber + " " +
                 courseTitle + " " +
                 semester + " " +
-                transfer + " " +
+                transferText + " " +
                 letterGrade;
+    }
+
+    public boolean isEmpty(){
+        return  toString().trim().isEmpty();
     }
 
     public String getSemester() { return semester; }

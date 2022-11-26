@@ -8,7 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import utd.dallas.backend.Course;
@@ -17,11 +17,9 @@ import utd.dallas.backend.Student;
 import utd.dallas.backend.StudentCourse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static utd.dallas.frontend.CourseCard.inHierarchy;
 
@@ -42,14 +40,10 @@ public class CreateController {
     @FXML private ScrollPane CorePane;
     @FXML private VBox optionalVBox;
     @FXML private VBox transcriptVBox;
-    @FXML private SplitPane CourseSelectionPane;
-
-
+    @FXML private ChoiceBox<String> trackBox;
     public Student currentStudent;
-    int delayTime = 1;
-    @FXML
-    private ChoiceBox<String> trackBox;
     private Double cardWidth;
+    List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
@@ -67,6 +61,14 @@ public class CreateController {
             currentStudent = new Student();
         }
 
+        Platform.runLater(() -> {
+            FlowPane flow = (FlowPane) CorePane.getContent().lookup("FlowPane");
+            cardWidth = flow.getChildren().get(0).getBoundsInParent().getWidth();
+            OptionalPane.setMinViewportWidth(cardWidth + 3);
+            CorePane.setMinViewportWidth(cardWidth + 3);
+
+        });
+
         trackBox.setItems(csTracks);
 
         setListeners();
@@ -77,13 +79,9 @@ public class CreateController {
             onCSButtonClick();
 
 
-        Platform.runLater(() -> {
-            FlowPane flow = (FlowPane) OptionalPane.getContent().lookup("FlowObject$2");
-            double card = flow.getChildren().get(0).getBoundsInParent().getWidth();
-            OptionalPane.setMinViewportWidth(card+3);
-            CorePane.setMinViewportWidth(card+3);
-        });
     }
+
+
 
     protected void setInitalFields(){
         studentName.setText(currentStudent.getStudentName());
@@ -149,45 +147,60 @@ public class CreateController {
 
 
     private void resetVbox(VBox current, Course.CourseType t){
-        current.getChildren().remove(current.lookup("FlowObject$2"));
+        current.getChildren().remove(current.lookup("FlowPane"));
 
         FlowObject g = new FlowObject(t);
+        ListOfFlowObjects.add(g);
         List<StudentCourse> courseOfType = currentStudent.getCourseType(t);
+        if(current != optionalVBox) {
+            courseOfType.add(new StudentCourse(t));
+        }
         addCoursesToObject(g, courseOfType);
         current.getChildren().add(g.getFlowPane());
 
-        for(CourseCard c : g.getObservableCard()){
-            final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-            Platform.runLater(() -> {
-                createCourseCardListener(c);
-            });
+        for(CourseCard card : g.getObservableCard()){
+            createCourseCardListener(card, g);
         }
     }
 
-    private void createCourseCardListener(CourseCard c){
+    private void createCourseCardListener(CourseCard c, FlowObject g){
         Scene currentScene = basePane.getScene();
         if(currentScene != null) {
             currentScene.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
+                if (inHierarchy(evt.getPickResult().getIntersectedNode(), c.summaryCard.getDeleteButton())) {
+                    if (g.getType() != Course.CourseType.OPTIONAL){
+                        currentStudent.getCourseList().remove(c.getCurrentCourse());
+                        g.getObservableCard().remove(c);
+                    }
+                }
+
                 if (!inHierarchy(evt.getPickResult().getIntersectedNode(), c.stackContainer)) {
                     c.card.setVisible(false);
+
+                    List<CourseCard> empty = g.removeEmpty();
+                    g.getObservableCard().removeAll(empty);
+                    empty.forEach(courseCard -> currentStudent.getCourseList().remove(courseCard.getCurrentCourse()));
+
+                    if(!g.hasAddCourse() && g.getType() != Course.CourseType.OPTIONAL){
+                        StudentCourse newCourse = new StudentCourse(g.getType());
+                        currentStudent.getCourseList().add(newCourse);
+                        g.addCard(newCourse);
+                    }
                 }
             });
         }
+
+        Platform.runLater(() -> {
+            createCourseCardListener(c, g);
+        });
     }
 
     private void addCoursesToObject(FlowObject g, List<StudentCourse> courseOfType) {
-        for(int i = 0; i < courseOfType.size(); i++){
+        for (StudentCourse studentCourse : courseOfType) {
             StudentCourse currentCourse;
-            try{
-                currentCourse = courseOfType.get(i);
-            } catch (IndexOutOfBoundsException e){
-                currentCourse = new StudentCourse();
-            }
-
+            currentCourse = studentCourse;
             g.addCard(currentCourse);
         }
-
-
     }
 
     protected void setListeners(){
