@@ -62,8 +62,8 @@ public class SummaryCard {
 
         summaryCard.getChildren().add(deleteButton);
         StackPane.setAlignment(deleteButton, Pos.TOP_RIGHT);
-        deleteButton.setTranslateX(-5);
-        deleteButton.setTranslateY(5);
+        deleteButton.setTranslateX(-10);
+        deleteButton.setTranslateY(0);
 
         Label addCourseLabel = new Label("Add Course");
         addCourseLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 16");
@@ -119,10 +119,25 @@ public class SummaryCard {
         StackPane cross = new StackPane(leftDiag, rightDiag);
         Pane container = new Pane(cross);
 
-        container.setMaxWidth(Math.abs(leftDiag.getEndX()-leftDiag.getStartX()));
-        container.setMaxHeight(Math.abs(leftDiag.getEndY()-leftDiag.getStartY()));
+        double maxWidth = Math.abs(leftDiag.getEndX()-leftDiag.getStartX());
 
-        container.setStyle("-fx-cursor: hand");
+        container.setMaxWidth(maxWidth);
+        container.setMaxHeight(maxWidth);
+
+        cross.setPadding(new Insets(5));
+        container.setPadding(new Insets(5));
+
+        cross.setStyle("-fx-cursor: hand");
+
+        cross.setOnMouseEntered(event -> {
+            if(cross.isVisible()) {
+                cross.setStyle("-fx-cursor: hand; -fx-background-color: gray; -fx-background-radius: " + String.valueOf(maxWidth/2-2) + "");
+            }
+        });
+        cross.setOnMouseExited(event -> {
+            if(cross.isVisible())
+                cross.setStyle("-fx-cursor: hand");
+        });
         return container;
     }
 

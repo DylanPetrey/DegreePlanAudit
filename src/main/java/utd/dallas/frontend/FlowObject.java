@@ -52,10 +52,11 @@ public class FlowObject {
     public boolean hasAddCourse(){
         return observableCard.get(observableCard.size()-1).getCurrentCourse().isEmpty();
     }
-    public void addCard(StudentCourse currentCourse){
+    public CourseCard addCard(StudentCourse currentCourse){
         currentCourse.setType(type);
         CourseCard currentCard = new CourseCard(currentCourse);
         observableCard.add(currentCard);
+        return currentCard;
     }
 
     public List<CourseCard> removeEmpty(){

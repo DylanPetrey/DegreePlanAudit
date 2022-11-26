@@ -184,7 +184,7 @@ public class CreateController {
                     if(!g.hasAddCourse() && g.getType() != Course.CourseType.OPTIONAL){
                         StudentCourse newCourse = new StudentCourse(g.getType());
                         currentStudent.getCourseList().add(newCourse);
-                        g.addCard(newCourse);
+                        createCourseCardListener(g.addCard(newCourse), g);
                     }
                 }
             });
@@ -199,7 +199,7 @@ public class CreateController {
         for (StudentCourse studentCourse : courseOfType) {
             StudentCourse currentCourse;
             currentCourse = studentCourse;
-            g.addCard(currentCourse);
+            createCourseCardListener(g.addCard(currentCourse), g);
         }
     }
 
