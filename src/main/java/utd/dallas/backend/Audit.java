@@ -15,9 +15,11 @@ import java.util.regex.Pattern;
 
 public class Audit {
     // Student variables
-    private Student currentStudent;
-    private Plan degreePlan;
-
+    private final Student currentStudent;
+    private final List<StudentCourse> filledCourses;
+    List<StudentCourse> coreList = new ArrayList<>();
+    List<StudentCourse> electList = new ArrayList<>();
+    List<StudentCourse> preList = new ArrayList<>();
     // Course Hashmaps
     private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();
     private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();
@@ -43,8 +45,8 @@ public class Audit {
      */
     public Audit(Student currentStudent){
         this.currentStudent = currentStudent;
-        degreePlan = currentStudent.getCurrentPlan();
-        courseMap = getClassMap(currentStudent.getCourseList());
+        this.filledCourses = currentStudent.getCleanCourseList();
+        courseMap = getClassMap(filledCourses);
     }
 
 
@@ -120,19 +122,21 @@ public class Audit {
      * This function calculates the core, elective, and cumulative GPA values
      */
     private void calculateGPAValues(){
-        List<StudentCourse> coreList = new ArrayList<>();
-        currentStudent.getCourseList().stream()
+        filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
                 .forEach(coreList::add);
         coreGPA = calcGPA(coreList);
 
-        List<StudentCourse> electList = new ArrayList<>();
-        currentStudent.getCourseList().stream()
+        filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL)
                 .forEach(electList::add);
         electiveGPA = calcGPA(electList);
 
-        combinedGPA = calcGPA(currentStudent.getCourseList());
+        filledCourses.stream()
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.PRE)
+                .forEach(preList::add);
+
+        combinedGPA = calcGPA(filledCourses);
     }
 
 
@@ -190,10 +194,13 @@ public class Audit {
      * Prints the GPA as seen on the sample audit
      */
     public void printGPA(){
-        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.CORE).toString());
+        currentStudent.printStudentInformation();
+        System.out.println();
+        System.out.println("Core: " + coreList.toString());
+        System.out.println("Elective: " + electList.toString());
+        System.out.println("Pre: " + preList.toString());
+        System.out.println();
         System.out.println("Core GPA: " + coreGPA);
-        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.ELECTIVE).toString());
-        System.out.println("Core: " + currentStudent.getCourseType(Course.CourseType.ADDITIONAL).toString());
         System.out.println("Elective GPA: " + electiveGPA);
         System.out.println("Combined GPA: " + combinedGPA);
     }

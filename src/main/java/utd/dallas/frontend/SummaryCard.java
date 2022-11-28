@@ -27,7 +27,7 @@ public class SummaryCard {
 
     private static final int MAX_TITLE_LENGTH = 42;
     private Pane deleteButton = new Pane();
-    private final BooleanProperty isOptionalType = new SimpleBooleanProperty(false);
+    private BooleanProperty isOptionalType = new SimpleBooleanProperty(false);
     BooleanBinding isEmptyCourse;
 
     SummaryCard(){
@@ -141,6 +141,7 @@ public class SummaryCard {
             if(cross.isVisible())
                 cross.setStyle("-fx-cursor: hand");
         });
+
         return container;
     }
 
@@ -175,4 +176,7 @@ public class SummaryCard {
         isOptionalType.setValue(type == Course.CourseType.OPTIONAL);
     }
 
+    public BooleanBinding isEmptyCourse() {
+        return isEmptyCourse;
+    }
 }

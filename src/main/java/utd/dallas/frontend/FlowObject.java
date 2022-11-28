@@ -9,21 +9,21 @@ import javafx.scene.layout.*;
 import utd.dallas.backend.Course;
 import utd.dallas.backend.StudentCourse;
 import java.util.ArrayList;
-import java.util.List;
 
 public class FlowObject {
+    VBox parent;
     FlowPane flowPane;
-    ObservableList<Node> flowOrder;
     ObservableList<CourseCard> observableCard;
     Course.CourseType type;
-    StackPane addCard;
 
-
-    FlowObject(Course.CourseType type){
+    FlowObject(Course.CourseType type, VBox parent){
         this.type = type;
+        this.parent = parent;
         flowPane = new FlowPane();
         flowPane.setHgap(0);
         flowPane.setAlignment(Pos.CENTER);
+        flowPane.setPrefHeight(100);
+
 
         observableCard = FXCollections.observableArrayList(new ArrayList<CourseCard>());
 
@@ -37,36 +37,47 @@ public class FlowObject {
 
     public void updateFlowPane(){
         flowPane.getChildren().clear();
-        flowOrder = FXCollections.observableArrayList();
+        ObservableList<Node> flowOrder = FXCollections.observableArrayList();
+
         observableCard.forEach(CourseCard ->{
-            flowOrder.add(CourseCard.getCard());
+            if(!flowOrder.contains(CourseCard.getCard()))
+                flowOrder.add(CourseCard.getCard());
         });
 
-        if(addCard != null){
-            flowOrder.add(addCard);
-        }
-
         flowPane.getChildren().addAll(flowOrder);
+
+        if(getObservableCard().size() == 0) {
+            flowPane.setMinHeight(150);
+            flowPane.setPrefHeight(150);
+        }else {
+            flowPane.setMinHeight(Region.USE_COMPUTED_SIZE);
+            flowPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+        }
     }
 
-    public boolean hasAddCourse(){
-        return observableCard.get(observableCard.size()-1).getCurrentCourse().isEmpty();
-    }
     public CourseCard addCard(StudentCourse currentCourse){
         currentCourse.setType(type);
         CourseCard currentCard = new CourseCard(currentCourse);
+        currentCard.setParent(this);
         currentCard.summaryCard.setCourseType(currentCourse.getType());
         observableCard.add(currentCard);
         return currentCard;
     }
 
-    public List<CourseCard> removeEmpty(){
-        List<CourseCard> removeList = new ArrayList<>();
-        for(int i = 0; i < observableCard.size()-1; i++)
-            if(observableCard.get(i).getCurrentCourse().isEmpty())
-                    removeList.add(observableCard.get(i));
+    public void addCard(CourseCard newCard){
+        newCard.getParent().removeCard(newCard);
+        newCard.setParent(this);
+        newCard.getCurrentCourse().setType(type);
+        newCard.summaryCard.setCourseType(type);
 
-        return removeList;
+        if(type == Course.CourseType.OPTIONAL || observableCard.size() < 1)
+            observableCard.add(observableCard.size(), newCard);
+        else
+            observableCard.add(observableCard.size()-1, newCard);
+    }
+
+    public void removeCard(CourseCard target){
+        observableCard.remove(target);
     }
 
     public FlowPane getFlowPane() {
@@ -78,6 +89,10 @@ public class FlowObject {
 
     public Course.CourseType getType() {
         return type;
+    }
+
+    public VBox getParent(){
+        return parent;
     }
 }
 

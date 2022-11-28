@@ -80,9 +80,8 @@ public class StudentCourse extends Course {
     }
 
     public boolean isEmpty(){
-        return  toString().trim().isEmpty();
+        return courseNumber.equals("");
     }
-
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
     public double getAttempted() { return attempted; }
@@ -91,7 +90,6 @@ public class StudentCourse extends Course {
     public String getTransfer() { return transfer; }
     public boolean isFromTranscript() { return fromTranscript; }
     public boolean isWaived() { return isWaived; }
-
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }

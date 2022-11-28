@@ -23,6 +23,7 @@ public class CourseCard {
     StackPane card;
     StackPane summary;
     SummaryCard summaryCard;
+    FlowObject parent;
 
     CourseCard(StudentCourse currentCourse) {
         // Initialize max width
@@ -261,4 +262,13 @@ public class CourseCard {
     public StudentCourse getCurrentCourse() {
         return currentCourse;
     }
+
+    public void setParent(FlowObject parent) {
+        this.parent = parent;
+    }
+
+    public FlowObject getParent() {
+        return parent;
+    }
+
 }

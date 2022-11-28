@@ -175,9 +175,9 @@ public class Plan {
      * @param courseNumber Course number to identify the course
      * @return true/false if the course is an optional core course
      */
-    public boolean isOpt(Course courseNumber) {
+    public boolean isOpt(String courseNumber) {
         for (Course currentClass : optionalCore) {
-            if (courseNumber.equals(currentClass))
+            if (courseNumber.equals(currentClass.getCourseNumber()))
                 return true;
         }
         return false;
@@ -220,9 +220,8 @@ public class Plan {
     public int getCourseHours(String courseNum){
         String path = "$.['" + courseNum + "'].Hours";
         try {
-            int hours = Integer.parseInt(CatalogFile.read(path));
-            return hours;
-        }catch (NumberFormatException e){
+            return Integer.parseInt(CatalogFile.read(path));
+        }catch (Exception e){
             return 3;
         }
     }
@@ -237,8 +236,7 @@ public class Plan {
         String path = "$.['" + courseNum + "'].Title";
         try {
             return CatalogFile.read(path);
-        }catch (NumberFormatException e){
-            System.out.print(courseNum);
+        }catch (Exception e){
             return "";
         }
     }
@@ -261,6 +259,14 @@ public class Plan {
         }
 
         return new ArrayList<>();
+    }
+
+    public Course getOptionalCourse(String courseNum){
+        for(Course optCourse : optionalCore){
+            if(optCourse.getCourseNumber().equals(courseNum))
+                return optCourse;
+        }
+        return null;
     }
 
     public long getNumOptional() { return numOptional; }

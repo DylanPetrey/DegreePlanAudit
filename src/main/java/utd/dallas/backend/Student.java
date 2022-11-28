@@ -94,8 +94,10 @@ public class Student {
         for(Course course : getCourseList()) {
             if (currentPlan.isCore(course))
                 setCourseType(course.courseNumber, Course.CourseType.CORE);
-            else if (currentPlan.isOpt(course))
+            else if (currentPlan.isOpt(course.getCourseNumber())) {
                 setCourseType(course.courseNumber, Course.CourseType.OPTIONAL);
+
+            }
             else if (currentPlan.isPre(course))
                 setCourseType(course.courseNumber, Course.CourseType.PRE);
             else if (currentPlan.isTrack(course))
@@ -246,7 +248,21 @@ public class Student {
         System.out.println(startDate);
         System.out.println(currentMajor);
 
-        courseList.forEach(Course::printCourse);
+        courseList.forEach(StudentCourse-> {
+            if(!StudentCourse.isEmpty()) {
+                System.out.print(StudentCourse.toString());
+                System.out.println(" " + StudentCourse.getType());
+            }
+
+        });
+    }
+
+    public List<StudentCourse> getCleanCourseList(){
+        List<StudentCourse> cleanCourses = new ArrayList<>();
+        for(StudentCourse course : courseList)
+            if(!course.isEmpty())
+                cleanCourses.add(course);
+        return cleanCourses;
     }
 
 
