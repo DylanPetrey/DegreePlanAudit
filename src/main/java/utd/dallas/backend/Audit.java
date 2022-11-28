@@ -1,8 +1,9 @@
+package utd.dallas.backend;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 /*
  * TODO:
@@ -14,9 +15,11 @@ import java.util.regex.Pattern;
 
 public class Audit {
     // Student variables
-    private Student currentStudent;
-    private Plan degreePlan;
-
+    private final Student currentStudent;
+    private final List<StudentCourse> filledCourses;
+    List<StudentCourse> coreList = new ArrayList<>();
+    List<StudentCourse> electList = new ArrayList<>();
+    List<StudentCourse> preList = new ArrayList<>();
     // Course Hashmaps
     private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();
     private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();
@@ -35,18 +38,15 @@ public class Audit {
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
-
     /**
      * Audit constructor
      *
      * @param currentStudent current student object
      */
-    public Audit(Student currentStudent) {
+    public Audit(Student currentStudent){
         this.currentStudent = currentStudent;
-        degreePlan = currentStudent.getCurrentTrack();
-        courseMap = getClassMap(currentStudent.getCourseList());
-
-
+        this.filledCourses = currentStudent.getCleanCourseList();
+        courseMap = getClassMap(filledCourses);
     }
 
 
@@ -102,7 +102,7 @@ public class Audit {
             // Loop over each repeated class
             courseList.forEach(course -> {
                 Matcher m = stringPattern.matcher(course.getLetterGrade());
-                if(!m.find() || (course.isTransfer() && !course.isFast()))
+                if(!m.find() || course.getTransfer().equals("T"))
                     return;
 
                 currentCourseList.add(course);
@@ -115,23 +115,30 @@ public class Audit {
 
 
     /**
+     * This function calculates the GPA given the utd classes and updates the GPA
+     * value rounded to 3 decimal places for core, elective and combined
+     */
+    /**
      * This function calculates the core, elective, and cumulative GPA values
      */
     private void calculateGPAValues(){
-        List<StudentCourse> coreList = new ArrayList<>();
-        currentStudent.getCourseList().stream()
+        filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
                 .forEach(coreList::add);
         coreGPA = calcGPA(coreList);
 
-        List<StudentCourse> electList = new ArrayList<>();
-        currentStudent.getCourseList().stream()
+        filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL)
                 .forEach(electList::add);
         electiveGPA = calcGPA(electList);
 
-        combinedGPA = calcGPA(currentStudent.getCourseList());
+        filledCourses.stream()
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.PRE)
+                .forEach(preList::add);
+
+        combinedGPA = calcGPA(filledCourses);
     }
+
 
     /**
      * Calculates the gpa for the courseList
@@ -153,7 +160,7 @@ public class Audit {
 
         courseList.forEach(studentCourse -> {
                     String letterGrade = studentCourse.getLetterGrade();
-                    int currentHour = currentStudent.getCurrentTrack().getCourseHours(studentCourse.getCourseNumber());
+                    int currentHour = currentStudent.getCurrentPlan().getCourseHours(studentCourse.getCourseNumber());
                     if (letterGrade.equalsIgnoreCase("A"))
                         totalPoints.updateAndGet(v -> (v+(A_GRADEPTS*currentHour)));
                     else if (letterGrade.equalsIgnoreCase("A-"))
@@ -175,7 +182,7 @@ public class Audit {
 
                     totalHours.updateAndGet(v -> (v+currentHour));
                 }
-                );
+        );
 
         double GPA = totalPoints.get() / totalHours.get();
         double scale = Math.pow(10, 3);
@@ -187,6 +194,12 @@ public class Audit {
      * Prints the GPA as seen on the sample audit
      */
     public void printGPA(){
+        currentStudent.printStudentInformation();
+        System.out.println();
+        System.out.println("Core: " + coreList.toString());
+        System.out.println("Elective: " + electList.toString());
+        System.out.println("Pre: " + preList.toString());
+        System.out.println();
         System.out.println("Core GPA: " + coreGPA);
         System.out.println("Elective GPA: " + electiveGPA);
         System.out.println("Combined GPA: " + combinedGPA);

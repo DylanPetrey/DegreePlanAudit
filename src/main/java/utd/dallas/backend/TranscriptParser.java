@@ -1,3 +1,5 @@
+package utd.dallas.backend;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -15,12 +17,11 @@ public class TranscriptParser {
      * Ideally this would return a filled student object which would then be used in other
      * parts of the project
      *
-     * @param fileName This will need to be changed to a file whenever we implement file uploading
+     * @param inputFile Transcript
      * @throws IOException The readPDF function throws an exception if the PDF can not be read
      */
-    public TranscriptParser(String fileName) throws IOException {
-
-        String transcript[] = readPDF(fileName);
+    public TranscriptParser(File inputFile) throws IOException {
+        String transcript[] = readPDF(inputFile);
 
         // Create the student Object
         this.currentStudent = createStudent(transcript);
@@ -28,17 +29,18 @@ public class TranscriptParser {
         // Fill the course information
         fillCourseInformation(currentStudent, transcript);
 
+        if(currentStudent.getTranscriptList().size() == 0)
+            throw new IOException();
     }
 
     /**
      * This function reads in PDF file and splits the text by lines
      *
-     * @param filename name of the file (might need to be changed into a file object)
+     * @param inputFile file object
      * @throws IOException If there is an error reading in the PDF
      * @return An array that is seperated by each line in the transcript
      */
-    private String[] readPDF(String filename) throws IOException{
-        File inputFile = new File(filename);
+    private String[] readPDF(File inputFile) throws IOException{
         PDDocument document = PDDocument.load(inputFile);
 
         PDFTextStripper pdfStripper = new PDFTextStripper();
@@ -117,7 +119,9 @@ public class TranscriptParser {
     private void fillCourseInformation(Student currentStudent, String[] transcript){
         boolean transfer = false;
         boolean fastTrack = false;
+        boolean thesis = false;
         boolean graduateCourse = false;
+        String transfer_text = "";
         String semester = "";
 
         for(int i = 0; i < transcript.length; i++){
@@ -128,17 +132,22 @@ public class TranscriptParser {
                 if(graduateCourse){
                     transfer = true;
                     fastTrack = false;
+                    transfer_text = "T";
                 }
                 continue;
             }else if(transcript[i].contains("Transfer Credit from UT Dallas Fast Track")){
                 graduateCourse = true;
                 transfer = true;
                 fastTrack = true;
+                transfer_text = "F/T";
+                currentStudent.setFastTrack(true);
+
                 continue;
             } else if(transcript[i].contains("Beginning of Graduate Record")){
                 graduateCourse = true;
                 transfer = false;
                 fastTrack = false;
+                transfer_text = "";
                 continue;
             }
 
@@ -156,7 +165,7 @@ public class TranscriptParser {
 
             // Check for class number in the line
             if(checkRegex(transcript[i], "(\\s[0-9]{4}\\s)|(\\s[0-9][vV]([0-9]{2})\\s)|(\\s[0-9]-{3}\\s)")){
-                currentStudent.addCourse(transcript[i], semester, transfer, fastTrack);
+                currentStudent.addCourse(transcript[i], semester, transfer_text);
             }
         }
     }

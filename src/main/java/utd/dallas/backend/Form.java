@@ -1,3 +1,5 @@
+package utd.dallas.backend;
+
 import java.util.*;
 
 
@@ -10,9 +12,9 @@ public class Form {
     private boolean thesis;
     private List<StudentCourse> courseList;
 
-    
 
-    /** 
+
+    /**
      * Initializes Form object to be used to fill out PDF
      * @param currentStudent Student object that the form is generated for
      */
@@ -62,7 +64,7 @@ public class Form {
     public void setAnticipatedGraduation(String anticipatedGraduation){ this.anticipatedGraduation = anticipatedGraduation; }
     public void setFastTrack(boolean isFastTrack){this.isFastTrack = isFastTrack; }
     public void setThesis(boolean thesis) { this.thesis = thesis; }
-    
+
     public void addCourse(List<Course> courseList, Course course) { courseList.add(course); }
     public void removeCourse(List<Course> courseList, Course course) { courseList.remove(course); }
 

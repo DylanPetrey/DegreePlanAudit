@@ -1,0 +1,196 @@
+{
+  "Traditional Computer Science": {
+    "numOptional": 2,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber": "CS 6363", "courseTitle": "Design and Analysis of Computer Algorithms"},
+      {"courseNumber": "CS 6378", "courseTitle": "Advanced Operating Systems"},
+      {"courseNumber": "CS 6390", "courseTitle": "Advanced Computer Networks"}
+    ],
+    "optionalCore": [
+      {"courseNumber": "CS 6353", "courseTitle": "Compiler Construction"},
+      {"courseNumber": "CS 6360", "courseTitle": "Database Design"},
+      {"courseNumber": "CS 6371",
+        "courseTitle": "Advanced Programming Languages"}
+    ],
+    "trackPrerequisites":[],
+    "admissionPrerequisites": [
+      {"courseNumber": "CS 5303",
+        "courseTitle": "Computer Science I"},
+      {"courseNumber": "CS 5330", "courseTitle": "Computer Science II"},
+      {"courseNumber": "CS 5333", "courseTitle": "Discrete Structures"},
+      {"courseNumber": "CS 5343", "courseTitle": "Algorithm Analysis & Data Structures"},
+      {"courseNumber": "CS 5348", "courseTitle": "Operating System Concepts"},
+      {"courseNumber": "CS 5349", "courseTitle": "Automata Theory"},
+      {"courseNumber": "CS 5390", "courseTitle": "Computer Networks"}
+    ]
+  },
+  "Network Telecommunications": {
+    "numOptional": 0,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber":"CS 6352", "courseTitle":"Perf. of Computer Systems and Networks"},
+      {"courseNumber":"CS 6363", "courseTitle":"Design and Analysis of Computer Algorithms"},
+      {"courseNumber":"CS 6378", "courseTitle":"Advanced Operating Systems"},
+      {"courseNumber":"CS 6385", "courseTitle":"Algorithmic Aspects of Telecomm. Networks"},
+      {"courseNumber":"CS 6390", "courseTitle":"Advanced Computer Networks"}
+    ],
+    "optionalCore": [],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"},
+      {"courseNumber":"CS 5390", "courseTitle":"Computer Networks"},
+      {"courseNumber":"CS 3341", "courseTitle":"Probability & Statistics in CS"}
+    ]
+  },
+  "Intelligent Systems": {
+    "numOptional": 1,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber":"CS 6320", "courseTitle":"Natural Language Processing"},
+      {"courseNumber":"CS 6363", "courseTitle":"Design and Analysis of Computer Algorithms"},
+      {"courseNumber":"CS 6364", "courseTitle":"Artificial Intelligence"},
+      {"courseNumber":"CS 6375", "courseTitle":"Machine Learning"}
+    ],
+    "optionalCore": [
+      {"courseNumber":"CS 6360", "courseTitle":"Database Design"},
+      {"courseNumber":"CS 6378", "courseTitle":"Advanced Operating Systems"}
+    ],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"}
+    ]
+  },
+  "Interactive Computing": {
+    "numOptional": 3,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber":"CS 6326", "courseTitle":"Human Computer Interaction"},
+      {"courseNumber":"CS 6363", "courseTitle":"Design and Analysis of Computer Algorithms"}
+    ],
+    "optionalCore": [
+      {"courseNumber":"CS 6323", "courseTitle":"Computer Animation and Gaming"},
+      {"courseNumber":"CS 6328", "courseTitle":"Modeling and Simulation"},
+      {"courseNumber":"CS 6331", "courseTitle":"Multimedia Systems"},
+      {"courseNumber":"CS 6334", "courseTitle":"Virtual Reality"},
+      {"courseNumber":"CS 6366", "courseTitle":"Computer Graphics"}
+    ],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"}
+    ]
+  },
+  "Systems": {
+    "numOptional": 1,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber":"CS 6304", "courseTitle":"Computer Architecture"},
+      {"courseNumber":"CS 6363", "courseTitle":"Design and Analysis of Computer Algorithms"},
+      {"courseNumber":"CS 6378", "courseTitle":"Advanced Operating Systems"},
+      {"courseNumber":"CS 6396", "courseTitle":"Real-Time Systems"}
+    ],
+    "optionalCore": [
+      {"courseNumber":"CS 6349", "courseTitle":"Network Security"},
+      {"courseNumber":"CS 6376", "courseTitle":"Parallel Processing"},
+      {"courseNumber":"CS 6380", "courseTitle":"Distributed Computing"},
+      {"courseNumber":"CS 6397", "courseTitle":"Synthesis and Opt. of High-Perf. Systems"},
+      {"courseNumber":"CS 6399", "courseTitle":"Parallel Architectures and Systems"}
+    ],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"},
+      {"courseNumber":"CS 5390", "courseTitle":"Computer Networks"}
+    ]
+  },
+  "Data Science": {
+    "numOptional": 1,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber": "CS 6313", "courseTitle": "Statistical Methods for Data Sciences"},
+      {"courseNumber": "CS 6350", "courseTitle": "Big Data Management and Analytics"},
+      {"courseNumber": "CS 6363", "courseTitle": "Design and Analysis of Computer Algorithms"},
+      {"courseNumber": "CS 6375", "courseTitle": "Machine Learning"}
+    ],
+    "optionalCore": [
+      {"courseNumber": "CS 6301", "courseTitle": "Social Network Analytics"},
+      {"courseNumber": "CS 6320", "courseTitle": "Natural Language Processing"},
+      { "courseNumber": "CS 6327", "courseTitle": "Video Analytics"},
+      {"courseNumber": "CS 6347", "courseTitle": "Statistics for Machine Learning"},
+      {"courseNumber": "CS 6360", "courseTitle": "Database Design"}
+    ],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      { "courseNumber": "CS 5303", "courseTitle": "Computer Science I"},
+      { "courseNumber": "CS 5330", "courseTitle": "Computer Science II"},
+      { "courseNumber": "CS 5333", "courseTitle": "Discrete Structures"},
+      { "courseNumber": "CS 5343", "courseTitle": "Algorithm Analysis & Data Structures"},
+      { "courseNumber": "CS 5348", "courseTitle": "Operating System Concepts"},
+      { "courseNumber": "CS 3341", "courseTitle": "Probability & Statistics in CS" }
+    ]
+  },
+  "Cyber Security": {
+    "numOptional": 2,
+    "excludedElectives": [""],
+    "requiredCore": [
+      {"courseNumber":"CS 6324", "courseTitle":"Information Security"},
+      {"courseNumber":"CS 6363", "courseTitle":"Design and Analysis of Computer Algorithms"},
+      {"courseNumber":"CS 6378", "courseTitle":"Advanced Operating Systems"}
+    ],
+    "optionalCore": [
+      {"courseNumber":"CS 6332", "courseTitle":"System Security & Malicious Code Analysis"},
+      {"courseNumber":"CS 6348", "courseTitle":"Data and Applications Security"},
+      {"courseNumber":"CS 6349", "courseTitle":"Network Security"},
+      {"courseNumber":"CS 6377", "courseTitle":"Introduction To Cryptography"}
+    ],
+    "trackPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"},
+      {"courseNumber":"CS 5390", "courseTitle":"Computer Networks"}
+    ],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5349", "courseTitle":"Automata Theory"},
+      {"courseNumber":"CS 5354", "courseTitle":"Software Engineering"},
+      {"courseNumber":"CS 3341", "courseTitle":"Probability & Statistics in CS"}
+    ]
+  },
+  "Software Engineering": {
+    "numOptional": 0,
+    "excludedElectives": ["CS 6359"],
+    "requiredCore": [
+      {"courseNumber":"SE 6329", "courseTitle":"Perf. of Computer Systems and Networks"},
+      {"courseNumber":"SE 6361", "courseTitle":"Advanced Requirements Engineering"},
+      {"courseNumber":"SE 6362", "courseTitle":"Adv Software Architecture & Design"},
+      {"courseNumber":"SE 6367", "courseTitle":"Software Testing, Validation, Verification"},
+      {"courseNumber":"SE 6387", "courseTitle":"Advanced Software Engineering Project"}
+    ],
+    "optionalCore": [],
+    "trackPrerequisites": [],
+    "admissionPrerequisites": [
+      {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
+      {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
+      {"courseNumber":"CS 5333", "courseTitle":"Discrete Structures"},
+      {"courseNumber":"CS 5343", "courseTitle":"Algorithm Analysis & Data Structures"},
+      {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"},
+      {"courseNumber":"CS 5354", "courseTitle":"Software Engineering"}
+    ]
+  }
+}
