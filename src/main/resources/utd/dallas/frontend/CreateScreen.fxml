@@ -260,7 +260,7 @@
                                        <children>
                                           <HBox alignment="CENTER">
                                              <children>
-                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Prerequsites" underline="true">
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Prerequisites" underline="true">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
