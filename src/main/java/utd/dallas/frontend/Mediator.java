@@ -11,6 +11,10 @@ public class Mediator {
     private Stage stage;
     private Student student;
     private File defaultDirectory;
+    private double screenWidth;
+    private double screenHeight;
+    private double screenX;
+    private double screenY;
 
     public static Mediator getInstance() {
         if(INSTANCE == null) {
@@ -31,7 +35,6 @@ public class Mediator {
     public Stage getStage() {
         return stage;
     }
-
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -43,12 +46,12 @@ public class Mediator {
     public void setStudent(Student student) {
         this.student = student;
     }
-
     public File getDefaultDirectory() { return defaultDirectory; }
-
     public void setDefaultDirectory(String defaultDirectory) {
         File f = new File(defaultDirectory);
         if(f.isDirectory());
             this.defaultDirectory = f;
     }
+
+
 }

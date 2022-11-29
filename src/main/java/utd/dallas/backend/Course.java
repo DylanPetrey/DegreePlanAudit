@@ -27,9 +27,9 @@ public class Course {
     /**
      * Filled constructor. Used for parsing the transcript.
      */
-    public Course(String courseNumber, String courseDescription, CourseType type) {
+    public Course(String courseNumber, String courseTitle, CourseType type) {
         this.courseNumber = courseNumber;
-        this.courseTitle = courseDescription;
+        this.courseTitle = courseTitle;
         this.type = type;
     }
 
@@ -91,11 +91,12 @@ public class Course {
         this.courseNumber = courseNumber;
     }
 
-    public void setCourseTitle(String courseDescription) {
-        this.courseTitle = courseDescription;
+    public void setCourseTitle(String courseTitle) {
+        this.courseTitle = courseTitle;
     }
 
     public void setType(Course.CourseType type) {
         this.type = type;
     }
+
 }

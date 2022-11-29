@@ -67,12 +67,21 @@ public class StudentCourse extends Course {
      */
     @Override
     public String toString() {
+        String transferText;
+        if(isWaived)
+            transferText = "Waived";
+        else
+            transferText = transfer;
         return  courseNumber + " " +
                 courseTitle + " " +
-                transfer + " " +
+                semester + " " +
+                transferText + " " +
                 letterGrade;
     }
 
+    public boolean isEmpty(){
+        return courseNumber.equals("");
+    }
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
     public double getAttempted() { return attempted; }
@@ -81,14 +90,13 @@ public class StudentCourse extends Course {
     public String getTransfer() { return transfer; }
     public boolean isFromTranscript() { return fromTranscript; }
     public boolean isWaived() { return isWaived; }
-
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
     public void setAttempted(double attempted) { this.attempted = attempted; }
     public void setPoints(double points) { this.points = points; }
     public void setEarned(double earned) { this.earned = earned; }
-
+    public void setWaived(boolean waived) { this.isWaived = waived; }
     public void setFromTranscript(boolean fromTranscript) {
         this.fromTranscript = fromTranscript;
     }

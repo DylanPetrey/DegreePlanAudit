@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -16,18 +17,15 @@
 
 <AnchorPane fx:id="basePane" prefHeight="600.0" prefWidth="600.0" scaleShape="false" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.CreateController">
    <children>
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" layoutY="7.0" maxWidth="800.0" minHeight="650.0" minViewportWidth="645.0" minWidth="600.0" prefHeight="600.0" prefWidth="645.0" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <content>
-            <VBox alignment="CENTER" maxHeight="1.7976931348623157E308" minWidth="-Infinity" spacing="20.0">
+      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="50.0" spacing="100.0" HBox.hgrow="always">
+                  <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="50.0" spacing="100.0">
                      <children>
                             <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCSButtonClick" onMouseClicked="#onCSButtonClick" prefHeight="70.0" prefWidth="200.0" text="Computer Science" />
                             <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSWEButtonClick" onMouseClicked="#onSWEButtonClick" prefHeight="70.0" prefWidth="200.0" text="Software Engineering" />
                      </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
                   </HBox>
                       <ChoiceBox fx:id="trackBox" onDragExited="#setTrackBox" value="Track" />
                   <HBox alignment="CENTER" prefHeight="130.0" spacing="100.0">
@@ -80,139 +78,221 @@
                            </bottom>
                         </BorderPane>
                      </children>
-                     <VBox.margin>
-                        <Insets top="10.0" />
-                     </VBox.margin>
                   </HBox>
-                  <HBox alignment="CENTER">
-                     <children>
-                        <VBox fx:id="coreVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
-                           <children>
-                              <HBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label alignment="TOP_LEFT" text="Core" underline="true">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets top="5.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets left="15.0" right="15.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="CENTER">
-                     <children>
-                        <VBox fx:id="approvedVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
-                           <children>
-                              <HBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Approved Electives" underline="true">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets top="5.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets left="15.0" right="15.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <HBox alignment="BOTTOM_CENTER">
-                     <children>
-                        <VBox fx:id="additionalVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
-                           <children>
-                              <HBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Additional Electives" underline="true">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets top="5.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <HBox.margin>
-                              <Insets left="15.0" right="15.0" />
-                           </HBox.margin>
-                        </VBox>
-                     </children>
-                  </HBox>
-                  <HBox alignment="BOTTOM_CENTER">
-                     <children>
-                        <VBox fx:id="preReqVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0">
-                           <children>
-                              <HBox alignment="CENTER_LEFT">
-                                 <children>
-                                    <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Prerequsites" underline="true">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                       <padding>
-                                          <Insets top="5.0" />
-                                       </padding>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <HBox.margin>
-                              <Insets left="15.0" right="15.0" />
-                           </HBox.margin>
-                        </VBox>
-                     </children>
-                     <VBox.margin>
-                        <Insets />
-                     </VBox.margin>
-                  </HBox>
-                  <BorderPane maxWidth="600.0">
-                     <right>
-                            <Button fx:id="printButton" mnemonicParsing="false" onMouseClicked="#onPrintButtonClick" text="Print" BorderPane.alignment="CENTER">
-                           <BorderPane.margin>
-                              <Insets right="25.0" />
-                           </BorderPane.margin>
-                        </Button>
-                     </right>
-                     <left>
-                        <Button fx:id="backButton" mnemonicParsing="false" onAction="#onBackButtonClick" text="Back" BorderPane.alignment="CENTER">
-                           <BorderPane.margin>
-                              <Insets left="25.0" />
-                           </BorderPane.margin>
-                        </Button>
-                     </left>
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </BorderPane>
                </children>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
                <padding>
                   <Insets bottom="25.0" left="20.0" right="20.0" top="25.0" />
                </padding>
             </VBox>
-         </content>
-      </ScrollPane>
+         </top>
+         <bottom>
+            <BorderPane maxWidth="600.0" BorderPane.alignment="CENTER">
+               <right>
+                      <Button fx:id="printButton" mnemonicParsing="false" onMouseClicked="#onPrintButtonClick" text="Print" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets right="25.0" />
+                     </BorderPane.margin>
+                  </Button>
+               </right>
+               <left>
+                  <Button fx:id="backButton" mnemonicParsing="false" onAction="#onBackButtonClick" text="Back" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets left="25.0" />
+                     </BorderPane.margin>
+                  </Button>
+               </left>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </BorderPane>
+         </bottom>
+         <center>
+            <SplitPane fx:id="primarySplitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+               <items>
+                  <ScrollPane fx:id="OptionalPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
+                     <content>
+                        <VBox spacing="2.0">
+                           <children>
+                              <HBox alignment="BOTTOM_CENTER">
+                                 <children>
+                                    <VBox fx:id="optionalVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="BOTTOM_CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Optional Core" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="BOTTOM_CENTER">
+                                 <children>
+                                    <VBox fx:id="transcriptVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Additional from Transcript" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+                  <ScrollPane fx:id="CorePane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
+                     <content>
+                        <VBox spacing="2.0">
+                           <children>
+                              <HBox alignment="CENTER">
+                                 <children>
+                                    <VBox fx:id="coreVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="BOTTOM_CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Core" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="BOTTOM_CENTER">
+                                 <children>
+                                    <VBox fx:id="approvedVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Approved Electives" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="BOTTOM_CENTER">
+                                 <children>
+                                    <VBox fx:id="additionalVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Additional Electives" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="BOTTOM_CENTER">
+                                 <children>
+                                    <VBox fx:id="preReqVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="10.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <HBox alignment="CENTER">
+                                             <children>
+                                                <Label alignment="TOP_LEFT" contentDisplay="CENTER" text="Prerequisites" underline="true">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                   <padding>
+                                                      <Insets top="5.0" />
+                                                   </padding>
+                                                </Label>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <HBox.margin>
+                                          <Insets left="15.0" right="15.0" />
+                                       </HBox.margin>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
+               </items>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+            </SplitPane>
+         </center>
+      </BorderPane>
    </children>
 </AnchorPane>

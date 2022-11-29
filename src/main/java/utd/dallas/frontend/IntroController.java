@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -22,7 +23,6 @@ public class IntroController {
         Stage stage = (Stage) createButton.getScene().getWindow();
         Scene currentStage = basePane.getScene();
         stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
-
     }
 
     @FXML
@@ -31,6 +31,5 @@ public class IntroController {
         Stage stage = (Stage) uploadButton.getScene().getWindow();
         Scene currentStage = basePane.getScene();
         stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
-
     }
 }

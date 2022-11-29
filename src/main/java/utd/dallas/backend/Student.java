@@ -11,7 +11,7 @@ public class Student {
     private String startDate;
     private String currentMajor;
     private String graduation;
-    private Plan currentPlan;
+    private final Plan currentPlan;
     private boolean fastTrack;
     private boolean thesis;
     private Form form;
@@ -62,8 +62,22 @@ public class Student {
      */
     public void addCourse(String line, String semester, String transfer){
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
+        String title;
+        String desc;
+        try {
+            title = currentPlan.getCourseTitle(newCourse.getCourseNumber());
+        } catch (Exception e){
+            title = newCourse.getCourseTitle();
+        }
+        newCourse.setCourseTitle(title);
+
         transcriptList.add(newCourse);
     }
+
+    public void addCourse(StudentCourse newCourse){
+        courseList.add(newCourse);
+    }
+
 
     /**
      * Drives the methods that set the course types for each course
@@ -72,8 +86,6 @@ public class Student {
         fillPlan();
         fillFormList();
         setInitialCourseTypes();
-        setOptionalCore();
-        setElectives();
     }
 
 
@@ -84,8 +96,10 @@ public class Student {
         for(Course course : getCourseList()) {
             if (currentPlan.isCore(course))
                 setCourseType(course.courseNumber, Course.CourseType.CORE);
-            else if (currentPlan.isOpt(course))
+            else if (currentPlan.isOpt(course.getCourseNumber())) {
                 setCourseType(course.courseNumber, Course.CourseType.OPTIONAL);
+
+            }
             else if (currentPlan.isPre(course))
                 setCourseType(course.courseNumber, Course.CourseType.PRE);
             else if (currentPlan.isTrack(course))
@@ -101,15 +115,6 @@ public class Student {
      */
     private void setOptionalCore(){
         List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
-        long numOpt = currentPlan.getNumOptional();
-
-        // Optional courses to be changed into core
-        while (numOpt > 0 && coreOptList.size() != 0){
-            StudentCourse maxCourse = getMaxCourseGPA(coreOptList);
-            setCourseType(maxCourse.getCourseNumber(), Course.CourseType.CORE);
-            coreOptList.remove(maxCourse);
-            numOpt--;
-        }
 
         // Any extra optional courses
         coreOptList.forEach(StudentCourse -> {
@@ -215,7 +220,7 @@ public class Student {
             courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));
         });
         currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
-            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.ELECTIVE));
+            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.OPTIONAL));
         });
     }
     public void fillFormList(){
@@ -246,12 +251,21 @@ public class Student {
         System.out.println(startDate);
         System.out.println(currentMajor);
 
-        courseList.forEach(Course::printCourse);
+        courseList.forEach(StudentCourse-> {
+            if(!StudentCourse.isEmpty()) {
+                System.out.print(StudentCourse.toString());
+                System.out.println(" " + StudentCourse.getType());
+            }
 
-        //1. TODO: Print Audit PDF
-        //2. TODO: Print Form PDF
-        form = new Form(this);
-        form.print();
+        });
+    }
+
+    public List<StudentCourse> getCleanCourseList(){
+        List<StudentCourse> cleanCourses = new ArrayList<>();
+        for(StudentCourse course : courseList)
+            if(!course.isEmpty())
+                cleanCourses.add(course);
+        return cleanCourses;
     }
 
 

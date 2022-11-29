@@ -5,7 +5,7 @@ import java.io.File;
 
 public class Main {
     public static void main(String args[]) throws Exception {
-        String inputFilePath = "src/main/resources/utd/dallas/backend/SampleTranscripts/Sample3.pdf";
+        String inputFilePath = "src/main/resources/utd/dallas/backend/SampleTranscripts/Sample4.pdf";
         File inputFile = new File(inputFilePath);
         TranscriptParser transcript =  new TranscriptParser(inputFile);
         Student curr = transcript.getStudent();

@@ -2,7 +2,6 @@ package utd.dallas.frontend;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -11,19 +10,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import utd.dallas.backend.Student;
 import utd.dallas.backend.TranscriptParser;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -74,7 +71,7 @@ public class UploadController {
             // On drag over if the DragBoard has files
             if (event.getGestureSource() != fileWindow && event.getDragboard().hasFiles()) {
                 // All files on the dragboard must have an accepted extension
-                if (!validExtensions.containsAll(
+                if (!new HashSet<>(validExtensions).containsAll(
                         event.getDragboard().getFiles().stream()
                                 .map(file -> getExtension(file.getName()))
                                 .collect(Collectors.toList()))) {
@@ -98,6 +95,7 @@ public class UploadController {
                     inputFile = event.getDragboard().getFiles().get(0);
                     filenameText.setText(inputFile.getName());
                     parser = new TranscriptParser(inputFile);
+                    Mediator.getInstance().setDefaultDirectory(inputFile.getParent());
                 } catch (Exception e) {
                     parser = null;
                     uploadFileBox.setFill(Paint.valueOf("#ff8080"));
@@ -110,7 +108,7 @@ public class UploadController {
         });
 
 
-        uploadButtonLabel.setOnMouseEntered(event -> uploadButtonLabel.setStyle("-fx-background-color: #c6c6c6; -fx-text-fill: black;-fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
+        uploadButtonLabel.setOnMouseEntered(event -> uploadButtonLabel.setStyle("-fx-background-color: #c6c6c6; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
         uploadButtonLabel.setOnMouseExited(event -> uploadButtonLabel.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
     }
 
