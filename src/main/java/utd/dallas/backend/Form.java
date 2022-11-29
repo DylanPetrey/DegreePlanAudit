@@ -2,7 +2,8 @@ package utd.dallas.backend;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -13,6 +14,7 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 
 
 public class Form {
+
     private String studentName;
     private String studentID;
     private String semesterAdmitted;
@@ -102,7 +104,7 @@ public class Form {
 
     /**
      * Accessor methods to be used outside the class.
-     */
+    */
     public String getStudenName(){return studentName; }
     public String getStudentID(){ return studentID; }
     public String getSemesterAdmitted(){ return semesterAdmitted; }
@@ -113,7 +115,7 @@ public class Form {
 
     /**
      * Mutator methods to be used outside the class.
-     */
+    */
     public void setStudenName(String studentName){ this.studentName = studentName; }
     public void setStudentID(String studentID){this.studentID = studentID; }
     public void setSemesterAdmitted(String semesterAdmitted){ this.semesterAdmitted = semesterAdmitted; }

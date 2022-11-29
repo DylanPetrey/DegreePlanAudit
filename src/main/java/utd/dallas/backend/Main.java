@@ -11,6 +11,7 @@ public class Main {
         Student curr = transcript.getStudent();
         curr.setCurrentPlan(Plan.Concentration.CYBER);
         curr.printStudentInformation();
+        FormInt.print(curr);
 
         
         Audit auditHelper = new Audit(curr);

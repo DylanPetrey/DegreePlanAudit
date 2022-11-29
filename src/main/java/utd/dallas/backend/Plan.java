@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -127,10 +129,10 @@ public class Plan {
      */
     public void setConcentration(Concentration type) {
         this.concentration = type;
-        String JSONfilename = Plan.class.getResource("JSONobjects/degreeRequirements.json").getFile().replace("%20", " ");
         JSONParser parser = new JSONParser();
 
         try {
+            String JSONfilename = URLDecoder.decode(Plan.class.getResource("JSONobjects/degreeRequirements.json").getFile(), "UTF-8");
             Object obj = parser.parse(new FileReader(JSONfilename));
 
             JSONObject jsonObject = (JSONObject) obj;
