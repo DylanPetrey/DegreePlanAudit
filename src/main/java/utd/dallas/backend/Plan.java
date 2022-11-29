@@ -167,9 +167,9 @@ public class Plan {
      * @param courseNumber Course number to identify the course
      * @return true/false if the course is a core course
      */
-    public boolean isCore(Course courseNumber) {
+    public boolean isCore(String courseNumber) {
         for (Course currentClass : requiredCore) {
-            if (courseNumber.equals(currentClass))
+            if (courseNumber.equals(currentClass.getCourseNumber()))
                 return true;
         }
         return false;
