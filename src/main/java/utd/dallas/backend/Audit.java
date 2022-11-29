@@ -17,13 +17,11 @@ public class Audit {
     // Student variables
     private final Student currentStudent;
     private final List<StudentCourse> filledCourses;
-    List<StudentCourse> coreList = new ArrayList<>();
-    List<StudentCourse> electList = new ArrayList<>();
-    List<StudentCourse> preList = new ArrayList<>();
-    // Course Hashmaps
-    private HashMap<String, List<StudentCourse>> courseMap = new HashMap<>();
-    private HashMap<String, List<StudentCourse>> utdGPAMap = new HashMap<>();
 
+    // List of courses divided up by type
+    private final List<StudentCourse> coreList = new ArrayList<>();
+    private final List<StudentCourse> electList = new ArrayList<>();
+    private final List<StudentCourse> preList = new ArrayList<>();
 
     // GPA Variables
     private double combinedGPA = 0;
@@ -33,91 +31,23 @@ public class Audit {
     // Requirement Variables
     private final double MIN_CORE_GPA = 3.19;
     private final double MIN_ELECT_GPA = 3.0;
-    private final double MIN_OVRALL_GPA = MIN_ELECT_GPA;
+    private final double MIN_OVRALL_GPA = 3.0;
     private final int REQUIRED_CORE_HOURS = 15;
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
     /**
-     * Audit constructor
+     * Performs the audit when created
      *
      * @param currentStudent current student object
      */
     public Audit(Student currentStudent){
         this.currentStudent = currentStudent;
         this.filledCourses = currentStudent.getCleanCourseList();
-        courseMap = getClassMap(filledCourses);
-    }
-
-
-    /**
-     * Performs all three parts of the audit. Basically to a main method for the class
-     */
-    public void runAudit(){
-        calculateGPA();
+        calculateGPAValues();
         printGPA();
     }
 
-
-    /**
-     * This function creates a hashmap of the input courseList based on the unique course
-     * names. This is to keep track of repeated classes
-     *
-     * @param classList List of courses
-     * @return Hashmap of each unique course
-     */
-    private HashMap<String, List<StudentCourse>> getClassMap(List<StudentCourse> classList){
-        HashMap<String, List<StudentCourse>> currentMap = new HashMap<>();
-
-        classList.forEach(course -> {
-            currentMap.computeIfAbsent(course.getCourseNumber(), k -> new ArrayList<>()).add(course);
-        });
-
-        return currentMap;
-    }
-
-
-
-    /**
-     * This function runs the gpa calculation
-     */
-    private void calculateGPA(){
-        validateGPACourses();
-        calculateGPAValues();
-    }
-
-
-    /**
-     * This function fills in a hashmap of all courses completed at utd with a
-     * valid grade A-F
-     */
-    private void validateGPACourses(){
-        // validate correct grade values
-        Pattern stringPattern = Pattern.compile("(^[A-F])(?=\\+|-|$)");
-
-        // Loop over Hashmap
-        courseMap.forEach((courseNumber, courseList) -> {
-            List<StudentCourse> currentCourseList = new ArrayList<>();
-
-            // Loop over each repeated class
-            courseList.forEach(course -> {
-                Matcher m = stringPattern.matcher(course.getLetterGrade());
-                if(!m.find() || course.getTransfer().equals("T"))
-                    return;
-
-                currentCourseList.add(course);
-            });
-
-            if(currentCourseList.size() != 0)
-                utdGPAMap.put(courseNumber, currentCourseList);
-        });
-    }
-
-
-    /**
-     * This function calculates the GPA given the utd classes and updates the GPA
-     * value rounded to 3 decimal places for core, elective and combined
-     */
     /**
      * This function calculates the core, elective, and cumulative GPA values
      */
@@ -156,33 +86,42 @@ public class Audit {
         final double C_GRADEPTS = 2.000;
         final double F_GRADEPTS = 0.000;
         AtomicReference<Double> totalPoints = new AtomicReference<>((double) 0);
-        AtomicReference<Integer> totalHours = new AtomicReference<>((Integer) 0);
+        AtomicReference<Double> totalHours = new AtomicReference<>((double) 0);
 
         courseList.forEach(studentCourse -> {
-                    String letterGrade = studentCourse.getLetterGrade();
-                    int currentHour = currentStudent.getCurrentPlan().getCourseHours(studentCourse.getCourseNumber());
-                    if (letterGrade.equalsIgnoreCase("A"))
-                        totalPoints.updateAndGet(v -> (v+(A_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("A-"))
-                        totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("B+"))
-                        totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("B"))
-                        totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("B-"))
-                        totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("C+"))
-                        totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("C"))
-                        totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*currentHour)));
-                    else if (letterGrade.equalsIgnoreCase("F"))
-                        totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*currentHour)));
-                    else
-                        return;
-
-                    totalHours.updateAndGet(v -> (v+currentHour));
+            String letterGrade = studentCourse.getLetterGrade();
+            double currentHour = 0;
+            if(studentCourse.getAttempted() != 0)
+                currentHour = studentCourse.getAttempted();
+            else {
+                try {
+                    currentHour = currentStudent.getCurrentPlan().getCourseHours(studentCourse.getCourseNumber());
+                    } catch (Exception e){
+                        currentHour = 3;
                 }
-        );
+            }
+            double finalCurrentHour = currentHour;
+            if (letterGrade.equalsIgnoreCase("A"))
+                totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("A-"))
+                totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B+"))
+                        totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B"))
+                        totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B-"))
+                        totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("C+"))
+                totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("C"))
+                totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("F"))
+                totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*finalCurrentHour)));
+            else
+                return;
+
+            totalHours.updateAndGet(v -> (v+finalCurrentHour));
+        });
 
         double GPA = totalPoints.get() / totalHours.get();
         double scale = Math.pow(10, 3);

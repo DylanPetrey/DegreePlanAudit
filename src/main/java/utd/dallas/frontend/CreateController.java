@@ -99,6 +99,7 @@ public class CreateController {
         studentID.setText(currentStudent.getStudentId());
         studentSemAdmitted.setText(currentStudent.getStartDate());
         fastTrack.setSelected(currentStudent.isFastTrack());
+        thesis.setSelected(currentStudent.isThesis());
     }
 
     @FXML
@@ -117,14 +118,12 @@ public class CreateController {
 
     @FXML
     protected void onPrintButtonClick() {
-        Audit auditHelper = new Audit(currentStudent);
-        auditHelper.runAudit();
+        new Audit(currentStudent);
     }
 
     @FXML
     protected void setTrackBox(){
         Object value = trackBox.getValue();
-        currentStudent.newFormList();
         if ("Traditional Computer Science".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.TRADITIONAL);
         } else if ("Network Telecommunications".equals(value)) {

@@ -1,5 +1,6 @@
 {
   "Traditional Computer Science": {
+    "major": "Computer Science",
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -10,13 +11,11 @@
     "optionalCore": [
       {"courseNumber": "CS 6353", "courseTitle": "Compiler Construction"},
       {"courseNumber": "CS 6360", "courseTitle": "Database Design"},
-      {"courseNumber": "CS 6371",
-        "courseTitle": "Advanced Programming Languages"}
+      {"courseNumber": "CS 6371", "courseTitle": "Advanced Programming Languages"}
     ],
     "trackPrerequisites":[],
     "admissionPrerequisites": [
-      {"courseNumber": "CS 5303",
-        "courseTitle": "Computer Science I"},
+      {"courseNumber": "CS 5303", "courseTitle": "Computer Science I"},
       {"courseNumber": "CS 5330", "courseTitle": "Computer Science II"},
       {"courseNumber": "CS 5333", "courseTitle": "Discrete Structures"},
       {"courseNumber": "CS 5343", "courseTitle": "Algorithm Analysis & Data Structures"},
@@ -26,6 +25,7 @@
     ]
   },
   "Network Telecommunications": {
+    "major": "Computer Science",
     "numOptional": 0,
     "excludedElectives": [""],
     "requiredCore": [
@@ -48,6 +48,7 @@
     ]
   },
   "Intelligent Systems": {
+    "major": "Computer Science",
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -70,6 +71,7 @@
     ]
   },
   "Interactive Computing": {
+    "major": "Computer Science",
     "numOptional": 3,
     "excludedElectives": [""],
     "requiredCore": [
@@ -93,6 +95,7 @@
     ]
   },
   "Systems": {
+    "major": "Computer Science",
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -119,6 +122,7 @@
     ]
   },
   "Data Science": {
+    "major": "Computer Science",
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -145,6 +149,7 @@
     ]
   },
   "Cyber Security": {
+    "major": "Computer Science",
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -173,6 +178,7 @@
     ]
   },
   "Software Engineering": {
+    "major": "Software Engineering",
     "numOptional": 0,
     "excludedElectives": ["CS 6359"],
     "requiredCore": [
