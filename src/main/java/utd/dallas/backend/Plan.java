@@ -167,9 +167,9 @@ public class Plan {
      * @param courseNumber Course number to identify the course
      * @return true/false if the course is a core course
      */
-    public boolean isCore(String courseNumber) {
+    public boolean isCore(Course courseNumber) {
         for (Course currentClass : requiredCore) {
-            if (courseNumber.equals(currentClass.getCourseNumber()))
+            if (courseNumber.equals(currentClass))
                 return true;
         }
         return false;
@@ -181,9 +181,9 @@ public class Plan {
      * @param courseNumber Course number to identify the course
      * @return true/false if the course is an optional core course
      */
-    public boolean isOpt(Course courseNumber) {
+    public boolean isOpt(String courseNumber) {
         for (Course currentClass : optionalCore) {
-            if (courseNumber.equals(currentClass))
+            if (courseNumber.equals(currentClass.getCourseNumber()))
                 return true;
         }
         return false;

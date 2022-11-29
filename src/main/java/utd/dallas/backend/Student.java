@@ -240,12 +240,7 @@ public class Student {
         });
     }
 
-    /**
-     * Outputs all the information to the console in a similar style to how it will
-     * be displayed the final Audit PDF.
-     * @throws IOException
-     */
-    public void printStudentInformation() throws IOException{
+    public void printStudentInformation(){
         System.out.println(studentName);
         System.out.println(studentId);
         System.out.println(startDate);
