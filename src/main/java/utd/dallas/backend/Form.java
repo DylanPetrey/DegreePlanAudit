@@ -41,21 +41,7 @@ public class Form {
         this.courseList = currentStudent.getCourseList();
     }
 
-    /**
-     * This function returns a list of Courses of a specified Course Type
-     * @param type The type of courses requested
-     * @return A list of courses of specified type
     
-    public List<Course> getCourseOfType(Course.CourseType type){
-        List<Course> courses = new ArrayList<>();
-        for (Course course : courseList) {
-            if (course.getType() == type) {
-                courses.add(course);
-            }
-        }
-        return courses;
-    }
-    */
     /**
      
      * @param fileName

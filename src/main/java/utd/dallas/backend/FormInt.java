@@ -6,6 +6,7 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -14,28 +15,15 @@ import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 
+import utd.dallas.backend.Course.CourseType;
+
 public interface FormInt {
 
-    /**
-     * This function returns a list of Courses of a specified Course Type
-     * 
-     * @param type The type of courses requested
-     * @return A list of courses of specified type
-     * 
-     *         public List<Course> getCourseOfType(Course.CourseType type){
-     *         List<Course> courses = new ArrayList<>();
-     *         for (Course course : courseList) {
-     *         if (course.getType() == type) {
-     *         courses.add(course);
-     *         }
-     *         }
-     *         return courses;
-     *         }
-     */
+
     /**
      * 
-     * @param student
-     * @throws IOException
+     * @param b boolean value to be converted to an int.
+     * @return integer value 1 if true 0 if false
      */
     private static int boolToInt(boolean b) {
         return b ? 1 : 0;
@@ -46,6 +34,8 @@ public interface FormInt {
         String loc = "";
         PDDocument pdfDocument = null;
         Plan plan = student.getCurrentPlan();
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
+
 
         try {
             String fileName = new String("Forms/DP-" + plan.getConcentration().toString() + ".pdf");
@@ -63,25 +53,26 @@ public interface FormInt {
 
         try {
             //TODO: Fill Courses
+            //TODO: Update PDF Form Fields
             acroForm.getField("Name of Student").setValue(student.getStudentName());
             acroForm.getField("Student ID Number").setValue(student.getStudentId());
-            student.setGraduation("Fall 23");
             acroForm.getField("Anticipated Graduation").setValue(student.getGraduation());
-            SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
             acroForm.getField("Date Submitted").setValue(formatter.format(new Date()));
-
             acroForm.getField("Check Box.0." + boolToInt(!student.isFastTrack()))
                     .setValue("Yes");
             acroForm.getField("Check Box.1." + boolToInt(!student.isThesis()))
                     .setValue("Yes");
-
-            
-        } catch (IOException e) {
-
-        } catch (NullPointerException npe) {
-        }
+            List<StudentCourse> studentCore = student.getCourseOfType(CourseType.CORE);
+            List<StudentCourse> studentElec = student.getCourseOfType(CourseType.ELECTIVE);
+            List<StudentCourse> studentPre = student.getCourseOfType(CourseType.PRE);
+            List<StudentCourse> studentAddl = student.getCourseOfType(CourseType.ADDITIONAL);
+            for (Course core : plan.getCore()) {
+            }
+        } catch (IOException ioe) {
+        } catch (NullPointerException npe) {}
 
         for (Course course : student.getTranscriptList()) {
+
 
         }
 

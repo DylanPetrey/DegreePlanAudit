@@ -214,6 +214,21 @@ public class Student {
                 c.add(current);
         return c;
     }
+
+    /**
+     * This function returns a list of Courses of a specified Course Type
+     * @param type The type of courses requested
+     * @return A list of courses of specified type
+    */
+    public List<StudentCourse> getCourseOfType(Course.CourseType type){
+        List<StudentCourse> courses = new ArrayList<>();
+        for (StudentCourse course : courseList) {
+            if (course.getType() == type) {
+                courses.add(course);
+            }
+        }
+        return courses;
+    }
     public void fillPlan(){
         currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {
             courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));
