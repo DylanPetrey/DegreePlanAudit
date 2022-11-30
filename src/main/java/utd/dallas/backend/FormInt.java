@@ -37,7 +37,7 @@ public interface FormInt {
      * @throws IOException
      */
 
-    public static void print(Student currentStudent) throws IOException{
+    public static void print(Student currentStudent) {
 
         String loc = "";
         PDDocument pdfDocument = null;
@@ -50,10 +50,11 @@ public interface FormInt {
             sb.append(".pdf");
             loc = URLDecoder.decode(Form.class.getResource(sb.toString()).getFile(), "UTF-8");
             pdfDocument = PDDocument.load(new File(loc));
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         }
+        catch (NullPointerException e) {e.printStackTrace();}
+        catch (IOException e) {e.printStackTrace();}
+
+
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
         PDAcroForm acroForm = docCatalog.getAcroForm();
         Iterator<PDField> fieldTreeIterator = acroForm.getFieldIterator();
@@ -63,13 +64,21 @@ public interface FormInt {
             COSDictionary obj = f.getCOSObject();
             if (f.getClass().equals(PDTextField.class)){
                 System.out.println(f.getFullyQualifiedName());
-                f.setValue("run");
+                try {
+                    f.setValue("run");
+                } catch (IOException e){}
 
             }
         }
         PDAcroForm finalForm = new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
-        pdfDocument.save(new File(".", "test.pdf"));
+        
+        try {
+            pdfDocument.save(new File(".", "test.pdf"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
 

@@ -119,6 +119,8 @@ public class CreateController {
     protected void onPrintButtonClick() {
         Audit auditHelper = new Audit(currentStudent);
         auditHelper.runAudit();
+        FormInt.print(currentStudent);
+
     }
 
     @FXML

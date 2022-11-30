@@ -14,7 +14,6 @@ public class Student {
     private final Plan currentPlan;
     private boolean fastTrack;
     private boolean thesis;
-    private Form form;
 
     private List<StudentCourse> courseList;
     private final List<StudentCourse> transcriptList;
