@@ -1,13 +1,11 @@
 package utd.dallas.backend;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,8 +28,8 @@ public class Plan {
         CYBER("Cyber-Security"),
         SOFTWARE("Software-Engineering");
 
-        private String concenString;
 
+        private final String concenString;
         Concentration(String concentration) {
             this.concenString = concentration;
         }
@@ -42,21 +40,25 @@ public class Plan {
 
     };
 
-    private long numOptional = 0;
-
-    File jsonFile = new File("src/main/resources/utd/dallas/backend/JSONobjects/utd_catalog.json").getAbsoluteFile();
-    DocumentContext CatalogFile;
-
+    private final File utdCatalogJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/utd_catalog.json").getAbsoluteFile();
+    private final File degreeRequirementsJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/degreeRequirements.json").getAbsoluteFile();
+    private DocumentContext CatalogFile;
     private Concentration concentration;
+
+    private final String major = "";
+    private long numOptional = 0;
     private List<Course> requiredCore = new ArrayList<Course>();
     private List<Course> optionalCore = new ArrayList<Course>();
     private List<Course> admissionPrerequisites = new ArrayList<Course>();
     private List<Course> trackPrerequisites = new ArrayList<Course>();
     private List<String> excludedElectives = new ArrayList<String>();
 
+    /**
+     * Initializes empty plan object
+     */
     Plan() {
         try {
-            CatalogFile = JsonPath.parse(jsonFile);
+            CatalogFile = JsonPath.parse(utdCatalogJSON);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -71,7 +73,7 @@ public class Plan {
         setConcentration(concentration);
 
         try {
-            CatalogFile = JsonPath.parse(jsonFile);
+            CatalogFile = JsonPath.parse(utdCatalogJSON);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,20 +125,18 @@ public class Plan {
     }
 
     /**
-     * Parses the JSON and fills in the plan variables
+     * Parses the degree requirements JSON and fills in initial variables from the degree plan
      *
-     * @param type The course type to get the degree requirements from the json
+     * @param plan the current plan to parse from the JSON
      */
-    public void setConcentration(Concentration type) {
-        this.concentration = type;
+    public void setConcentration(Concentration plan) {
+        this.concentration = plan;
         JSONParser parser = new JSONParser();
-
         try {
-            String JSONfilename = URLDecoder.decode(Plan.class.getResource("JSONobjects/degreeRequirements.json").getFile(), "UTF-8");
-            Object obj = parser.parse(new FileReader(JSONfilename));
+            Object obj = parser.parse(new FileReader(degreeRequirementsJSON));
 
             JSONObject jsonObject = (JSONObject) obj;
-            JSONObject jsonCurrentPlan = (JSONObject) jsonObject.get(type.toString());
+            JSONObject jsonCurrentPlan = (JSONObject) jsonObject.get(plan.toString());
             this.numOptional = (long) jsonCurrentPlan.get("numOptional");
 
             JSONArray requiredCore = (JSONArray) jsonCurrentPlan.get("requiredCore");
@@ -154,24 +154,34 @@ public class Plan {
             List<String> excludedElective = (List<String>) jsonCurrentPlan.get("excludedElectives");
             this.excludedElectives = toList(excludedElective);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
 
     /**
+     * Retrieves a new course object if it is an optional course in the degree plan
+     *
+     * @param courseNum Course number to identify the course
+     * @return Optional course from the degreePlan
+     */
+    public Course getOptionalCourse(String courseNum){
+        for(Course optCourse : optionalCore){
+            if(optCourse.getCourseNumber().equals(courseNum))
+                return optCourse;
+        }
+        return null;
+    }
+
+    /**
      * Checks if a course is a core course
      *
-     * @param courseNumber Course number to identify the course
+     * @param course Course to check in plan
      * @return true/false if the course is a core course
      */
-    public boolean isCore(Course courseNumber) {
+    public boolean isCore(Course course) {
         for (Course currentClass : requiredCore) {
-            if (courseNumber.equals(currentClass))
+            if (course.equals(currentClass))
                 return true;
         }
         return false;
@@ -180,12 +190,12 @@ public class Plan {
     /**
      * Checks if a course is an optional core course
      *
-     * @param courseNumber Course number to identify the course
+     * @param course Course to check in plan
      * @return true/false if the course is an optional core course
      */
-    public boolean isOpt(String courseNumber) {
+    public boolean isOpt(Course course) {
         for (Course currentClass : optionalCore) {
-            if (courseNumber.equals(currentClass.getCourseNumber()))
+            if (course.equals(currentClass))
                 return true;
         }
         return false;
@@ -194,12 +204,12 @@ public class Plan {
     /**
      * Checks if a course is a track course
      *
-     * @param courseNumber Course number to identify the course
+     * @param course Course to check in plan
      * @return true/false if the course is a track course
      */
-    public boolean isTrack(Course courseNumber) {
+    public boolean isTrack(Course course) {
         for (Course currentClass : trackPrerequisites) {
-            if (courseNumber.equals(currentClass))
+            if (course.equals(currentClass))
                 return true;
         }
         return false;
@@ -208,31 +218,55 @@ public class Plan {
     /**
      * Checks if a course is a prerequisite
      *
-     * @param courseNumber Course number to identify the course
+     * @param course Course to check in plan
      * @return true/false if the course is a prerequisite
      */
-    public boolean isPre(Course courseNumber) {
+    public boolean isPre(Course course) {
         for (Course currentClass : admissionPrerequisites) {
-            if (courseNumber.equals(currentClass))
+            if (course.equals(currentClass))
                 return true;
         }
         return false;
     }
 
     /**
+     * Parse current major from the degree plan JSON
+     *
+     * @return String for the major
+     */
+    public String getMajor(){
+        String path = "$.['" + concentration.toString() + "'].Major";
+        try {
+            return CatalogFile.read(path);
+        }catch (Exception e){
+            return "";
+        }
+    }
+
+    /**
+     * Parse course title from the JSON
+     *
+     * @param courseNum Course number to identify the course
+     * @return String for the course title
+     */
+    public String getCourseTitle(String courseNum){
+        String path = "$.['" + courseNum + "'].Title";
+        try {
+            return CatalogFile.read(path);
+        }catch (Exception e){
+            return "";
+        }
+    }
+
+    /**
      * Parse number of credit hours from the JSON
      *
      * @param courseNum Course number to identify the course
-     * @return number of credit hours
+     * @return int of the number of credit hours
      */
     public int getCourseHours(String courseNum){
         String path = "$.['" + courseNum + "'].Hours";
-        try {
-            int hours = Integer.parseInt(CatalogFile.read(path));
-            return hours;
-        }catch (NumberFormatException e){
-            return 3;
-        }
+        return Integer.parseInt(CatalogFile.read(path));
     }
 
     /**
@@ -251,24 +285,11 @@ public class Plan {
     }
 
     /**
-     * Parse course description from the JSON
+     * Gets all the courses in the DegreePlan that are a certain type
      *
-     * @param courseNum Course number to identify the course
-     * @return Course description
+     * @param type target course type
+     * @return List of courses of that type
      */
-    public String getCourseTitle(String courseNum){
-        String path = "$.['" + courseNum + "'].Description";
-        try {
-            return CatalogFile.read(path);
-        }catch (NumberFormatException e){
-            return "";
-        }
-    }
-
-    /**
-     * Accessor methods to be used outside the class.
-     */
-
     public List<Course> getCourseOfType(Course.CourseType type) {
         switch (type){
             case CORE:
@@ -281,10 +302,12 @@ public class Plan {
                 prereq.addAll(trackPrerequisites);
                 return prereq;
         }
-
         return new ArrayList<>();
     }
 
+    /**
+     * Accessor methods to be used outside the class.
+     */
     public long getNumOptional() { return numOptional; }
     public List<Course> getCore() { return requiredCore; }
     public List<Course> getOptionalCore() { return optionalCore; }

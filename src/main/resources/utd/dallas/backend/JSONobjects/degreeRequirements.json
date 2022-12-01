@@ -10,13 +10,11 @@
     "optionalCore": [
       {"courseNumber": "CS 6353", "courseTitle": "Compiler Construction"},
       {"courseNumber": "CS 6360", "courseTitle": "Database Design"},
-      {"courseNumber": "CS 6371",
-        "courseTitle": "Advanced Programming Languages"}
+      {"courseNumber": "CS 6371", "courseTitle": "Advanced Programming Languages"}
     ],
     "trackPrerequisites":[],
     "admissionPrerequisites": [
-      {"courseNumber": "CS 5303",
-        "courseTitle": "Computer Science I"},
+      {"courseNumber": "CS 5303", "courseTitle": "Computer Science I"},
       {"courseNumber": "CS 5330", "courseTitle": "Computer Science II"},
       {"courseNumber": "CS 5333", "courseTitle": "Discrete Structures"},
       {"courseNumber": "CS 5343", "courseTitle": "Algorithm Analysis & Data Structures"},
@@ -93,6 +91,7 @@
     ]
   },
   "Systems": {
+    "major": "Computer Science",
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [

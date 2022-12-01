@@ -3,8 +3,9 @@ package utd.dallas.backend;
 import java.util.Objects;
 
 public class Course {
-    protected String courseNumber;
-    protected String courseTitle;
+    private String courseNumber;
+    private String courseTitle;
+    private String description;
     protected CourseType type;
     public enum CourseType {
         CORE,
@@ -38,7 +39,6 @@ public class Course {
         this.courseTitle = courseTitle;
         this.type = type;
     }
-
 
     /**
      * Prints the course to the console
@@ -83,14 +83,13 @@ public class Course {
     public CourseType getType() {
         return type;
     }
-
     public String getCourseNumber() {
         return courseNumber;
     }
-
     public String getCourseTitle() {
         return courseTitle;
     }
+    public String getDescription() { return description; }
 
     /**
      * Mutator methods to be used outside the class.
@@ -98,11 +97,12 @@ public class Course {
     public void setCourseNumber(String courseNumber) {
         this.courseNumber = courseNumber;
     }
-
     public void setCourseTitle(String courseTitle) {
         this.courseTitle = courseTitle;
     }
-
+    public void setDescription(String courseDescription) {
+        this.description = courseTitle;
+    }
     public void setType(Course.CourseType type) {
         this.type = type;
     }
