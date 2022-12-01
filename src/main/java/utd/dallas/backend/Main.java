@@ -14,7 +14,6 @@ public class Main {
         FormInt.print(curr);
 
         
-        Audit auditHelper = new Audit(curr);
-        auditHelper.runAudit();
+        new Audit(curr);
     }
 }
