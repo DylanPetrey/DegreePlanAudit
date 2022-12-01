@@ -113,7 +113,7 @@ public class Student {
      * used when determining the electives.
      */
     private void setOptionalCore(){
-        List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
+        List<StudentCourse> coreOptList = getCourseOfType(Course.CourseType.OPTIONAL);
 
         // Any extra optional courses
         coreOptList.forEach(StudentCourse -> {
@@ -128,7 +128,7 @@ public class Student {
      * Fills the electives. It separates them into 6000 level electives and additional electives
      */
     private void setElectives(){
-        List<StudentCourse> otherList = getCourseType(Course.CourseType.OTHER);
+        List<StudentCourse> otherList = getCourseOfType(Course.CourseType.OTHER);
         double numElectHours = 15.0;
 
         for(int i = 0; i < otherList.size(); i++){
@@ -207,27 +207,13 @@ public class Student {
      * @param type target type to retrieve
      * @return List of courses of specified type
      */
-    public List<StudentCourse> getCourseType(Course.CourseType type){
+    public List<StudentCourse> getCourseOfType(Course.CourseType type){
         List<StudentCourse> c = new ArrayList<>();
         for(StudentCourse current : courseList)
-            if(current.type == type)
+            if(current.getType() == type)
                 c.add(current);
+        System.out.println(c.hashCode());
         return c;
-    }
-
-    /**
-     * This function returns a list of Courses of a specified Course Type
-     * @param type The type of courses requested
-     * @return A list of courses of specified type
-    */
-    public List<StudentCourse> getCourseOfType(Course.CourseType type){
-        List<StudentCourse> courses = new ArrayList<>();
-        for (StudentCourse course : courseList) {
-            if (course.getType() == type) {
-                courses.add(course);
-            }
-        }
-        return courses;
     }
     public void fillPlan(){
         currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {

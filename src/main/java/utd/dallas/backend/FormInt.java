@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -21,21 +22,32 @@ public interface FormInt {
 
 
     /**
+     * Converts a boolean value to an integer.
      * 
-     * @param b boolean value to be converted to an int.
-     * @return integer value 1 if true 0 if false
+     *
+     * @param b Determine whether the return value should be 1 or 0
+     *
+     * @return 1 if the boolean value is true and 0 if it is false
+     *
      */
     private static int boolToInt(boolean b) {
         return b ? 1 : 0;
     }
 
+/**
+ * The print function prints a student's form to the console.
+ *
+ * @param student active student
+ *
+ * @return Void
+ *
+ */
     public static void print(Student student) {
 
         String loc = "";
         PDDocument pdfDocument = null;
         Plan plan = student.getCurrentPlan();
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
-
 
         try {
             String fileName = new String("Forms/DP-" + plan.getConcentration().toString() + ".pdf");
@@ -51,28 +63,40 @@ public interface FormInt {
         PDAcroForm acroForm = docCatalog.getAcroForm();
         Iterator<PDField> fieldTreeIterator = acroForm.getFieldIterator();
 
-        try {
-            //TODO: Fill Courses
-            //TODO: Update PDF Form Fields
-            acroForm.getField("Name of Student").setValue(student.getStudentName());
-            acroForm.getField("Student ID Number").setValue(student.getStudentId());
-            acroForm.getField("Anticipated Graduation").setValue(student.getGraduation());
-            acroForm.getField("Date Submitted").setValue(formatter.format(new Date()));
-            acroForm.getField("Check Box.0." + boolToInt(!student.isFastTrack()))
-                    .setValue("Yes");
-            acroForm.getField("Check Box.1." + boolToInt(!student.isThesis()))
-                    .setValue("Yes");
-            List<StudentCourse> studentCore = student.getCourseOfType(CourseType.CORE);
-            List<StudentCourse> studentElec = student.getCourseOfType(CourseType.ELECTIVE);
-            List<StudentCourse> studentPre = student.getCourseOfType(CourseType.PRE);
-            List<StudentCourse> studentAddl = student.getCourseOfType(CourseType.ADDITIONAL);
-            for (Course core : plan.getCore()) {
+        fillField(acroForm, "Name of Student", student.getStudentName());
+        fillField(acroForm, "Student ID Number", student.getStudentId());
+        fillField(acroForm, "Anticipated Graduation", student.getGraduation());
+        fillField(acroForm, "Date Submitted", formatter.format(new Date()));
+        fillField(acroForm, "Check Box.0." + boolToInt(!student.isFastTrack()), "Yes");
+        fillField(acroForm, "Check Box.1." + boolToInt(!student.isThesis()), "Yes");
+
+        List<StudentCourse> studentCore = cloneList(student.getCourseOfType(CourseType.CORE));
+        int i = 0;
+        for (Course c : plan.getCore()) {
+            int index = studentCore.indexOf(c);
+            if (index >= 0) {
+                StudentCourse studentCourse = studentCore.get(index);
+                fillField(acroForm, "Core." + i + ".2", studentCourse.getSemester());
+                fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
+                fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
+                studentCore.remove(index);
+                i++;
             }
-        } catch (IOException ioe) {
-        } catch (NullPointerException npe) {}
+        }
+        for (StudentCourse studentCourse : studentCore) {
+            fillField(acroForm, "Core." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Core." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Core." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
+        }
+            List<StudentCourse> studentElec = cloneList(student.getCourseOfType(CourseType.ELECTIVE));
+            List<StudentCourse> studentPre = cloneList(student.getCourseOfType(CourseType.PRE));
+            List<StudentCourse> studentAddl = cloneList(student.getCourseOfType(CourseType.ADDITIONAL));
+            List<StudentCourse> studentTrack = cloneList(student.getCourseOfType(CourseType.TRACK));
+            List<StudentCourse> studentOther = cloneList(student.getCourseOfType(CourseType.OTHER));
 
         for (Course course : student.getTranscriptList()) {
-
 
         }
 
@@ -97,5 +121,23 @@ public interface FormInt {
             pdfDocument.save(new File(".", "test.pdf"));
         } catch (IOException e) {
         }
+    }
+
+    private static List<StudentCourse> cloneList(List<StudentCourse> list) {
+        List<StudentCourse> clone = new ArrayList<StudentCourse>(list.size());
+        for (StudentCourse c : list)
+            clone.add(new StudentCourse(c));
+        return clone;
+    }
+
+    private static void fillField(PDAcroForm acroForm, String fullyQualifiedName, String value) {
+        try {
+            acroForm.getField(fullyQualifiedName).setValue(value);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+
     }
 }

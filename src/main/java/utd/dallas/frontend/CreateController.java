@@ -171,7 +171,7 @@ public class CreateController {
         }
 
         // Add courses to current flow
-        for (StudentCourse currentCourse : currentStudent.getCourseType(t)) {
+        for (StudentCourse currentCourse : currentStudent.getCourseOfType(t)) {
             currentFlow.addCard(currentCourse);
         }
 

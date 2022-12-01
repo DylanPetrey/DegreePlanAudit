@@ -24,6 +24,12 @@ public class Course {
         this.courseTitle = "";
     }
 
+    public Course(Course another) {
+        this.courseNumber = another.courseNumber;
+        this.courseTitle = another.courseTitle;
+        this.type = another.type;
+    }
+
     /**
      * Filled constructor. Used for parsing the transcript.
      */
@@ -42,7 +48,8 @@ public class Course {
     }
 
     /**
-     * Creates a string of the course similar to how it will look on the final audit pdf
+     * Creates a string of the course similar to how it will look on the final audit
+     * pdf
      *
      * @return returns a string of the course
      */
@@ -60,12 +67,13 @@ public class Course {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!obj.getClass().isAssignableFrom(this.getClass())) {
-            return false;
+        if (this == obj)
+            return true;
+        if (obj.getClass().isAssignableFrom(this.getClass()) || this.getClass().isAssignableFrom(obj.getClass())) {
+            Course course = (Course) obj;
+            return Objects.equals(courseNumber, course.courseNumber);
         }
-        Course course = (Course) obj;
-        return Objects.equals(courseNumber, course.courseNumber);
+        return false;
     }
 
     /**

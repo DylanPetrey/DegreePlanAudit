@@ -1,6 +1,8 @@
 package utd.dallas.backend;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class StudentCourse extends Course {
     private String letterGrade = "";
@@ -14,6 +16,17 @@ public class StudentCourse extends Course {
 
     public StudentCourse(){
     }
+
+    public StudentCourse(StudentCourse another) {
+        super((Course) another);
+        this.letterGrade = another.letterGrade;
+        this.semester = another.semester;
+        this.attempted = another.attempted;
+        this.earned = another.earned;
+        this.points = another.earned;
+        this.isWaived = another.isWaived;
+        this.fromTranscript = another.fromTranscript;
+    } 
 
     public StudentCourse(CourseType type){
         this.type = type;
