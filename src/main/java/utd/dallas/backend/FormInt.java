@@ -24,11 +24,9 @@ public interface FormInt {
     /**
      * Converts a boolean value to an integer.
      * 
-     *
      * @param b Determine whether the return value should be 1 or 0
      *
      * @return 1 if the boolean value is true and 0 if it is false
-     *
      */
     private static int boolToInt(boolean b) {
         return b ? 1 : 0;
@@ -70,7 +68,7 @@ public interface FormInt {
         fillField(acroForm, "Check Box.0." + boolToInt(!student.isFastTrack()), "Yes");
         fillField(acroForm, "Check Box.1." + boolToInt(!student.isThesis()), "Yes");
 
-        List<StudentCourse> studentCore = cloneList(student.getCourseOfType(CourseType.CORE));
+        List<StudentCourse> studentCore = cloneList(student.getCourseType(CourseType.CORE));
         int i = 0;
         for (Course c : plan.getCore()) {
             int index = studentCore.indexOf(c);
@@ -90,11 +88,11 @@ public interface FormInt {
             fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
             fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
         }
-            List<StudentCourse> studentElec = cloneList(student.getCourseOfType(CourseType.ELECTIVE));
-            List<StudentCourse> studentPre = cloneList(student.getCourseOfType(CourseType.PRE));
-            List<StudentCourse> studentAddl = cloneList(student.getCourseOfType(CourseType.ADDITIONAL));
-            List<StudentCourse> studentTrack = cloneList(student.getCourseOfType(CourseType.TRACK));
-            List<StudentCourse> studentOther = cloneList(student.getCourseOfType(CourseType.OTHER));
+            List<StudentCourse> studentElec = cloneList(student.getCourseType(CourseType.ELECTIVE));
+            List<StudentCourse> studentPre = cloneList(student.getCourseType(CourseType.PRE));
+            List<StudentCourse> studentAddl = cloneList(student.getCourseType(CourseType.ADDITIONAL));
+            List<StudentCourse> studentTrack = cloneList(student.getCourseType(CourseType.TRACK));
+            List<StudentCourse> studentOther = cloneList(student.getCourseType(CourseType.OTHER));
 
         for (Course course : student.getTranscriptList()) {
 
@@ -116,9 +114,9 @@ public interface FormInt {
         }
         PDAcroForm finalForm = new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
-
         try {
             pdfDocument.save(new File(".", "test.pdf"));
+            pdfDocument.close();
         } catch (IOException e) {
         }
     }

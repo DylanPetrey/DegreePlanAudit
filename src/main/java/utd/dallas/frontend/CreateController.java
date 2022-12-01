@@ -119,6 +119,7 @@ public class CreateController {
     @FXML
     protected void onPrintButtonClick() {
         new Audit(currentStudent);
+        FormInt.print(currentStudent);
     }
 
     @FXML
@@ -168,7 +169,7 @@ public class CreateController {
         }
 
         // Add courses to current flow
-        for (StudentCourse currentCourse : currentStudent.getCourseOfType(t)) {
+        for (StudentCourse currentCourse : currentStudent.getCourseType(t)) {
             currentFlow.addCard(currentCourse);
         }
 
