@@ -81,6 +81,19 @@ public interface FormInt {
                 i++;
             }
         }
+
+        List<StudentCourse> studentOptional = cloneList(student.getCourseType(CourseType.OPTIONAL));
+        for (Course c : plan.getOptionalCore()) {
+            int index = studentOptional.indexOf(c);
+            if (index >= 0) {
+                StudentCourse studentCourse = studentOptional.get(index);
+                fillField(acroForm, "Core." + i + ".2", studentCourse.getSemester());
+                fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
+                fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
+                studentOptional.remove(index);
+                i++;
+            }
+        }
         for (StudentCourse studentCourse : studentCore) {
             fillField(acroForm, "Core." + i + ".0", studentCourse.getCourseTitle());
             fillField(acroForm, "Core." + i + ".1", studentCourse.getCourseNumber());
@@ -88,7 +101,16 @@ public interface FormInt {
             fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
             fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
         }
-            List<StudentCourse> studentElec = cloneList(student.getCourseType(CourseType.ELECTIVE));
+
+        i = 0;
+        List<StudentCourse> studentElec = cloneList(student.getCourseType(CourseType.ELECTIVE));
+        for (StudentCourse studentCourse : studentElec) {
+            fillField(acroForm, "Elective." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Elective." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Elective." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Elective." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Elective." + i + ".4", studentCourse.getLetterGrade());
+        }
             List<StudentCourse> studentPre = cloneList(student.getCourseType(CourseType.PRE));
             List<StudentCourse> studentAddl = cloneList(student.getCourseType(CourseType.ADDITIONAL));
             List<StudentCourse> studentTrack = cloneList(student.getCourseType(CourseType.TRACK));
@@ -132,6 +154,7 @@ public interface FormInt {
         try {
             acroForm.getField(fullyQualifiedName).setValue(value);
         } catch (IOException ioe) {
+            System.out.println("TEST");
             ioe.printStackTrace();
         } catch (NullPointerException npe){
             npe.printStackTrace();

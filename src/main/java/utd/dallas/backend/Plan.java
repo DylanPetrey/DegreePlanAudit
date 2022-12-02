@@ -294,13 +294,14 @@ public class Plan {
         switch (type){
             case CORE:
                 return requiredCore;
-            case ELECTIVE:
+            case OPTIONAL:
                 return optionalCore;
             case PRE:
                 List<Course> prereq = new ArrayList<>();
                 prereq.addAll(admissionPrerequisites);
                 prereq.addAll(trackPrerequisites);
                 return prereq;
+
         }
         return new ArrayList<>();
     }

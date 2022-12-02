@@ -9,7 +9,7 @@ public class Main {
         File inputFile = new File(inputFilePath);
         TranscriptParser transcript =  new TranscriptParser(inputFile);
         Student curr = transcript.getStudent();
-        curr.setCurrentPlan(Plan.Concentration.CYBER);
+        curr.setCurrentPlan(Plan.Concentration.TRADITIONAL);
         curr.printStudentInformation();
         FormInt.print(curr);
 

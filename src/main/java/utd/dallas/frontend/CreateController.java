@@ -127,19 +127,19 @@ public class CreateController {
         Object value = trackBox.getValue();
         if ("Traditional Computer Science".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.TRADITIONAL);
-        } else if ("Network-Telecommunications".equals(value)) {
+        } else if ("Network Telecommunications".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.NETWORKS);
-        } else if ("Intelligent-Systems".equals(value)) {
+        } else if ("Intelligent Systems".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.INTEL);
-        } else if ("Interactive-Computing".equals(value)) {
+        } else if ("Interactive Computing".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.INTERACTIVE);
         } else if ("Systems".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.SYSTEMS);
-        } else if ("Data-Science".equals(value)) {
+        } else if ("Data Science".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.DATA);
-        } else if ("Cyber-Security".equals(value)) {
+        } else if ("Cyber Security".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.CYBER);
-        } else if ("Software-Engineering".equals(value)) {
+        } else if ("Software Engineering".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
         }
 
