@@ -3,9 +3,7 @@ package utd.dallas.backend;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -39,6 +37,7 @@ public class Plan {
     };
 
     private final File utdCatalogJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/utd_catalog.json").getAbsoluteFile();
+    private Set<String> utdCatalogCourseNums = new HashSet<>();
     private final File degreeRequirementsJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/degreeRequirements.json").getAbsoluteFile();
     private DocumentContext CatalogFile;
     private Concentration concentration;
@@ -60,6 +59,8 @@ public class Plan {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        utdCatalogCourseNums = getAllCourseNums();
     }
 
     /**
@@ -75,6 +76,8 @@ public class Plan {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        utdCatalogCourseNums = getAllCourseNums();
     }
 
     /**
@@ -111,7 +114,8 @@ public class Plan {
             JSONObject currentCourse = (JSONObject) o;
             String num = (String) currentCourse.get("courseNumber");
             String title = (String) currentCourse.get("courseTitle");
-            list.add(new Course(num, title, type));
+            String hours = getCourseHours(num);
+            list.add(new Course(num, title, hours, type));
         }
         return list;
     }
@@ -235,6 +239,17 @@ public class Plan {
         }
     }
 
+    private Set<String> getAllCourseNums(){
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new FileReader(utdCatalogJSON));
+
+            JSONObject jsonObject = (JSONObject) obj;
+            return (Set<String>) jsonObject.keySet();
+        } catch (Exception ignore) { }
+        return new HashSet<String>();
+    }
+
     /**
      * Parse course title from the JSON
      *
@@ -256,9 +271,21 @@ public class Plan {
      * @param courseNum Course number to identify the course
      * @return int of the number of credit hours
      */
-    public int getCourseHours(String courseNum){
+    public String getCourseHours(String courseNum){
         String path = "$.['" + courseNum + "'].Hours";
-        return Integer.parseInt(CatalogFile.read(path));
+        String hourFromName = courseNum.substring(courseNum.length() - 3, courseNum.length() - 2);
+        try {
+            String h =  CatalogFile.read(path);
+            if(h.matches("^\\d$"))
+                return h;
+            throw new RuntimeException();
+        }catch (Exception e){
+            String stringNum = hourFromName;
+            if(stringNum.matches("^\\d$"))
+                return stringNum;
+            else
+                return "";
+        }
     }
 
     /**
@@ -307,4 +334,8 @@ public class Plan {
     public List<Course> getTrackPrerequisites() { return trackPrerequisites; }
     public List<String> getExcludedElectives() { return excludedElectives; }
     public Concentration getConcentration() { return concentration; }
+
+    public Set<String> getUtdCatalogCourseNums() {
+        return utdCatalogCourseNums;
+    }
 }

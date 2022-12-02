@@ -90,17 +90,7 @@ public class Audit {
 
         courseList.forEach(studentCourse -> {
             String letterGrade = studentCourse.getLetterGrade();
-            double currentHour = 0;
-            if(studentCourse.getAttempted() != 0)
-                currentHour = studentCourse.getAttempted();
-            else {
-                try {
-                    currentHour = currentStudent.getCurrentPlan().getCourseHours(studentCourse.getCourseNumber());
-                    } catch (Exception e){
-                        currentHour = 3;
-                }
-            }
-            double finalCurrentHour = currentHour;
+            int finalCurrentHour = Integer.parseInt(studentCourse.getHours());
             if (letterGrade.equalsIgnoreCase("A"))
                 totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("A-"))

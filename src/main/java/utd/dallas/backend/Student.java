@@ -75,7 +75,8 @@ public class Student {
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
         try {
             newCourse.setCourseTitle(currentPlan.getCourseTitle(newCourse.getCourseNumber()));
-        } catch (Exception ignore){}
+            newCourse.setHours(currentPlan.getCourseHours(newCourse.getCourseNumber()));
+        } catch (Exception ignore){ }
 
         transcriptList.add(newCourse);
     }
@@ -99,10 +100,10 @@ public class Student {
     public void resetCourseList(){
         this.courseList = new ArrayList<>();
         currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {
-            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getType()));
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
         });
         currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
-            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), Course.CourseType.OPTIONAL));
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), Course.CourseType.OPTIONAL));
         });
     }
 
@@ -170,18 +171,7 @@ public class Student {
         return course;
     }
 
-    /**
-     * Autofill values from course catalog if they exist
-     *
-     * @param target target course to fill
-     */
-    public void autoFillValues(StudentCourse target){
-        try {
-            target.setCourseTitle(currentPlan.getCourseTitle(target.getCourseNumber()));
-            target.setHours(currentPlan.getCourseHours(target.getCourseNumber()));
-            target.setDescription(currentPlan.getCourseDescription(target.getCourseNumber()));
-        } catch (Exception ignore) { }
-    }
+
 
 
     /**
