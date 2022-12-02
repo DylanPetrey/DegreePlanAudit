@@ -11,7 +11,7 @@ public class Main {
         Student curr = transcript.getStudent();
         curr.setCurrentPlan(Plan.Concentration.TRADITIONAL);
         curr.printStudentInformation();
-        FormInt.print(curr);
+        Form.print(curr);
 
         
         System.out.println(Arrays.toString(curr.getCurrentPlan().getUtdCatalogCourseNums().toArray()));
