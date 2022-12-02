@@ -220,6 +220,11 @@ public class Student {
     public boolean isFastTrack() { return fastTrack; }
     public boolean isThesis() { return thesis; }
 
+    public String getSimpleName() {
+        String names[] = studentName.split(" ");
+        return names[0] + names[1];
+    }
+
 
 
     /**

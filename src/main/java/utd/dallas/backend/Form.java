@@ -9,12 +9,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
-import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 
 import utd.dallas.backend.Course.CourseType;
 
@@ -43,6 +41,7 @@ public interface Form {
     public static void print(Student student) {
 
         String loc = "";
+        List<StudentCourse> courseList;
         PDDocument pdfDocument = null;
         Plan plan = student.getCurrentPlan();
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -63,25 +62,26 @@ public interface Form {
 
         fillField(acroForm, "Name of Student", student.getStudentName());
         fillField(acroForm, "Student ID Number", student.getStudentId());
+        fillField(acroForm, "Semester Admitted to Program", student.getStartDate());
         fillField(acroForm, "Anticipated Graduation", student.getGraduation());
         fillField(acroForm, "Date Submitted", formatter.format(new Date()));
         fillField(acroForm, "Check Box.0." + boolToInt(!student.isFastTrack()), "Yes");
         fillField(acroForm, "Check Box.1." + boolToInt(!student.isThesis()), "Yes");
 
-        List<StudentCourse> studentCore = cloneList(student.getCourseType(CourseType.CORE));
+        courseList = cloneList(student.getCourseType(CourseType.CORE));
         int i = 0;
         for (Course c : plan.getCore()) {
-            int index = studentCore.indexOf(c);
+            int index = courseList.indexOf(c);
             if (index >= 0) {
-                StudentCourse studentCourse = studentCore.get(index);
+                StudentCourse studentCourse = courseList.get(index);
                 fillField(acroForm, "Core." + i + ".2", studentCourse.getSemester());
                 fillField(acroForm, "Core." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, "Core." + i + ".4", studentCourse.getLetterGrade());
-                studentCore.remove(index);
+                courseList.remove(index);
                 i++;
             }
         }
-        for (StudentCourse studentCourse : studentCore) {
+        for (StudentCourse studentCourse : courseList) {
             fillField(acroForm, "Core." + i + ".0", studentCourse.getCourseTitle());
             fillField(acroForm, "Core." + i + ".1", studentCourse.getCourseNumber());
             fillField(acroForm, "Core." + i + ".2", studentCourse.getSemester());
@@ -90,20 +90,20 @@ public interface Form {
             i++;
         }
 
-        List<StudentCourse> studentOptional = cloneList(student.getCourseType(CourseType.OPTIONAL));
+        courseList = cloneList(student.getCourseType(CourseType.OPTIONAL));
         i = 0;
         for (Course c : plan.getOptionalCore()) {
-            int index = studentOptional.indexOf(c);
+            int index = courseList.indexOf(c);
             if (index >= 0) {
-                StudentCourse studentCourse = studentOptional.get(index);
+                StudentCourse studentCourse = courseList.get(index);
                 fillField(acroForm, "Optional." + i + ".2", studentCourse.getSemester());
                 fillField(acroForm, "Optional." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, "Optional." + i + ".4", studentCourse.getLetterGrade());
-                studentOptional.remove(index);
+                courseList.remove(index);
                 i++;
             }
         }
-        for (StudentCourse studentCourse : studentCore) {
+        for (StudentCourse studentCourse : courseList) {
             fillField(acroForm, "Optional." + i + ".0", studentCourse.getCourseTitle());
             fillField(acroForm, "Optional." + i + ".1", studentCourse.getCourseNumber());
             fillField(acroForm, "Optional." + i + ".2", studentCourse.getSemester());
@@ -112,9 +112,9 @@ public interface Form {
             i++;
         }
 
-        List<StudentCourse> studentElec = cloneList(student.getCourseType(CourseType.ELECTIVE));
+        courseList = cloneList(student.getCourseType(CourseType.ELECTIVE));
         i = 0;
-        for (StudentCourse studentCourse : studentElec) {
+        for (StudentCourse studentCourse : courseList) {
             fillField(acroForm, "Elective." + i + ".0", studentCourse.getCourseTitle());
             fillField(acroForm, "Elective." + i + ".1", studentCourse.getCourseNumber());
             fillField(acroForm, "Elective." + i + ".2", studentCourse.getSemester());
@@ -122,34 +122,51 @@ public interface Form {
             fillField(acroForm, "Elective." + i + ".4", studentCourse.getLetterGrade());
             i++;
         }
-        //fillField(acroForm, "Elective.0.0", "TEST");
-            List<StudentCourse> studentPre = cloneList(student.getCourseType(CourseType.PRE));
-            List<StudentCourse> studentAddl = cloneList(student.getCourseType(CourseType.ADDITIONAL));
-            List<StudentCourse> studentTrack = cloneList(student.getCourseType(CourseType.TRACK));
-            List<StudentCourse> studentOther = cloneList(student.getCourseType(CourseType.OTHER));
+        
 
-        for (Course course : student.getTranscriptList()) {
-
+        courseList = cloneList(student.getCourseType(CourseType.ADDITIONAL));
+        i = 0;
+        for (StudentCourse studentCourse : courseList) {
+            fillField(acroForm, "Additional." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Additional." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Additional." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Additional." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Additional." + i + ".4", studentCourse.getLetterGrade());
+            i++;
         }
 
-        while (fieldTreeIterator.hasNext()) {
-            PDField f = fieldTreeIterator.next();
-            COSDictionary obj = f.getCOSObject();
-            if (f.getClass().equals(PDTextField.class)) {
-                System.out.println(f.getFullyQualifiedName());
-                /*
-                 * /
-                 * try {
-                 * f.setValue("run");
-                 * } catch (IOException e){}
-                 */
-
+        courseList = cloneList(student.getCourseType(CourseType.PRE));
+        i = 0;
+        for (Course c : plan.getAdmissionPrerequisites()) {
+            int index = courseList.indexOf(c);
+            if (index >= 0) {
+                StudentCourse studentCourse = courseList.get(index);
+                fillField(acroForm, "Prereq." + i + ".2", studentCourse.getSemester());
+                fillField(acroForm, "Prereq." + i + ".3", studentCourse.getTransfer());
+                fillField(acroForm, "Prereq." + i + ".4", studentCourse.getLetterGrade());
+                courseList.remove(index);
+                i++;
             }
         }
+
+
+        List<StudentCourse> studentOther = cloneList(student.getCourseType(CourseType.OTHER));
+        i = 0;
+        for (StudentCourse studentCourse : courseList) {
+            fillField(acroForm, "Additional." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Additional." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Additional." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Additional." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Additional." + i + ".4", studentCourse.getLetterGrade());
+            i++;
+        }
+
+       
         //PDAcroForm finalForm = new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         try {
-            pdfDocument.save(new File(".", "test.pdf"));
+            String name = student.getStudentName().replaceAll("\\s", "");
+            pdfDocument.save(new File(".", "DegreePlan_" + name + ".pdf"));
             pdfDocument.close();
         } catch (IOException e) {
         }
@@ -171,5 +188,14 @@ public interface Form {
         } catch (NullPointerException npe){
         }
 
+    }
+
+    private static void fillSection(String section, Student student, PDAcroForm acroForm, CourseType type) {
+        
+        switch (type){
+
+            case CORE:
+                break;
+        }
     }
 }
