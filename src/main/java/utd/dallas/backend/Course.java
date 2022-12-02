@@ -6,6 +6,7 @@ public class Course {
     private String courseNumber;
     private String courseTitle;
     private String description;
+    private String hours;
     protected CourseType type;
     public enum CourseType {
         CORE,
@@ -23,6 +24,7 @@ public class Course {
     public Course() {
         this.courseNumber = "";
         this.courseTitle = "";
+        this.hours = "";
     }
 
     public Course(Course another) {
@@ -34,9 +36,10 @@ public class Course {
     /**
      * Filled constructor. Used for parsing the transcript.
      */
-    public Course(String courseNumber, String courseTitle, CourseType type) {
+    public Course(String courseNumber, String courseTitle, String hours, CourseType type) {
         this.courseNumber = courseNumber;
         this.courseTitle = courseTitle;
+        this.hours = hours;
         this.type = type;
     }
 
@@ -80,31 +83,21 @@ public class Course {
      * Accessor methods to be used outside the class.
      */
 
-    public CourseType getType() {
-        return type;
-    }
-    public String getCourseNumber() {
-        return courseNumber;
-    }
-    public String getCourseTitle() {
-        return courseTitle;
-    }
+    public CourseType getType() { return type; }
+    public String getCourseNumber() { return courseNumber; }
+    public String getCourseTitle() { return courseTitle; }
     public String getDescription() { return description; }
+    public String getHours() { return hours; }
+
 
     /**
      * Mutator methods to be used outside the class.
      */
-    public void setCourseNumber(String courseNumber) {
-        this.courseNumber = courseNumber;
-    }
-    public void setCourseTitle(String courseTitle) {
-        this.courseTitle = courseTitle;
-    }
-    public void setDescription(String courseDescription) {
-        this.description = courseTitle;
-    }
+    public void setCourseNumber(String courseNumber) { this.courseNumber = courseNumber; }
+    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
+    public void setDescription(String courseDescription) { this.description = courseTitle; }
     public void setType(Course.CourseType type) {
         this.type = type;
     }
-
+    public void setHours(String hours) { this.hours = hours; }
 }

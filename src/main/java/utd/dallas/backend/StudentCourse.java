@@ -7,7 +7,6 @@ import java.util.List;
 public class StudentCourse extends Course {
     private String letterGrade = "";
     private String semester = "";
-    private double hours = 0;
     private double attempted = 0;
     private double earned = 0;
     private double points = 0;
@@ -33,9 +32,10 @@ public class StudentCourse extends Course {
         this.type = type;
     }
 
-    public StudentCourse(String id, String title, CourseType type) {
+    public StudentCourse(String id, String title, String hours, CourseType type) {
         setCourseNumber(id);
         setCourseTitle(title);
+        setHours(hours);
         this.type = type;
     }
 
@@ -70,6 +70,7 @@ public class StudentCourse extends Course {
         }
 
         attempted = Double.parseDouble(tokens[0]);
+        setHours(String.valueOf((int) attempted));
         earned = Double.parseDouble(tokens[1]);
         points = Double.parseDouble(tokens[tokens.length - 1]);
     }
@@ -88,6 +89,7 @@ public class StudentCourse extends Course {
             transferText = transfer;
         return  getCourseNumber() + " " +
                 getCourseTitle() + " " +
+                getHours() + " " +
                 semester + " " +
                 transferText + " " +
                 letterGrade;
@@ -98,7 +100,6 @@ public class StudentCourse extends Course {
     }
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
-    public double getHours() { return hours; }
     public double getAttempted() { return attempted; }
     public double getEarned() { return earned; }
     public double getPoints() {return points; }
@@ -111,11 +112,11 @@ public class StudentCourse extends Course {
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
-    public void setHours(double hours) { this.hours = hours; }
     public void setWaived(boolean waived) { this.isWaived = waived; }
 
     public void setCourseVariables(StudentCourse newCourse){
         setCourseNumber(newCourse.getCourseNumber());
+        setHours(newCourse.getHours());
         semester = newCourse.getSemester();
         attempted = newCourse.getAttempted();
         points = newCourse.getPoints();

@@ -11,7 +11,10 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import utd.dallas.backend.*;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -196,6 +199,33 @@ public class CreateController {
     private void createCourseCardListener(CourseCard card){
         screenClickListener(card);
         addRemoveBlankCardListener(card);
+
+        /*
+            make sure the following command is added to the VM classpath:
+            --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+         */
+        TextFields.bindAutoCompletion(
+                card.getCourseNumField(),
+                currentStudent.getCurrentPlan().getUtdCatalogCourseNums().toArray())
+                .setOnAutoCompleted(e -> autoFillValues(card));
+    }
+
+    /**
+     * Autofill values from course catalog if they exist
+     *
+     * @param target target course to fill
+     */
+    public void autoFillValues(CourseCard target){
+        try {
+            String num = target.currentCourse.getCourseNumber();
+            String title = currentStudent.getCurrentPlan().getCourseTitle(num);
+            String hours = currentStudent.getCurrentPlan().getCourseHours(num);
+            target.getCurrentCourse().setCourseTitle(title);
+            target.getCourseTitleField().setText(title);
+            target.getCurrentCourse().setHours(hours);
+            target.getCourseHoursField().setText(String.valueOf(hours));
+
+        } catch (Exception ignore) { }
     }
 
     public void screenClickListener(CourseCard card){

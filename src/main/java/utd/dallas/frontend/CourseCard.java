@@ -2,6 +2,8 @@ package utd.dallas.frontend;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,8 +13,11 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import utd.dallas.backend.Course;
 import utd.dallas.backend.StudentCourse;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class CourseCard {
@@ -24,12 +29,23 @@ public class CourseCard {
     StackPane summary;
     SummaryCard summaryCard;
     FlowObject parent;
+    TextField courseNumField = new TextField();
+    TextField courseTitleField = new TextField();
+    TextField courseHoursField = new TextField();
+    ObservableList<String>
+            gradeValues = FXCollections.observableArrayList("Grade", "A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "I", "CR", "NC", "W", "WL"),
+            semesterValues = FXCollections.observableArrayList();
+
+
+
 
     CourseCard(StudentCourse currentCourse) {
         // Initialize max width
         Text t = new Text("Design and Analysis of Computer Algorithms");
         t.setFont(Font.getDefault());
         maxTextWidth = t.getLayoutBounds().getWidth() + 20;
+
+        semesterValues.addAll(getSemesterValues());
 
         // Initialize objects
         this.currentCourse = currentCourse;
@@ -59,6 +75,28 @@ public class CourseCard {
         });
     }
 
+    private List<String> getSemesterValues(){
+        LocalDate currentdate = LocalDate.now();
+        double day = currentdate.getDayOfYear();
+        int year = currentdate.getYear();
+
+        List<String> semesterList = new ArrayList<>();
+        semesterList.add("Semester");
+
+
+        int currentYear = year % 2000;
+        String[] semesters = new String[]{"SP", "SU", "F"};
+        int currentSemester = (int) (day / (366.0/3));
+
+        for(double i = currentYear + (currentSemester+1)/3.0; i > currentYear-10; i = i - 1/3.0){
+            String currentSem = (int)i + semesters[(int) ((i - (int) i) * 10 / 3)];
+            semesterList.add(currentSem);
+        }
+
+
+        return semesterList;
+    }
+
     private void summaryCardConstraints(){
         double scale = -0.15;
         summary.setScaleX(summary.getScaleX() + scale);
@@ -69,9 +107,8 @@ public class CourseCard {
         summary.setStyle("-fx-border-color: black; -fx-border-radius: 5; -fx-padding: 5");
 
         summary.setOnMouseEntered(event -> {
-            if(!card.isVisible()) {
+            if(!card.isVisible())
                 summary.setStyle("-fx-background-color: #c6c6c6; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5; -fx-padding: 5");
-            }
         });
         summary.setOnMouseExited(event -> {
             if(!card.isVisible())
@@ -98,17 +135,30 @@ public class CourseCard {
         current.setSpacing(10);
         current.setMaxWidth(maxTextWidth);
 
-        TextField courseNumField = new TextField();
-        courseNumField.setPromptText("Course Number");
-        courseNumField.setText(currentCourse.getCourseNumber());
+        courseNumField = createNumField();
+
+        courseHoursField = createHoursField();
+        CheckBox waiverCheckBox = createWaiverBox();
+
+
+        current.getChildren().addAll(courseNumField, courseHoursField, waiverCheckBox);
+
+        return current;
+    }
+
+    private TextField createNumField(){
+        TextField numField = new TextField();
+        numField.setPromptText("Course Number");
+        numField.setText(currentCourse.getCourseNumber());
         summaryCard.setNumText(currentCourse.getCourseNumber());
 
-        TextField semesterField = new TextField();
-        semesterField.setPromptText("Semester");
-        semesterField.setText(currentCourse.getSemester());
-        summaryCard.setSemesterText(currentCourse.getSemester());
+        Text t = new Text("Course Number");
+        t.setFont(Font.getDefault());
+        double maxWidth = t.getLayoutBounds().getWidth() + 20;
+        numField.setPrefWidth(maxWidth);
+        HBox.setHgrow(numField, Priority.ALWAYS);
 
-        courseNumField.textProperty().addListener((observable, oldValue, newValue) -> {
+        numField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 currentCourse.setCourseNumber(newValue);
                 summaryCard.setNumText(newValue);
@@ -117,39 +167,58 @@ public class CourseCard {
                 summaryCard.setNumText(oldValue);
             }
         });
+        return numField;
+    }
+    private TextField createHoursField() {
+        TextField hours = new TextField();
+        hours.setPromptText("Hours");
+        Text t = new Text("Hours");
 
-        semesterField.textProperty().addListener((observable, oldValue, newValue) -> {
-            try {
-                currentCourse.setSemester(newValue);
-                summaryCard.setSemesterText(newValue);
-            } catch (NullPointerException e){
-                currentCourse.setSemester(oldValue);
-                summaryCard.setSemesterText(oldValue);
+        t.setFont(Font.getDefault());
+        double maxWidth = t.getLayoutBounds().getWidth() + 20;
+        hours.setPrefWidth(maxWidth);
+        HBox.setHgrow(hours, Priority.ALWAYS);
+
+        hours.setText(currentCourse.getHours());
+        summaryCard.setHoursText(currentCourse.getHours());
+
+        hours.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue,
+                                String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    hours.setText(newValue.replaceAll("[^\\d]", ""));
+                    summaryCard.setHoursText(newValue);
+                }
+
+                if (newValue.length() > 1) {
+                    newValue = newValue.substring(0, 1);
+                    hours.setText(newValue);
+                    summaryCard.setHoursText(newValue);
+                }
             }
         });
 
-        current.getChildren().addAll(courseNumField, semesterField);
-
-        return current;
+        return hours;
     }
 
     private TextField createTitleField(){
-        TextField current = new TextField();
-        current.setPromptText("Title");
-        current.setText(currentCourse.getCourseTitle());
+        courseTitleField = new TextField();
+        courseTitleField.setPromptText("Title");
+        courseTitleField.setText(currentCourse.getCourseTitle());
         summaryCard.setTitleText(currentCourse.getCourseTitle());
 
-        current.setMinWidth(maxTextWidth);
-        current.setPrefWidth(maxTextWidth);
-        current.setMaxWidth(maxTextWidth);
+        courseTitleField.setMinWidth(maxTextWidth);
+        courseTitleField.setPrefWidth(maxTextWidth);
+        courseTitleField.setMaxWidth(maxTextWidth);
 
-        current.textProperty().addListener(new ChangeListener<String>() {
+        courseTitleField.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> ov, final String oldValue, final String newValue) {
-                String currentText = current.getText();
+                String currentText = courseTitleField.getText();
                 if (currentText.length() > MAX_TITLE_LENGTH) {
                     currentText = currentText.substring(0, MAX_TITLE_LENGTH);
-                    current.setText(currentText);
+                    courseTitleField.setText(currentText);
                 }
 
                 currentCourse.setCourseTitle(currentText);
@@ -158,7 +227,7 @@ public class CourseCard {
             }
         });
 
-        current.textProperty().addListener((observable, oldValue, newValue) -> {
+        courseTitleField.textProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 currentCourse.setCourseTitle(newValue);
                 summaryCard.setTitleText(newValue);
@@ -168,7 +237,7 @@ public class CourseCard {
 
             }
         });
-        return current;
+        return courseTitleField;
     }
 
 
@@ -179,61 +248,134 @@ public class CourseCard {
         current.setSpacing(10);
         current.setMaxWidth(maxTextWidth);
 
-        TextField gradeField = new TextField();
-        gradeField.setPromptText("Grade");
-        current.getChildren().add(gradeField);
-        gradeField.setText(currentCourse.getLetterGrade());
-        summaryCard.setGradeText(currentCourse.getLetterGrade());
+        ComboBox<String> semBox = createSemesterBox();
+        TextField transferField = createTransferField();
+        ComboBox<String> gradeBox = createGradeBox();
 
-        gradeField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+        current.getChildren().addAll(semBox, gradeBox, transferField);
+
+        return current;
+    }
+
+
+    private ComboBox<String> createSemesterBox(){
+        ComboBox<String> semesterBox = new ComboBox<>();
+        semesterBox.setItems(semesterValues);
+        try {
+            if (currentCourse.getSemester().equals(""))
+                semesterBox.setValue(semesterValues.get(0));
+            else
+                semesterBox.setValue(currentCourse.getSemester());
+        }catch (Exception e) {
+            semesterBox.setValue(semesterValues.get(0));
+        }
+
+        summaryCard.setSemesterText(currentCourse.getSemester());
+        semesterBox.setVisibleRowCount(10);
+
+        semesterBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             try {
-                currentCourse.setLetterGrade(newValue);
-                summaryCard.setGradeText(newValue);
-
+                String semValue = "";
+                if(!newValue.equals(semesterValues.get(0)))
+                    semValue = newValue;
+                currentCourse.setSemester(semValue);
+                summaryCard.setSemesterText(semValue);
             } catch (NullPointerException e){
-                currentCourse.setLetterGrade(oldValue);
-                summaryCard.setGradeText(oldValue);
+                String semValue = "";
+                if(!oldValue.equals(semesterValues.get(0)))
+                    semValue = oldValue;
+                currentCourse.setSemester(semValue);
+                summaryCard.setSemesterText(semValue);
             }
         });
 
-        if(currentCourse.getType() != Course.CourseType.PRE && currentCourse.getType() != Course.CourseType.TRACK) {
-            TextField transferField = new TextField();
-            transferField.setPromptText("Transfer");
-            transferField.setText(currentCourse.getTransfer());
-            summaryCard.setTransferText(currentCourse.getTransfer());
-            summaryCard.setWaiveText(false);
+        return semesterBox;
+    }
 
-            current.getChildren().addAll(transferField);
+    private TextField createTransferField(){
+        TextField transferField = new TextField();
+        transferField.setPromptText("Transfer");
+        transferField.setText(currentCourse.getTransfer());
+        summaryCard.setTransferText(currentCourse.getTransfer());
 
-            transferField.textProperty().addListener((observable, oldValue, newValue) -> {
-                try {
-                    currentCourse.setTransfer(newValue);
-                    summaryCard.setTransferText(newValue);
-                    summaryCard.setWaiveText(false);
-                } catch (NullPointerException e){
-                    currentCourse.setTransfer(oldValue);
-                    summaryCard.setTransferText(oldValue);
-                    summaryCard.setWaiveText(false);
-                }
-            });
+        Text t = new Text("Transfer");
+        t.setFont(Font.getDefault());
+        double maxTransferWidth = t.getLayoutBounds().getWidth() + 20;
+        transferField.setPrefWidth(maxTransferWidth);
+        HBox.setHgrow(transferField, Priority.ALWAYS);
 
-        } else {
-            CheckBox waiverCheckBox = new CheckBox();
-            waiverCheckBox.setText("Waiver");
-            waiverCheckBox.setSelected(currentCourse.isWaived());
-            summaryCard.setTransferText("");
+        transferField.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentCourse.setTransfer(newValue);
+                summaryCard.setTransferText(newValue);
+                summaryCard.setWaiveText(false);
+            } catch (NullPointerException e){
+                currentCourse.setTransfer(oldValue);
+                summaryCard.setTransferText(oldValue);
+                summaryCard.setWaiveText(false);
+            }
+        });
+
+        return transferField;
+    }
+
+    public CheckBox createWaiverBox (){
+        CheckBox waiverCheckBox = new CheckBox();
+        waiverCheckBox.setText("Waiver");
+        waiverCheckBox.setSelected(currentCourse.isWaived());
+        summaryCard.setTransferText("");
+        summaryCard.setWaiveText(waiverCheckBox.isSelected());
+
+        Text t = new Text("Waiver");
+        t.setFont(Font.getDefault());
+        double maxWidth = t.getLayoutBounds().getWidth() + 30;
+        waiverCheckBox.setPrefWidth(maxWidth);
+        HBox.setHgrow(waiverCheckBox, Priority.ALWAYS);
+
+
+        waiverCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            currentCourse.setWaived(waiverCheckBox.isSelected());
             summaryCard.setWaiveText(waiverCheckBox.isSelected());
+            summaryCard.setTransferText("");
+        });
 
-            waiverCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                currentCourse.setWaived(waiverCheckBox.isSelected());
-                summaryCard.setWaiveText(waiverCheckBox.isSelected());
-                summaryCard.setTransferText("");
-            });
+        return waiverCheckBox;
+    }
 
-            current.getChildren().addAll(waiverCheckBox);
 
+    private ComboBox<String> createGradeBox(){
+        ComboBox<String> gradeBox = new ComboBox<>();
+        gradeBox.setItems(gradeValues);
+        gradeBox.setValue(gradeValues.get(0));
+        summaryCard.setGradeText(currentCourse.getLetterGrade());
+
+        try {
+            if (currentCourse.getLetterGrade().equals(""))
+                gradeBox.setValue(gradeValues.get(0));
+            else
+                gradeBox.setValue(currentCourse.getLetterGrade());
+        }catch (Exception e) {
+            gradeBox.setValue(gradeValues.get(0));
         }
-        return current;
+
+        gradeBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                String gradeValue = "";
+                if(!newValue.equals("Grade"))
+                    gradeValue = newValue;
+                currentCourse.setLetterGrade(gradeValue);
+                summaryCard.setGradeText(gradeValue);
+            } catch (NullPointerException e){
+                String gradeValue = "";
+                if(!newValue.equals("Grade"))
+                    gradeValue = newValue;
+                currentCourse.setLetterGrade(gradeValue);
+                summaryCard.setGradeText(gradeValue);
+            }
+        });
+
+        return gradeBox;
     }
 
     private StackPane createCard(){
@@ -271,4 +413,7 @@ public class CourseCard {
         return parent;
     }
 
+    public TextField getCourseNumField() { return courseNumField; }
+    public TextField getCourseTitleField() { return courseTitleField; }
+    public TextField getCourseHoursField() { return courseHoursField; }
 }

@@ -55,13 +55,12 @@ public class FlowObject {
         }
     }
 
-    public CourseCard addCard(StudentCourse currentCourse){
+    public void addCard(StudentCourse currentCourse){
         currentCourse.setType(type);
         CourseCard currentCard = new CourseCard(currentCourse);
         currentCard.setParent(this);
         currentCard.summaryCard.setCourseType(currentCourse.getType());
         observableCard.add(currentCard);
-        return currentCard;
     }
 
     public void addCard(CourseCard newCard){
