@@ -51,7 +51,7 @@
                            <center>
                               <Group BorderPane.alignment="CENTER">
                                  <children>
-                                          <TextField fx:id="studentID" layoutY="17.0" onAction="#setStudentID" style="-fx-background-color: #fff0e3;" />
+                                          <TextField fx:id="studentID" layoutY="17.0" onAction="#setStudentID" style="-fx-background-color: #ffffff;" />
                                           <Label layoutX="3.0" text="Student ID" textFill="WHITE">
                                        <font>
                                           <Font name="Charter Roman" size="13.0" />
@@ -62,7 +62,7 @@
                            <bottom>
                               <Group BorderPane.alignment="CENTER">
                                  <children>
-                                          <TextField fx:id="studentSemAdmitted" layoutY="17.0" onAction="#setStudentSemAdmitted" style="-fx-background-color: #fff0e3;" />
+                                          <TextField fx:id="studentSemAdmitted" layoutY="17.0" onAction="#setStudentSemAdmitted" style="-fx-background-color: #ffffff;" />
                                           <Label layoutX="3.0" text="Semester Admitted" textFill="WHITE">
                                        <font>
                                           <Font name="Charter Roman" size="13.0" />
