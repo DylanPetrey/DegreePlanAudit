@@ -40,7 +40,7 @@
                            <top>
                               <Group BorderPane.alignment="CENTER">
                                  <children>
-                                          <TextField fx:id="studentName" layoutY="17.0" onAction="#setStudentName" style="-fx-background-color: #fff0e3;" />
+                                          <TextField fx:id="studentName" layoutY="17.0" onAction="#setStudentName" style="-fx-background-color: #ffffff;" />
                                           <Label layoutX="3.0" text="Name of Student" textFill="WHITE">
                                        <font>
                                           <Font name="Charter Roman" size="13.0" />
@@ -96,7 +96,7 @@
                                        <font>
                                           <Font name="Charter Roman" size="13.0" />
                                        </font></Label>
-                                          <TextField fx:id="anticipatedGrad" layoutY="17.0" style="-fx-background-color: #fff0e3;" />
+                                          <TextField fx:id="anticipatedGrad" layoutY="17.0" style="-fx-background-color: #ffffff;" />
                                  </children>
                               </Group>
                            </bottom>
@@ -135,7 +135,7 @@
                <items>
                   <ScrollPane fx:id="OptionalPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
                      <content>
-                        <VBox spacing="2.0" style="-fx-background-color: #fff0e3;">
+                        <VBox spacing="2.0" style="-fx-background-color: #ffffff;">
                            <children>
                               <HBox alignment="BOTTOM_CENTER">
                                  <children>
@@ -198,7 +198,7 @@
                   </ScrollPane>
                   <ScrollPane fx:id="CorePane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
                      <content>
-                        <VBox spacing="2.0" style="-fx-background-color: #fff0e3;">
+                        <VBox spacing="2.0" style="-fx-background-color: #ffffff;">
                            <children>
                               <HBox alignment="CENTER">
                                  <children>
