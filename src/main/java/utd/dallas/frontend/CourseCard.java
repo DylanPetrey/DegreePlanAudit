@@ -15,10 +15,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import utd.dallas.backend.StudentCourse;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class CourseCard {
     private static final int MAX_TITLE_LENGTH = 42;
@@ -37,15 +33,13 @@ public class CourseCard {
             semesterValues = FXCollections.observableArrayList();
 
 
-
-
-    CourseCard(StudentCourse currentCourse) {
+    CourseCard(StudentCourse currentCourse, ObservableList<String> semesterValues) {
         // Initialize max width
         Text t = new Text("Design and Analysis of Computer Algorithms");
         t.setFont(Font.getDefault());
         maxTextWidth = t.getLayoutBounds().getWidth() + 20;
 
-        semesterValues.addAll(getSemesterValues());
+        this.semesterValues = semesterValues;
 
         // Initialize objects
         this.currentCourse = currentCourse;
@@ -75,27 +69,6 @@ public class CourseCard {
         });
     }
 
-    private List<String> getSemesterValues(){
-        LocalDate currentdate = LocalDate.now();
-        double day = currentdate.getDayOfYear();
-        int year = currentdate.getYear();
-
-        List<String> semesterList = new ArrayList<>();
-        semesterList.add("Semester");
-
-
-        int currentYear = year % 2000;
-        String[] semesters = new String[]{"SP", "SU", "F"};
-        int currentSemester = (int) (day / (366.0/3));
-
-        for(double i = currentYear + (currentSemester+1)/3.0; i > currentYear-10; i = i - 1/3.0){
-            String currentSem = (int)i + semesters[(int) ((i - (int) i) * 10 / 3)];
-            semesterList.add(currentSem);
-        }
-
-
-        return semesterList;
-    }
 
     private void summaryCardConstraints(){
         double scale = -0.15;
@@ -186,15 +159,18 @@ public class CourseCard {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
-                if (!newValue.matches("\\d*")) {
+                if (newValue.matches("[0-9]$")) {
                     hours.setText(newValue.replaceAll("[^\\d]", ""));
                     summaryCard.setHoursText(newValue);
+                    currentCourse.setHours(newValue);
                 }
 
                 if (newValue.length() > 1) {
                     newValue = newValue.substring(0, 1);
                     hours.setText(newValue);
                     summaryCard.setHoursText(newValue);
+                    currentCourse.setHours(newValue);
+
                 }
             }
         });
@@ -309,11 +285,9 @@ public class CourseCard {
             try {
                 currentCourse.setTransfer(newValue);
                 summaryCard.setTransferText(newValue);
-                summaryCard.setWaiveText(false);
             } catch (NullPointerException e){
                 currentCourse.setTransfer(oldValue);
                 summaryCard.setTransferText(oldValue);
-                summaryCard.setWaiveText(false);
             }
         });
 

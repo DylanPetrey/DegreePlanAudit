@@ -17,6 +17,7 @@ import utd.dallas.backend.*;
 
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,8 +51,9 @@ public class CreateController {
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
-            softwareTracks = FXCollections.observableArrayList(
-                    "Software Engineering");
+            softwareTracks = FXCollections.observableArrayList("Software Engineering"),
+            semesterValues = FXCollections.observableArrayList();
+
 
 
 
@@ -68,6 +70,7 @@ public class CreateController {
         }
 
         DDHandler = new DragDropHandler();
+        semesterValues.addAll(getSemesterValues());
 
         Platform.runLater(() -> {
             double maxWidth = 0;
@@ -97,6 +100,28 @@ public class CreateController {
 
     }
 
+    private List<String> getSemesterValues(){
+        LocalDate currentdate = LocalDate.now();
+        double day = currentdate.getDayOfYear();
+        int year = currentdate.getYear();
+
+        List<String> semesterList = new ArrayList<>();
+        semesterList.add("Semester");
+
+
+        int currentYear = year % 2000;
+        String[] semesters = new String[]{"SP", "SU", "F"};
+        int currentSemester = (int) (day / (366.0/3));
+
+        for(double i = currentYear + (currentSemester+1)/3.0; i > currentYear-10; i = i - 1/3.0){
+            String currentSem = (int)i + semesters[(int) ((i - (int) i) * 10 / 3)];
+            semesterList.add(currentSem);
+        }
+
+
+        return semesterList;
+    }
+
     protected void setInitalFields(){
         studentName.setText(currentStudent.getStudentName());
         studentID.setText(currentStudent.getStudentId());
@@ -104,6 +129,8 @@ public class CreateController {
         fastTrack.setSelected(currentStudent.isFastTrack());
         thesis.setSelected(currentStudent.isThesis());
     }
+
+
 
     @FXML
     protected void onSWEButtonClick() {
@@ -162,7 +189,7 @@ public class CreateController {
     private void resetVbox(VBox current, Course.CourseType t){
         // Replace old flow pane
         current.getChildren().remove(current.lookup("FlowPane"));
-        FlowObject currentFlow = new FlowObject(t, current);
+        FlowObject currentFlow = new FlowObject(t, current, semesterValues);
         ListOfFlowObjects.add(currentFlow);
 
         // Add empty courses to modify
