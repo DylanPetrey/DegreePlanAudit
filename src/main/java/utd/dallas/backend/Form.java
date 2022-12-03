@@ -6,39 +6,37 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 
 import utd.dallas.backend.Course.CourseType;
 
-public interface Form {
+public class Form {
 
+    private PDAcroForm acroForm;
+    private Student student;
 
     /**
-     * Converts a boolean value to an integer.
+     * Constructs a Form object for the given student
      * 
-     * @param b Determine whether the return value should be 1 or 0
-     *
-     * @return 1 if the boolean value is true and 0 if it is false
+     * @param student
      */
-    private static int boolToInt(boolean b) {
-        return b ? 1 : 0;
+    public Form(Student student) {
+        this.student = student;
     }
 
-/**
- * The print function prints a student's form to the console.
- *
- * @param student active student
- *
- * @return Void
- *
- */
-    public static void print(Student student) {
+    /**
+     * The print function prints a student's form to the console.
+     *
+     * @param student active student
+     *
+     * @return Void
+     *
+     */
+    public void print(Student student) {
 
         String loc = "";
         List<StudentCourse> courseList;
@@ -58,7 +56,6 @@ public interface Form {
 
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
         PDAcroForm acroForm = docCatalog.getAcroForm();
-        Iterator<PDField> fieldTreeIterator = acroForm.getFieldIterator();
 
         fillField(acroForm, "Name of Student", student.getStudentName());
         fillField(acroForm, "Student ID Number", student.getStudentId());
@@ -122,7 +119,6 @@ public interface Form {
             fillField(acroForm, "Elective." + i + ".4", studentCourse.getLetterGrade());
             i++;
         }
-        
 
         courseList = cloneList(student.getCourseType(CourseType.ADDITIONAL));
         i = 0;
@@ -149,8 +145,7 @@ public interface Form {
             }
         }
 
-
-        List<StudentCourse> studentOther = cloneList(student.getCourseType(CourseType.OTHER));
+        courseList = cloneList(student.getCourseType(CourseType.ADDITIONAL));
         i = 0;
         for (StudentCourse studentCourse : courseList) {
             fillField(acroForm, "Additional." + i + ".0", studentCourse.getCourseTitle());
@@ -161,8 +156,18 @@ public interface Form {
             i++;
         }
 
-       
-        //PDAcroForm finalForm = new PDAcroForm(pdfDocument);
+        courseList = cloneList(student.getCourseType(CourseType.OTHER));
+        i = 0;
+        for (StudentCourse studentCourse : courseList) {
+            fillField(acroForm, "Other." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Other." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Other." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Other." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Other." + i + ".4", studentCourse.getLetterGrade());
+            i++;
+        }
+
+        // PDAcroForm finalForm = new PDAcroForm(pdfDocument);
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         try {
             String name = student.getStudentName().replaceAll("\\s", "");
@@ -172,6 +177,45 @@ public interface Form {
         }
     }
 
+    private static void fillField(PDAcroForm acroForm, String fullyQualifiedName, String value) {
+        try {
+            acroForm.getField(fullyQualifiedName).setValue(value);
+        } catch (IOException ioe) {
+            System.out.println("TEST");
+            ioe.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+
+    }
+
+    private static void fillPartialLine() {
+    }
+
+    private static void fillFullLine(Student student, PDAcroForm acroForm) {
+        List<StudentCourse> courseList = cloneList(student.getCourseType(CourseType.OTHER));
+        int i = 0;
+        for (StudentCourse studentCourse : courseList) {
+            fillField(acroForm, "Other." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, "Other." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, "Other." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, "Other." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, "Other." + i + ".4", studentCourse.getLetterGrade());
+            i++;
+        }
+    }
+
+    /**
+     * Converts a boolean value to an integer.
+     * 
+     * @param b Determine whether the return value should be 1 or 0
+     *
+     * @return 1 if the boolean value is true and 0 if it is false
+     */
+    private static int boolToInt(boolean b) {
+        return b ? 1 : 0;
+    }
+
     private static List<StudentCourse> cloneList(List<StudentCourse> list) {
         List<StudentCourse> clone = new ArrayList<StudentCourse>(list.size());
         for (StudentCourse c : list)
@@ -179,24 +223,4 @@ public interface Form {
         return clone;
     }
 
-    private static void fillField(PDAcroForm acroForm, String fullyQualifiedName, String value) {
-        try {
-            acroForm.getField(fullyQualifiedName).setValue(value);
-        } catch (IOException ioe) {
-            System.out.println("TEST");
-            ioe.printStackTrace();
-        } catch (NullPointerException npe){
-            npe.printStackTrace();
-        }
-
-    }
-
-    private static void fillSection(String section, Student student, PDAcroForm acroForm, CourseType type) {
-        
-        switch (type){
-
-            case CORE:
-                break;
-        }
-    }
 }
