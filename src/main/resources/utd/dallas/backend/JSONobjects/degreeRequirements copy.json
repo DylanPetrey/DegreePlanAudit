@@ -14,7 +14,8 @@
     ],
     "trackPrerequisites":[
       {"courseNumber": "CS 5349", "courseTitle": "Automata Theory"},
-      {"courseNumber": "CS 5390", "courseTitle": "Computer Networks"}],
+      {"courseNumber": "CS 5390", "courseTitle": "Computer Networks"}
+    ],
     "admissionPrerequisites": [
       {"courseNumber":"CS 5303", "courseTitle":"Computer Science I"},
       {"courseNumber":"CS 5330", "courseTitle":"Computer Science II"},
