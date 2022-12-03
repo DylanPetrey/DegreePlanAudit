@@ -24,8 +24,10 @@ public class StudentCourse extends Course {
         this.attempted = another.attempted;
         this.earned = another.earned;
         this.points = another.earned;
+        this.transfer = another.transfer;
         this.isWaived = another.isWaived;
         this.fromTranscript = another.fromTranscript;
+
     } 
 
     public StudentCourse(CourseType type){

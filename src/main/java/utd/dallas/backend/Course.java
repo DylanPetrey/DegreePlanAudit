@@ -9,13 +9,23 @@ public class Course {
     private String hours;
     protected CourseType type;
     public enum CourseType {
-        CORE,
-        OPTIONAL,
-        ELECTIVE,
-        ADDITIONAL,
-        TRACK,
-        PRE,
-        OTHER;
+        CORE("Core"),
+        OPTIONAL("Optional"),
+        ELECTIVE("Elective"),
+        ADDITIONAL("Additional"),
+        TRACK("Track"),
+        PRE("Prereq"),
+        OTHER("Other");
+
+        private final String typeString;
+        private CourseType(String st){
+            this.typeString = st;
+        }
+
+        public String toString() {
+            return this.typeString;
+            
+        }
     }
 
     /**
