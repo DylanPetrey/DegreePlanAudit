@@ -145,11 +145,12 @@ public class CourseCard {
     private TextField createHoursField() {
         TextField hours = new TextField();
         hours.setPromptText("Hours");
-        Text t = new Text("Hours");
 
+        Text t = new Text("Hours");
         t.setFont(Font.getDefault());
         double maxWidth = t.getLayoutBounds().getWidth() + 20;
         hours.setPrefWidth(maxWidth);
+
         HBox.setHgrow(hours, Priority.ALWAYS);
 
         hours.setText(currentCourse.getHours());
@@ -159,7 +160,7 @@ public class CourseCard {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue,
                                 String newValue) {
-                if (newValue.matches("[0-9]$")) {
+                if (newValue.matches("[0-9]$") || newValue.equals("")) {
                     hours.setText(newValue.replaceAll("[^\\d]", ""));
                     summaryCard.setHoursText(newValue);
                     currentCourse.setHours(newValue);

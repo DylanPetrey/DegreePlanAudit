@@ -21,7 +21,6 @@ public class DragDropHandler {
     private double scrollVelocity = 0;
     private CourseCard draggingCard;
 
-
     DragDropHandler(){
         if (cardFormat == null)
             cardFormat = new DataFormat("CourseCard");

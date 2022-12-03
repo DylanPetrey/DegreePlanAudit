@@ -56,8 +56,8 @@ public class Form {
     public List<StudentCourse> getCourseList() {return courseList; }
 
     /**
-     * Mutator methods to be used outside the class.
-     */
+    * Mutator methods to be used outside the class.
+    */
     public void setStudenName(String studentName){ this.studentName = studentName; }
     public void setStudentID(String studentID){this.studentID = studentID; }
     public void setSemesterAdmitted(String semesterAdmitted){ this.semesterAdmitted = semesterAdmitted; }
