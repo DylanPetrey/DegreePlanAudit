@@ -186,6 +186,7 @@ public interface Form {
             System.out.println("TEST");
             ioe.printStackTrace();
         } catch (NullPointerException npe){
+            npe.printStackTrace();
         }
 
     }
