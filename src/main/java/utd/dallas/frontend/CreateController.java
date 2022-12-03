@@ -149,7 +149,7 @@ public class CreateController {
     @FXML
     protected void onPrintButtonClick() {
         new Audit(currentStudent);
-        Form.print(currentStudent);
+        new Form(currentStudent).print();
     }
 
     @FXML

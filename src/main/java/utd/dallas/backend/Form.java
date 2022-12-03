@@ -36,7 +36,7 @@ public class Form {
      * @return Void
      *
      */
-    public void print(Student student) {
+    public void print() {
 
         String loc = "";
         List<StudentCourse> courseList;
@@ -55,7 +55,7 @@ public class Form {
         }
 
         PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
-        PDAcroForm acroForm = docCatalog.getAcroForm();
+        this.acroForm = docCatalog.getAcroForm();
 
         fillField(acroForm, "Name of Student", student.getStudentName());
         fillField(acroForm, "Student ID Number", student.getStudentId());
