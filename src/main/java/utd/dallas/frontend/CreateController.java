@@ -93,7 +93,7 @@ public class CreateController {
 
         setListeners();
 
-        if(currentStudent.getCurrentMajor().equals("Software-Engineering"))
+        if(currentStudent.getCurrentMajor().equals("Software Engineering"))
             onSWEButtonClick();
         else
             onCSButtonClick();
