@@ -32,13 +32,11 @@ public class Form {
     }
 
     /**
-     * The print function prints a student's form to the console.
+     * The print function fills the degree plan for the selected concentration and saves it to a new PDF file.
+     * 
      *
-     * @param student active student
-     *
-     * @return Void
-     *
-     */
+     * @return Nothing
+     */ 
     public void print() {
 
         String loc = "";
@@ -81,6 +79,17 @@ public class Form {
         } catch (IOException e) {}
     }
 
+
+    /**
+     * The fillField function fills the field with the given value.
+     * 
+     *
+     * @param acroForm AcroForm object
+     * @param String Fully qualified name of the PDField trying to be written to
+     * @param String Value to be filled in.
+     *
+     * @return Nothing
+     */
     private void fillField(PDAcroForm acroForm, String fullyQualifiedName, String value) {
         try {
             acroForm.getField(fullyQualifiedName).setValue(value);
@@ -93,6 +102,14 @@ public class Form {
 
     }
 
+    /**
+     * The fillDefault function fills in the default values for a given course type.
+     * 
+     *
+     * @param type Determine which course type to fill
+     *
+     * @return The list of courses that are not in the plan
+     */
     private void fillDefault(CourseType type) {
         courseList = cloneList(student.getCourseType(type));
         int i = 0;
@@ -110,6 +127,17 @@ public class Form {
         fillRest(type, i);;
     }
 
+    
+
+    /**
+     * The fillRest function fills the rest of the form with student's courses.
+     * 
+     *
+     * @param type Determine which course type to fill
+     * @param int Keep track of the number of courses in each course type
+     *
+     * @return The number of courses that are added to the form
+     */
     private void fillRest(CourseType type, int i) {
         if(i == 0)
             courseList = cloneList(student.getCourseType(type));
@@ -124,16 +152,30 @@ public class Form {
     }
 
     /**
-     * Converts a boolean value to an integer.
+     * The boolToInt function converts a boolean value to an integer.
      * 
-     * @param b Determine whether the return value should be 1 or 0
      *
-     * @return 1 if the boolean value is true and 0 if it is false
+     * @param b Determine whether or not the return value should be 1 or 0
+     *
+     * @return 1 if the boolean parameter is true, and 0 otherwise
      */
     private static int boolToInt(boolean b) {
         return b ? 1 : 0;
     }
 
+    
+    /**
+     * The cloneList function takes a list of StudentCourse objects and returns a new list containing
+     * copies of the original objects. This is useful when you want to make changes to the copy, but not
+     * change the original. For example, if you have an array of StudentCourse objects that are used in multiple places, 
+     * it's best practice to clone them before making any changes so that your code doesn't break elsewhere. 
+     * 
+     *
+     * @param list Store the list of studentcourse objects that will be returned by the function
+     *
+     * @return A new list containing a copy of the elements in the original list
+     *
+     */
     private static List<StudentCourse> cloneList(List<StudentCourse> list) {
         List<StudentCourse> clone = new ArrayList<StudentCourse>(list.size());
         for (StudentCourse c : list)
