@@ -19,7 +19,6 @@ public class Form {
     private PDAcroForm acroForm;
     private Student student;
     private Plan plan;
-    private List<StudentCourse> courseList;
 
     /**
      * Constructs a Form object for the given student
@@ -37,7 +36,7 @@ public class Form {
      *
      * @return Nothing
      */ 
-    public void print() {
+    public void print(String filePath) {
 
         String loc = "";
         PDDocument pdfDocument = null;
@@ -64,17 +63,25 @@ public class Form {
         fillField(acroForm, "Check Box.0." + boolToInt(!student.isFastTrack()), "Yes");
         fillField(acroForm, "Check Box.1." + boolToInt(!student.isThesis()), "Yes");
 
-        fillDefault(CourseType.CORE);
-        fillDefault(CourseType.OPTIONAL);
-        fillRest(CourseType.ELECTIVE, 0);
-        fillRest(CourseType.ADDITIONAL, 0);
-        fillDefault(CourseType.OTHER);
-        fillDefault(CourseType.PRE);
+        List<StudentCourse> courseList = cloneList(student.getCourseType(CourseType.CORE));
+        fillDefault(CourseType.CORE, courseList);
+        fillDefault(CourseType.OPTIONAL, courseList);
+
+        courseList = cloneList(student.getCourseType(CourseType.ELECTIVE));
+        fillRest(CourseType.ELECTIVE, courseList,  0);
+
+        courseList = cloneList(student.getCourseType(CourseType.ADDITIONAL));
+        fillRest(CourseType.ADDITIONAL, courseList, 0);
+
+
+        // fillRest(CourseType.OTHER);
+
+        courseList = cloneList(student.getCourseType(CourseType.PRE));
+        fillDefault(CourseType.PRE, courseList);
 
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         try {
-            String name = student.getStudentName().replaceAll("\\s", "");
-            pdfDocument.save(new File(".", "DegreePlan_" + name + ".pdf"));
+            pdfDocument.save(new File(filePath));
             pdfDocument.close();
         } catch (IOException e) {}
     }
@@ -94,10 +101,8 @@ public class Form {
         try {
             acroForm.getField(fullyQualifiedName).setValue(value);
         } catch (IOException ioe) {
-            System.out.println("TEST");
             ioe.printStackTrace();
         } catch (NullPointerException npe) {
-            npe.printStackTrace();
         }
 
     }
@@ -110,21 +115,24 @@ public class Form {
      *
      * @return The list of courses that are not in the plan
      */
-    private void fillDefault(CourseType type) {
-        courseList = cloneList(student.getCourseType(type));
+    private void fillDefault(CourseType type, List<StudentCourse> courseList) {
+        String typeString = type.toString();
+
+        List<Course> planCourses = plan.getCourseOfType(type);
         int i = 0;
-        for (Course c : plan.getCourseOfType(type)) {
+        for (Course c : planCourses) {
             int index = courseList.indexOf(c);
             if (index >= 0) {
                 StudentCourse studentCourse = courseList.get(index);
-                fillField(acroForm, type.toString() + "." + i + ".2", studentCourse.getSemester());
-                fillField(acroForm, type.toString() + "." + i + ".3", studentCourse.getTransfer());
-                fillField(acroForm, type.toString() + "." + i + ".4", studentCourse.getLetterGrade());
+                fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
+                fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
+                fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
                 courseList.remove(index);
                 i++;
             }
         }
-        fillRest(type, i);;
+        if(type == CourseType.PRE)
+            fillRest(type, courseList, i);
     }
 
     
@@ -138,17 +146,21 @@ public class Form {
      *
      * @return The number of courses that are added to the form
      */
-    private void fillRest(CourseType type, int i) {
+    private int fillRest(CourseType type, List<StudentCourse> courseList, int i) {
+        String typeString = type.toString();
+
         if(i == 0)
             courseList = cloneList(student.getCourseType(type));
+
         for (StudentCourse studentCourse : courseList) {
-            fillField(acroForm, type.toString() + "." + i + ".0", studentCourse.getCourseTitle());
-            fillField(acroForm, type.toString() + "." + i + ".1", studentCourse.getCourseNumber());
-            fillField(acroForm, type.toString() + "." + i + ".2", studentCourse.getSemester());
-            fillField(acroForm, type.toString() + "." + i + ".3", studentCourse.getTransfer());
-            fillField(acroForm, type.toString() + "." + i + ".4", studentCourse.getLetterGrade());
+            fillField(acroForm, typeString + "." + i + ".0", studentCourse.getCourseTitle());
+            fillField(acroForm, typeString + "." + i + ".1", studentCourse.getCourseNumber());
+            fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
+            fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
+            fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
             i++;
         }
+        return i;
     }
 
     /**
