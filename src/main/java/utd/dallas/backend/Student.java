@@ -226,7 +226,7 @@ public class Student {
         if(names.length < 2)
             return studentName;
         else
-            return names[0] + names[names.length];
+            return names[0] + names[names.length-1];
     
     }
 
