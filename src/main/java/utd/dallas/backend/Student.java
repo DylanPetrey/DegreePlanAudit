@@ -1,5 +1,6 @@
 package utd.dallas.backend;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -218,6 +219,16 @@ public class Student {
     public String getGraduation() { return graduation;}
     public boolean isFastTrack() { return fastTrack; }
     public boolean isThesis() { return thesis; }
+
+    public String getSimpleName() {
+        String names[] = studentName.split(" ");
+        
+        if(names.length < 2)
+            return studentName;
+        else
+            return names[0] + names[names.length-1];
+    
+    }
 
 
 

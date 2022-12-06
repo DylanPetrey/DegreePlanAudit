@@ -9,9 +9,11 @@ public class Main {
         File inputFile = new File(inputFilePath);
         TranscriptParser transcript =  new TranscriptParser(inputFile);
         Student curr = transcript.getStudent();
-        curr.setCurrentPlan(Plan.Concentration.DATA);
+        curr.setCurrentPlan(Plan.Concentration.INTEL);
         curr.printStudentInformation();
+        new Form(curr).print("TEST.pdf");
 
+        
         System.out.println(Arrays.toString(curr.getCurrentPlan().getUtdCatalogCourseNums().toArray()));
 
         new Audit(curr);

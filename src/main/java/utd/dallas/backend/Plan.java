@@ -15,14 +15,14 @@ import org.json.simple.parser.ParseException;
 public class Plan {
 
     public enum Concentration {
-        TRADITIONAL("Traditional Computer Science"),
-        NETWORKS("Network Telecommunications"),
-        INTEL("Intelligent Systems"),
-        INTERACTIVE("Interactive Computing"),
+        TRADITIONAL("Traditional"),
+        NETWORKS("Network-Telecommunications"),
+        INTEL("Intelligent-Systems"),
+        INTERACTIVE("Interactive-Computing"),
         SYSTEMS("Systems"),
-        DATA("Data Science"),
-        CYBER("Cyber Security"),
-        SOFTWARE("Software Engineering");
+        DATA("Data-Science"),
+        CYBER("Cyber-Security"),
+        SOFTWARE("Software-Engineering");
 
 
         private final String concenString;
@@ -97,7 +97,13 @@ public class Plan {
         return list;
     }
 
-
+    /**
+     * Creates a list of courses from a JSON object
+     *
+     * @param array JSON object of a courses from the degreeRequirements json
+     * @param type The course type to initialize the courses with
+     * @return a list of courses
+     */
     /**
      * Creates a list of courses from a JSON object
      *
@@ -298,7 +304,7 @@ public class Plan {
         String path = "$.['" + courseNum + "'].Description";
         try {
             return CatalogFile.read(path);
-        }catch (Exception e){
+        }catch (NumberFormatException e){
             return "";
         }
     }
@@ -320,6 +326,7 @@ public class Plan {
                 prereq.addAll(admissionPrerequisites);
                 prereq.addAll(trackPrerequisites);
                 return prereq;
+
         }
         return new ArrayList<>();
     }

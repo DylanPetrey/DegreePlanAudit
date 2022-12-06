@@ -1,6 +1,5 @@
 {
-  "Traditional Computer Science": {
-    "major": "Computer Science",
+  "Traditional": {
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -24,8 +23,7 @@
       {"courseNumber": "CS 5390", "courseTitle": "Computer Networks"}
     ]
   },
-  "Network Telecommunications": {
-    "major": "Computer Science",
+  "Network-Telecommunications": {
     "numOptional": 0,
     "excludedElectives": [""],
     "requiredCore": [
@@ -47,8 +45,7 @@
       {"courseNumber":"CS 3341", "courseTitle":"Probability & Statistics in CS"}
     ]
   },
-  "Intelligent Systems": {
-    "major": "Computer Science",
+  "Intelligent-Systems": {
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -70,8 +67,7 @@
       {"courseNumber":"CS 5348", "courseTitle":"Operating System Concepts"}
     ]
   },
-  "Interactive Computing": {
-    "major": "Computer Science",
+  "Interactive-Computing": {
     "numOptional": 3,
     "excludedElectives": [""],
     "requiredCore": [
@@ -121,8 +117,7 @@
       {"courseNumber":"CS 5390", "courseTitle":"Computer Networks"}
     ]
   },
-  "Data Science": {
-    "major": "Computer Science",
+  "Data-Science": {
     "numOptional": 1,
     "excludedElectives": [""],
     "requiredCore": [
@@ -148,8 +143,7 @@
       { "courseNumber": "CS 3341", "courseTitle": "Probability & Statistics in CS" }
     ]
   },
-  "Cyber Security": {
-    "major": "Computer Science",
+  "Cyber-Security": {
     "numOptional": 2,
     "excludedElectives": [""],
     "requiredCore": [
@@ -177,8 +171,7 @@
       {"courseNumber":"CS 3341", "courseTitle":"Probability & Statistics in CS"}
     ]
   },
-  "Software Engineering": {
-    "major": "Software Engineering",
+  "Software-Engineering": {
     "numOptional": 0,
     "excludedElectives": ["CS 6359"],
     "requiredCore": [
