@@ -3,17 +3,29 @@ package utd.dallas.backend;
 import java.util.Objects;
 
 public class Course {
-    protected String courseNumber;
-    protected String courseTitle;
+    private String courseNumber;
+    private String courseTitle;
+    private String description;
+    private String hours;
     protected CourseType type;
     public enum CourseType {
-        CORE,
-        OPTIONAL,
-        ELECTIVE,
-        ADDITIONAL,
-        TRACK,
-        PRE,
-        OTHER;
+        CORE("Core"),
+        OPTIONAL("Optional"),
+        ELECTIVE("Elective"),
+        ADDITIONAL("Additional"),
+        TRACK("Track"),
+        PRE("Prereq"),
+        OTHER("Other");
+
+        private final String typeString;
+        private CourseType(String st){
+            this.typeString = st;
+        }
+
+        public String toString() {
+            return this.typeString;
+            
+        }
     }
 
     /**
@@ -22,17 +34,24 @@ public class Course {
     public Course() {
         this.courseNumber = "";
         this.courseTitle = "";
+        this.hours = "";
+    }
+
+    public Course(Course another) {
+        this.courseNumber = another.courseNumber;
+        this.courseTitle = another.courseTitle;
+        this.type = another.type;
     }
 
     /**
      * Filled constructor. Used for parsing the transcript.
      */
-    public Course(String courseNumber, String courseTitle, CourseType type) {
+    public Course(String courseNumber, String courseTitle, String hours, CourseType type) {
         this.courseNumber = courseNumber;
         this.courseTitle = courseTitle;
+        this.hours = hours;
         this.type = type;
     }
-
 
     /**
      * Prints the course to the console
@@ -42,7 +61,8 @@ public class Course {
     }
 
     /**
-     * Creates a string of the course similar to how it will look on the final audit pdf
+     * Creates a string of the course similar to how it will look on the final audit
+     * pdf
      *
      * @return returns a string of the course
      */
@@ -60,43 +80,34 @@ public class Course {
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!obj.getClass().isAssignableFrom(this.getClass())) {
-            return false;
+        if (this == obj)
+            return true;
+        if (obj.getClass().isAssignableFrom(this.getClass()) || this.getClass().isAssignableFrom(obj.getClass())) {
+            Course course = (Course) obj;
+            return Objects.equals(courseNumber, course.courseNumber);
         }
-        Course course = (Course) obj;
-        return Objects.equals(courseNumber, course.courseNumber);
+        return false;
     }
 
     /**
      * Accessor methods to be used outside the class.
      */
 
-    public CourseType getType() {
-        return type;
-    }
+    public CourseType getType() { return type; }
+    public String getCourseNumber() { return courseNumber; }
+    public String getCourseTitle() { return courseTitle; }
+    public String getDescription() { return description; }
+    public String getHours() { return hours; }
 
-    public String getCourseNumber() {
-        return courseNumber;
-    }
-
-    public String getCourseTitle() {
-        return courseTitle;
-    }
 
     /**
      * Mutator methods to be used outside the class.
      */
-    public void setCourseNumber(String courseNumber) {
-        this.courseNumber = courseNumber;
-    }
-
-    public void setCourseTitle(String courseTitle) {
-        this.courseTitle = courseTitle;
-    }
-
+    public void setCourseNumber(String courseNumber) { this.courseNumber = courseNumber; }
+    public void setCourseTitle(String courseTitle) { this.courseTitle = courseTitle; }
+    public void setDescription(String courseDescription) { this.description = courseTitle; }
     public void setType(Course.CourseType type) {
         this.type = type;
     }
-
+    public void setHours(String hours) { this.hours = hours; }
 }

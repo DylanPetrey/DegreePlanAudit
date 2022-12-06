@@ -1,5 +1,6 @@
 package utd.dallas.backend;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -10,13 +11,19 @@ public class Student {
     private String startDate;
     private String currentMajor;
     private String graduation;
-    private final Plan currentPlan;
     private boolean fastTrack;
     private boolean thesis;
 
+
+    // Student objects
+    private final Plan currentPlan;
     private List<StudentCourse> courseList;
     private final List<StudentCourse> transcriptList;
 
+
+    /**
+     * Creates empty student object. Used when not uploading transcript
+     */
     public Student(){
         this.studentName = "";
         this.studentId = "";
@@ -31,8 +38,7 @@ public class Student {
     }
 
     /**
-     * Initializes the student object using basic information and creating a
-     * blank list of classes
+     * Initializes the student object using basic information and creating a blank list of courses
      *
      * @param studentName Name of the student
      * @param studentId ID number of the student
@@ -51,8 +57,16 @@ public class Student {
     }
 
     /**
-     * This function creates a course from the input on the transcript and adds it to the
-     * list of the student's courses.
+     * Adds a course to the courseList.
+     *
+     * @param newCourse StudentCourse object to be added to the courseList
+     */
+    public void addCourse(StudentCourse newCourse){
+        courseList.add(newCourse);
+    }
+
+    /**
+     * This function adds courses from the transcript.
      *
      * @param line This is the line of the course as read on the transcript.
      * @param semester String identifying the semester.
@@ -60,186 +74,122 @@ public class Student {
      */
     public void addCourse(String line, String semester, String transfer){
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
-        String title;
-        String desc;
         try {
-            title = currentPlan.getCourseTitle(newCourse.getCourseNumber());
-        } catch (Exception e){
-            title = newCourse.getCourseTitle();
-        }
-        newCourse.setCourseTitle(title);
+            newCourse.setCourseTitle(currentPlan.getCourseTitle(newCourse.getCourseNumber()));
+            newCourse.setHours(currentPlan.getCourseHours(newCourse.getCourseNumber()));
+        } catch (Exception ignore){ }
 
         transcriptList.add(newCourse);
     }
 
-    public void addCourse(StudentCourse newCourse){
-        courseList.add(newCourse);
-    }
-
-
     /**
-     * Drives the methods that set the course types for each course
+     * Changes the current course plan and updates the courseList accordingly.
+     *
+     * @param concentration New degree plan that the student is switching to
      */
-    private void evaluateDegreePlan(){
-        fillPlan();
-        fillFormList();
+    public void setCurrentPlan(Plan.Concentration concentration) {
+        this.currentPlan.setConcentration(concentration);
+
+        resetCourseList();
+        fillFromTranscript();
         setInitialCourseTypes();
     }
 
-
     /**
-     * Sets the student's courses to their default type based on the current degree plan
+     * Resets the courseList values and fills in courses from the degreePlan
      */
-    private void setInitialCourseTypes(){
-        for(Course course : getCourseList()) {
-            if (currentPlan.isCore(course))
-                setCourseType(course.courseNumber, Course.CourseType.CORE);
-            else if (currentPlan.isOpt(course.getCourseNumber())) {
-                setCourseType(course.courseNumber, Course.CourseType.OPTIONAL);
-
-            }
-            else if (currentPlan.isPre(course))
-                setCourseType(course.courseNumber, Course.CourseType.PRE);
-            else if (currentPlan.isTrack(course))
-                setCourseType(course.courseNumber, Course.CourseType.TRACK);
-            else
-                setCourseType(course.courseNumber, Course.CourseType.OTHER);
-        }
-    }
-
-    /**
-     * Changes the maximum number of optional courses into core courses and allows the rest to be
-     * used when determining the electives.
-     */
-    private void setOptionalCore(){
-        List<StudentCourse> coreOptList = getCourseType(Course.CourseType.OPTIONAL);
-
-        // Any extra optional courses
-        coreOptList.forEach(StudentCourse -> {
-            setCourseType(StudentCourse.getCourseNumber(), Course.CourseType.OTHER);
-        });
-    }
-
-
-
-
-    /**
-     * Fills the electives. It separates them into 6000 level electives and additional electives
-     */
-    private void setElectives(){
-        List<StudentCourse> otherList = getCourseType(Course.CourseType.OTHER);
-        double numElectHours = 15.0;
-
-        for(int i = 0; i < otherList.size(); i++){
-            StudentCourse currentCourse = otherList.get(i);
-            try {
-                int currentNum = Integer.parseInt(currentCourse.getCourseNumber().split(" ")[1]);
-                if(currentNum >= 6000 && numElectHours > 0){
-                    setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ELECTIVE);
-                    numElectHours -= currentCourse.getAttempted();
-                } else if (5000 <= currentNum && currentNum < 6000) {
-                    setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ADDITIONAL);
-                }
-            } catch (NumberFormatException e){
-                setCourseType(currentCourse.getCourseNumber(), Course.CourseType.ADDITIONAL);
-            }
-
-
-        }
-    }
-
-    /**
-     * Gets the course object that has the highest GPA. This is used when deciding which optional
-     * class is core or elective
-     *
-     * @param listOfCourses List of courses that the function will loop through.
-     * @return Course object that has the highest GPA
-     */
-    public StudentCourse getMaxCourseGPA(List<StudentCourse> listOfCourses){
-        double maxGPA = 0;
-        StudentCourse maxCourse = new StudentCourse();
-
-        for(int i = 0; i < listOfCourses.size(); i++){
-            StudentCourse currentCourse = listOfCourses.get(i);
-
-            double currentGPA = calcGPA(currentCourse.getEarned(), currentCourse.getAttempted());
-            if(currentGPA > maxGPA){
-                maxGPA = currentGPA;
-                maxCourse = currentCourse;
-            }
-
-        }
-        return maxCourse;
-    }
-
-    /**
-     * Calculates the GPA
-     *
-     * @param gpaPoints number of points
-     * @param gpaHours number of hours
-     * @return returns the gpa rounded to 3 decimal places
-     */
-    private double calcGPA(double gpaPoints, double gpaHours){
-        double GPA = gpaPoints / gpaHours;
-
-        double scale = Math.pow(10, 3);
-        return Math.round(GPA * scale) / scale;
-    }
-
-
-    /**
-     * Modifies the courseType of a course in the courseList
-     *
-     * @param number String of the course number
-     * @param type Type to set the course type to
-     */
-    public void setCourseType(String number, Course.CourseType type){
-        for(int i = 0; i < courseList.size(); i++)
-            if(courseList.get(i).getCourseNumber().equals(number))
-                courseList.get(i).setType(type);
-    }
-
-
-    /**
-     * Returns a list of courses of the specified type in the courseList
-     *
-     * @param type target type to retrieve
-     * @return List of courses of specified type
-     */
-    public List<StudentCourse> getCourseType(Course.CourseType type){
-        List<StudentCourse> c = new ArrayList<>();
-        for(StudentCourse current : courseList)
-            if(current.type == type)
-                c.add(current);
-        return c;
-    }
-    public void fillPlan(){
+    public void resetCourseList(){
+        this.courseList = new ArrayList<>();
         currentPlan.getCourseOfType(Course.CourseType.CORE).forEach(course -> {
-            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), course.getType()));
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
         });
         currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
-            courseList.add(new StudentCourse(course.courseNumber, course.getCourseTitle(), Course.CourseType.OPTIONAL));
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), Course.CourseType.OPTIONAL));
         });
     }
-    public void fillFormList(){
+
+    /**
+     * Fills in courses from the transcript
+     */
+    public void fillFromTranscript(){
         transcriptList.forEach(studentCourse -> {
-                    if (courseList.contains(studentCourse))
-                        setFormListValue(studentCourse);
-                    else
-                        courseList.add(studentCourse);
-                });
+            if (courseList.contains(studentCourse))
+                setFormListValue(studentCourse);
+            else
+                courseList.add(studentCourse);
+        });
     }
 
+    /**
+     * Fills in existing values of the courseList from the transcript
+     */
     public void setFormListValue(StudentCourse value){
         courseList.forEach(studentCourse -> {
             if (studentCourse.equals(value))
                 studentCourse.setCourseVariables(value);
-
         });
     }
 
     /**
-     * Outputs all the information to the console in a similar style to how it will
+     * Assigns default course types from transcript based on degree plan
+     */
+    private void setInitialCourseTypes(){
+        for(Course course : courseList) {
+            if (currentPlan.isCore(course))
+                setCourseType(course, Course.CourseType.CORE);
+            else if (currentPlan.isOpt(course))
+                setCourseType(course, Course.CourseType.OPTIONAL);
+            else if (currentPlan.isPre(course) || currentPlan.isTrack(course))
+                setCourseType(course, Course.CourseType.PRE);
+            else
+                setCourseType(course, Course.CourseType.OTHER);
+        }
+    }
+
+    /**
+     * Modifies the courseType of a course in the courseList
+     *
+     * @param course course to modify
+     * @param type new course type for the course
+     */
+    public void setCourseType(Course course, Course.CourseType type){
+        for (StudentCourse studentCourse : courseList)
+            if (studentCourse.equals(course))
+                studentCourse.setType(type);
+    }
+
+    /**
+     * Creates a list of all the courses of a specific type
+     *
+     * @param type target type to retrieve
+     * @return list of courses of specified type
+     */
+    public List<StudentCourse> getCourseType(Course.CourseType type){
+        List<StudentCourse> course = new ArrayList<>();
+        for(StudentCourse current : courseList)
+            if(current.type == type)
+                course.add(current);
+        return course;
+    }
+
+
+
+
+    /**
+     * Creates a list of all the nonempty courses
+     *
+     * @return list of courses of specified type
+     */
+    public List<StudentCourse> getCleanCourseList(){
+        List<StudentCourse> cleanCourses = new ArrayList<>();
+        for(StudentCourse course : courseList)
+            if(!course.isEmpty())
+                cleanCourses.add(course);
+        return cleanCourses;
+    }
+
+    /**
+     * Prints all the information in a similar style to how it will
      * be displayed the final Audit PDF.
      */
     public void printStudentInformation(){
@@ -253,24 +203,15 @@ public class Student {
                 System.out.print(StudentCourse.toString());
                 System.out.println(" " + StudentCourse.getType());
             }
-
         });
     }
-
-    public List<StudentCourse> getCleanCourseList(){
-        List<StudentCourse> cleanCourses = new ArrayList<>();
-        for(StudentCourse course : courseList)
-            if(!course.isEmpty())
-                cleanCourses.add(course);
-        return cleanCourses;
-    }
-
 
     /**
      * Accessor methods to be used outside the class.
      */
     public List<StudentCourse> getCourseList() { return courseList; }
     public List<StudentCourse> getTranscriptList() { return transcriptList; }
+    public Plan getCurrentPlan() { return currentPlan; }
     public String getStudentName(){ return studentName; }
     public String getStudentId(){ return studentId; }
     public String getStartDate(){ return startDate; }
@@ -278,7 +219,16 @@ public class Student {
     public String getGraduation() { return graduation;}
     public boolean isFastTrack() { return fastTrack; }
     public boolean isThesis() { return thesis; }
-    public Plan getCurrentPlan() { return currentPlan; }
+
+    public String getSimpleName() {
+        String names[] = studentName.split(" ");
+        
+        if(names.length < 2)
+            return studentName;
+        else
+            return names[0] + names[names.length-1];
+    
+    }
 
 
 
@@ -292,13 +242,4 @@ public class Student {
     public void setGraduation(String graduation) { this.graduation = graduation;}
     public void setThesis(boolean thesis) { this.thesis = thesis;}
     public void setFastTrack(boolean fastTrack) { this.fastTrack = fastTrack;}
-    public void setCurrentPlan(Plan.Concentration concentration) {
-        this.currentPlan.setConcentration(concentration);
-        this.courseList = new ArrayList<>();
-        evaluateDegreePlan();
-    }
-
-    public void newFormList() {
-        this.courseList = new ArrayList<>();
-    }
 }

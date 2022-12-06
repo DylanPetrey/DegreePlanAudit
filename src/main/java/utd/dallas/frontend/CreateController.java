@@ -4,16 +4,24 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.stage.*;
+import javafx.stage.FileChooser.ExtensionFilter;
+
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import utd.dallas.backend.*;
 
+import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,6 +47,7 @@ public class CreateController {
     @FXML private VBox optionalVBox;
     @FXML private VBox transcriptVBox;
     @FXML private ChoiceBox<String> trackBox;
+    @FXML private Button printButton;
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
@@ -47,8 +56,9 @@ public class CreateController {
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
-            softwareTracks = FXCollections.observableArrayList(
-                    "Software Engineering");
+            softwareTracks = FXCollections.observableArrayList("Software Engineering"),
+            semesterValues = FXCollections.observableArrayList();
+
 
 
 
@@ -65,6 +75,7 @@ public class CreateController {
         }
 
         DDHandler = new DragDropHandler();
+        semesterValues.addAll(getSemesterValues());
 
         Platform.runLater(() -> {
             double maxWidth = 0;
@@ -94,12 +105,37 @@ public class CreateController {
 
     }
 
+    private List<String> getSemesterValues(){
+        LocalDate currentdate = LocalDate.now();
+        double day = currentdate.getDayOfYear();
+        int year = currentdate.getYear();
+
+        List<String> semesterList = new ArrayList<>();
+        semesterList.add("Semester");
+
+
+        int currentYear = year % 2000;
+        String[] semesters = new String[]{"SP", "SU", "F"};
+        int currentSemester = (int) (day / (366.0/3));
+
+        for(double i = currentYear + (currentSemester+1)/3.0; i > currentYear-10; i = i - 1/3.0){
+            String currentSem = (int)i + semesters[(int) ((i - (int) i) * 10 / 3)];
+            semesterList.add(currentSem);
+        }
+
+
+        return semesterList;
+    }
+
     protected void setInitalFields(){
         studentName.setText(currentStudent.getStudentName());
         studentID.setText(currentStudent.getStudentId());
         studentSemAdmitted.setText(currentStudent.getStartDate());
         fastTrack.setSelected(currentStudent.isFastTrack());
+        thesis.setSelected(currentStudent.isThesis());
     }
+
+
 
     @FXML
     protected void onSWEButtonClick() {
@@ -117,14 +153,26 @@ public class CreateController {
 
     @FXML
     protected void onPrintButtonClick() {
-        Audit auditHelper = new Audit(currentStudent);
-        auditHelper.runAudit();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save As");
+        fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
+        fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DP.pdf");
+        
+        Stage stage = (Stage) printButton.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+        try {
+            new Form(currentStudent).print(file.getAbsolutePath());
+        } catch (Exception ignore) {}
+        
+        new Audit(currentStudent);
+
     }
 
     @FXML
     protected void setTrackBox(){
         Object value = trackBox.getValue();
-        currentStudent.newFormList();
         if ("Traditional Computer Science".equals(value)) {
             currentStudent.setCurrentPlan(Plan.Concentration.TRADITIONAL);
         } else if ("Network Telecommunications".equals(value)) {
@@ -160,7 +208,7 @@ public class CreateController {
     private void resetVbox(VBox current, Course.CourseType t){
         // Replace old flow pane
         current.getChildren().remove(current.lookup("FlowPane"));
-        FlowObject currentFlow = new FlowObject(t, current);
+        FlowObject currentFlow = new FlowObject(t, current, semesterValues);
         ListOfFlowObjects.add(currentFlow);
 
         // Add empty courses to modify
@@ -196,6 +244,33 @@ public class CreateController {
     private void createCourseCardListener(CourseCard card){
         screenClickListener(card);
         addRemoveBlankCardListener(card);
+
+        /*
+            make sure the following command is added to the VM classpath:
+            --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+         */
+        TextFields.bindAutoCompletion(
+                card.getCourseNumField(),
+                currentStudent.getCurrentPlan().getUtdCatalogCourseNums().toArray())
+                .setOnAutoCompleted(e -> autoFillValues(card));
+    }
+
+    /**
+     * Autofill values from course catalog if they exist
+     *
+     * @param target target course to fill
+     */
+    public void autoFillValues(CourseCard target){
+        try {
+            String num = target.currentCourse.getCourseNumber();
+            String title = currentStudent.getCurrentPlan().getCourseTitle(num);
+            String hours = currentStudent.getCurrentPlan().getCourseHours(num);
+            target.getCurrentCourse().setCourseTitle(title);
+            target.getCourseTitleField().setText(title);
+            target.getCurrentCourse().setHours(hours);
+            target.getCourseHoursField().setText(String.valueOf(hours));
+
+        } catch (Exception ignore) { }
     }
 
     public void screenClickListener(CourseCard card){

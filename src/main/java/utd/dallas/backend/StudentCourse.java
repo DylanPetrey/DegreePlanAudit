@@ -1,6 +1,8 @@
 package utd.dallas.backend;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class StudentCourse extends Course {
     private String letterGrade = "";
@@ -15,13 +17,27 @@ public class StudentCourse extends Course {
     public StudentCourse(){
     }
 
+    public StudentCourse(StudentCourse another) {
+        super((Course) another);
+        this.letterGrade = another.letterGrade;
+        this.semester = another.semester;
+        this.attempted = another.attempted;
+        this.earned = another.earned;
+        this.points = another.earned;
+        this.transfer = another.transfer;
+        this.isWaived = another.isWaived;
+        this.fromTranscript = another.fromTranscript;
+
+    } 
+
     public StudentCourse(CourseType type){
         this.type = type;
     }
 
-    public StudentCourse(String id, String title, CourseType type) {
-        this.courseNumber = id;
-        this.courseTitle = title;
+    public StudentCourse(String id, String title, String hours, CourseType type) {
+        setCourseNumber(id);
+        setCourseTitle(title);
+        setHours(hours);
         this.type = type;
     }
 
@@ -41,21 +57,22 @@ public class StudentCourse extends Course {
     private void processInput(String input) {
         // Course name
         String[] tokens = input.split("\\s+");
-        courseNumber = tokens[0] + " " + tokens[1];
+        setCourseNumber(tokens[0] + " " + tokens[1]);
 
         // Fills in the course title and checks if there is a letter grade.
         // If there is not a letter grade, then the course is in the current semester
         if (!tokens[tokens.length - 2].matches("[-+]?[0-9]*\\.?[0-9]+")) {
-            courseTitle = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 4));
+            setCourseTitle(String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 4)));
             letterGrade = tokens[tokens.length - 2];
             tokens = Arrays.copyOfRange(tokens, tokens.length - 4, tokens.length);
         } else {
-            courseTitle = String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3));
+            setCourseTitle(String.join(" ", Arrays.copyOfRange(tokens, 2, tokens.length - 3)));
             letterGrade = "";
             tokens = Arrays.copyOfRange(tokens, tokens.length - 3, tokens.length);
         }
 
         attempted = Double.parseDouble(tokens[0]);
+        setHours(String.valueOf((int) attempted));
         earned = Double.parseDouble(tokens[1]);
         points = Double.parseDouble(tokens[tokens.length - 1]);
     }
@@ -72,15 +89,16 @@ public class StudentCourse extends Course {
             transferText = "Waived";
         else
             transferText = transfer;
-        return  courseNumber + " " +
-                courseTitle + " " +
+        return  getCourseNumber() + " " +
+                getCourseTitle() + " " +
+                getHours() + " " +
                 semester + " " +
                 transferText + " " +
                 letterGrade;
     }
 
     public boolean isEmpty(){
-        return courseNumber.equals("");
+        return getCourseNumber().equals("");
     }
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
@@ -90,19 +108,17 @@ public class StudentCourse extends Course {
     public String getTransfer() { return transfer; }
     public boolean isFromTranscript() { return fromTranscript; }
     public boolean isWaived() { return isWaived; }
+
+
+
     public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
-    public void setAttempted(double attempted) { this.attempted = attempted; }
-    public void setPoints(double points) { this.points = points; }
-    public void setEarned(double earned) { this.earned = earned; }
     public void setWaived(boolean waived) { this.isWaived = waived; }
-    public void setFromTranscript(boolean fromTranscript) {
-        this.fromTranscript = fromTranscript;
-    }
 
     public void setCourseVariables(StudentCourse newCourse){
-        this.courseNumber = newCourse.getCourseNumber();
+        setCourseNumber(newCourse.getCourseNumber());
+        setHours(newCourse.getHours());
         semester = newCourse.getSemester();
         attempted = newCourse.getAttempted();
         points = newCourse.getPoints();
