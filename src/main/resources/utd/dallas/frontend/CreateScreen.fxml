@@ -17,7 +17,7 @@
 
 <AnchorPane fx:id="basePane" prefHeight="600.0" prefWidth="600.0" scaleShape="false" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.CreateController">
    <children>
-      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane style="-fx-background-color: #154734;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #154734;" BorderPane.alignment="CENTER">
                <children>
