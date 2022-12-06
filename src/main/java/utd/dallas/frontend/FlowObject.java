@@ -70,6 +70,7 @@ public class FlowObject {
         newCard.getParent().removeCard(newCard);
         newCard.setParent(this);
         newCard.getCurrentCourse().setType(type);
+        newCard.updateType();
         newCard.summaryCard.setCourseType(type);
 
         if(type == Course.CourseType.OPTIONAL || observableCard.size() < 1)

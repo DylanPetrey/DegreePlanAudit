@@ -13,6 +13,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import utd.dallas.backend.Course;
 import utd.dallas.backend.StudentCourse;
 
 
@@ -28,6 +29,8 @@ public class CourseCard {
     TextField courseNumField = new TextField();
     TextField courseTitleField = new TextField();
     TextField courseHoursField = new TextField();
+    TextField transferField;
+    CheckBox waiverCheckBox;
     ObservableList<String>
             gradeValues = FXCollections.observableArrayList("Grade", "A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "I", "CR", "NC", "W", "WL"),
             semesterValues = FXCollections.observableArrayList();
@@ -111,10 +114,10 @@ public class CourseCard {
         courseNumField = createNumField();
 
         courseHoursField = createHoursField();
-        CheckBox waiverCheckBox = createWaiverBox();
 
 
-        current.getChildren().addAll(courseNumField, courseHoursField, waiverCheckBox);
+
+        current.getChildren().addAll(courseNumField, courseHoursField);
 
         return current;
     }
@@ -226,11 +229,17 @@ public class CourseCard {
         current.setMaxWidth(maxTextWidth);
 
         ComboBox<String> semBox = createSemesterBox();
-        TextField transferField = createTransferField();
         ComboBox<String> gradeBox = createGradeBox();
 
+        StackPane transWaive = new StackPane();
 
-        current.getChildren().addAll(semBox, gradeBox, transferField);
+        transferField = createTransferField();
+        waiverCheckBox = createWaiverBox();
+
+        updateType();
+
+        transWaive.getChildren().addAll(transferField,waiverCheckBox);
+        current.getChildren().addAll(semBox, gradeBox, transWaive);
 
         return current;
     }
@@ -375,20 +384,29 @@ public class CourseCard {
     public StackPane getCard() {
         return stackContainer;
     }
-
     public StudentCourse getCurrentCourse() {
         return currentCourse;
     }
-
     public void setParent(FlowObject parent) {
         this.parent = parent;
     }
-
     public FlowObject getParent() {
         return parent;
     }
-
     public TextField getCourseNumField() { return courseNumField; }
     public TextField getCourseTitleField() { return courseTitleField; }
     public TextField getCourseHoursField() { return courseHoursField; }
+    public void updateType(){
+        if(currentCourse.getType() == Course.CourseType.PRE){
+            transferField.setVisible(false);
+            waiverCheckBox.setVisible(true);
+            summaryCard.setTransferText("");
+            summaryCard.setWaiveText(currentCourse.isWaived());
+        } else {
+            waiverCheckBox.setVisible(false);
+            transferField.setVisible(true);
+            summaryCard.setWaiveText(false);
+            summaryCard.setTransferText(currentCourse.getTransfer());
+        }
+    }
 }

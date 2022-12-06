@@ -52,7 +52,7 @@ public class SummaryCard {
 
         VBox cardText = new VBox();
         cardText.getChildren().addAll(titleFlow, titleLabel);
-        cardText = createSummaryCard(hourFlow, semesterFlow, gradeFlow, transferFlow, waiveFlow);
+        cardText = createSummaryCard(hourFlow, semesterFlow, gradeFlow, transferFlow);
         cardText.setAlignment(Pos.TOP_LEFT);
         summaryCard.getChildren().addAll(cardText);
 
@@ -84,7 +84,7 @@ public class SummaryCard {
         return summaryCard;
     }
 
-    private VBox createSummaryCard(TextFlow hourFlow, TextFlow semester, TextFlow grade, TextFlow transfer, TextFlow waiveFlow){
+    private VBox createSummaryCard(TextFlow hourFlow, TextFlow semester, TextFlow grade, TextFlow transfer){
         VBox currentSummary = new VBox();
 
         GridPane variables = new GridPane();
