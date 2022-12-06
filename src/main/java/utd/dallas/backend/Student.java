@@ -222,7 +222,12 @@ public class Student {
 
     public String getSimpleName() {
         String names[] = studentName.split(" ");
-        return names[0] + names[1];
+        
+        if(names.length < 2)
+            return studentName;
+        else
+            return names[0] + names[names.length];
+    
     }
 
 

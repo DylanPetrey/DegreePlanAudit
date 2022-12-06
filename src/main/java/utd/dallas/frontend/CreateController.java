@@ -4,18 +4,22 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.stage.*;
+import javafx.stage.FileChooser.ExtensionFilter;
+
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import utd.dallas.backend.*;
 
-
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -43,6 +47,7 @@ public class CreateController {
     @FXML private VBox optionalVBox;
     @FXML private VBox transcriptVBox;
     @FXML private ChoiceBox<String> trackBox;
+    @FXML private Button printButton;
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
@@ -148,8 +153,19 @@ public class CreateController {
 
     @FXML
     protected void onPrintButtonClick() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save As");
+        fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
+        fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DP.pdf");
+        
+        Stage stage = (Stage) printButton.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
+
+
+        new Form(currentStudent).print(file.getAbsolutePath());
         new Audit(currentStudent);
-        new Form(currentStudent).print();
+
     }
 
     @FXML
