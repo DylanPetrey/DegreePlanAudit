@@ -22,6 +22,8 @@ public class Audit {
     private final List<StudentCourse> coreList = new ArrayList<>();
     private final List<StudentCourse> electList = new ArrayList<>();
     private final List<StudentCourse> preList = new ArrayList<>();
+    List<Course> currentSemester = new ArrayList<>();
+
 
     // GPA Variables
     private double combinedGPA = 0;
@@ -46,6 +48,7 @@ public class Audit {
         this.filledCourses = currentStudent.getCleanCourseList();
         calculateGPAValues();
         printGPA();
+        evaluateRequirements();
     }
 
     /**
@@ -91,7 +94,7 @@ public class Audit {
         courseList.forEach(studentCourse -> {
             String letterGrade = studentCourse.getLetterGrade();
             int finalCurrentHour = Integer.parseInt(studentCourse.getHours());
-            if (letterGrade.equalsIgnoreCase("A"))
+            if (letterGrade.equalsIgnoreCase("A") || letterGrade.equalsIgnoreCase("A+"))
                 totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("A-"))
                 totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*finalCurrentHour)));
@@ -105,7 +108,7 @@ public class Audit {
                 totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("C"))
                 totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("F"))
+            else if (letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
                 totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*finalCurrentHour)));
             else
                 return;
@@ -133,4 +136,35 @@ public class Audit {
         System.out.println("Elective GPA: " + electiveGPA);
         System.out.println("Combined GPA: " + combinedGPA);
     }
+
+    public void evaluateRequirements(){
+        List<Course> coreRequirements = getMissingCourses(Course.CourseType.CORE);
+
+        System.out.println(coreRequirements.toString());
+        System.out.println(currentSemester.toString());
+    }
+
+    public List<Course> getMissingCourses(Course.CourseType type){
+        List<Course> missing = new ArrayList<>();
+        for(Course c : currentStudent.getCurrentPlan().getCourseOfType(type)){
+            boolean contains = false;
+
+            for(StudentCourse s : currentStudent.getCourseType(type)){
+                if(c.getCourseNumber().equals(s.getCourseNumber()) && !s.getSemester().isEmpty()) {
+                    contains = true;
+                    String letterGrade = s.getLetterGrade();
+                    if(s.getLetterGrade().isEmpty())
+                        currentSemester.add(s);
+                    if(letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
+                        contains = false;
+                    break;
+                }
+            }
+            if(!contains)
+                missing.add(c);
+        }
+
+        return missing;
+
+    };
 }

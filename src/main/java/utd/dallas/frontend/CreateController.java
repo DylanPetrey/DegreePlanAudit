@@ -162,8 +162,10 @@ public class CreateController {
         Stage stage = (Stage) printButton.getScene().getWindow();
         File file = fileChooser.showSaveDialog(stage);
 
-
-        new Form(currentStudent).print(file.getAbsolutePath());
+        try {
+            new Form(currentStudent).print(file.getAbsolutePath());
+        } catch (Exception ignore) {}
+        
         new Audit(currentStudent);
 
     }
