@@ -48,6 +48,8 @@ public class CreateController {
     @FXML private VBox transcriptVBox;
     @FXML private ChoiceBox<String> trackBox;
     @FXML private Button printButton;
+    @FXML private Button CSButton;
+    @FXML private Button SEButton;
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
@@ -58,9 +60,6 @@ public class CreateController {
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
             softwareTracks = FXCollections.observableArrayList("Software Engineering"),
             semesterValues = FXCollections.observableArrayList();
-
-
-
 
     @FXML
     protected void initialize() {
@@ -366,6 +365,18 @@ public class CreateController {
         thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
             currentStudent.setThesis(thesis.isSelected());
         });
+
+        CSButton.setOnMouseEntered(event -> CSButton.setStyle("-fx-background-color: #c6c6c6"));
+        CSButton.setOnMouseExited(event -> CSButton.setStyle("-fx-background-color: #ffffff"));
+        SEButton.setOnMouseEntered(event -> SEButton.setStyle("-fx-background-color: #c6c6c6"));
+        SEButton.setOnMouseExited(event -> SEButton.setStyle("-fx-background-color: #ffffff"));
+        printButton.setOnMouseEntered(event -> printButton.setStyle("-fx-background-color: #c6c6c6"));
+        printButton.setOnMouseExited(event -> printButton.setStyle("-fx-background-color: #ffffff"));
+        backButton.setOnMouseEntered(event -> backButton.setStyle("-fx-background-color: #c6c6c6"));
+        backButton.setOnMouseExited(event -> backButton.setStyle("-fx-background-color: #ffffff"));
+        trackBox.setOnMouseEntered(event -> trackBox.setStyle("-fx-background-color: #c6c6c6"));
+        trackBox.setOnMouseExited(event -> trackBox.setStyle("-fx-background-color: #ffffff"));
+
     }
 
     @FXML
