@@ -91,6 +91,13 @@ public class CreateController {
 
             DDHandler.setupScrolling(CorePane);
             DDHandler.setupScrolling(OptionalPane);
+
+            double w = Math.max(CSButton.getLayoutBounds().getWidth() + 10, SEButton.getLayoutBounds().getWidth() + 10);
+            double h = Math.max(CSButton.getLayoutBounds().getHeight(), SEButton.getLayoutBounds().getHeight());
+            CSButton.setPrefWidth(w);
+            CSButton.setPrefHeight(h);
+            SEButton.setPrefWidth(w);
+            SEButton.setPrefHeight(h);
         });
 
         trackBox.setItems(csTracks);
