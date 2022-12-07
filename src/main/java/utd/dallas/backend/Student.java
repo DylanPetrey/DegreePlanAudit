@@ -25,7 +25,7 @@ public class Student {
      * Creates empty student object. Used when not uploading transcript
      */
     public Student(){
-        this.studentName = "";
+        this.studentName = "Student Name";
         this.studentId = "";
         this.startDate = "";
         this.currentMajor = "";
