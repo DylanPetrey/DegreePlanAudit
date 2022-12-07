@@ -24,14 +24,14 @@
                <children>
                   <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="50.0" spacing="100.0">
                      <children>
-                            <Button fx:id="CSButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCSButtonClick" onMouseClicked="#onCSButtonClick" prefHeight="70.0" prefWidth="200.0" style="-fx-background-color: #ffffff;" text="Computer Science" textFill="#154734">
+                            <Button fx:id="CSButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCSButtonClick" onMouseClicked="#onCSButtonClick" prefHeight="70.0" style="-fx-background-color: #ffffff;" text="Computer Science" textFill="#154734">
                            <font>
                               <Font name="Charter Roman" size="18.0" />
                            </font>
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></Button>
-                            <Button fx:id="SEButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSWEButtonClick" onMouseClicked="#onSWEButtonClick" prefHeight="70.0" prefWidth="200.0" style="-fx-background-color: #ffffff;" text="Software Engineering" textFill="#154734">
+                            <Button fx:id="SEButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onSWEButtonClick" onMouseClicked="#onSWEButtonClick" prefHeight="70.0" style="-fx-background-color: #ffffff;" text="Software Engineering" textFill="#154734">
                            <font>
                               <Font name="Charter Roman" size="18.0" />
                            </font>
