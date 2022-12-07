@@ -15,14 +15,17 @@ public class FlowObject {
     FlowPane flowPane;
     ObservableList<CourseCard> observableCard;
     Course.CourseType type;
+    ObservableList<String> semesterValues;
 
-    FlowObject(Course.CourseType type, VBox parent){
+
+    FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues){
         this.type = type;
         this.parent = parent;
         flowPane = new FlowPane();
         flowPane.setHgap(0);
         flowPane.setAlignment(Pos.CENTER);
         flowPane.setPrefHeight(100);
+        this.semesterValues = semesterValues;
 
 
         observableCard = FXCollections.observableArrayList(new ArrayList<CourseCard>());
@@ -55,19 +58,19 @@ public class FlowObject {
         }
     }
 
-    public CourseCard addCard(StudentCourse currentCourse){
+    public void addCard(StudentCourse currentCourse){
         currentCourse.setType(type);
-        CourseCard currentCard = new CourseCard(currentCourse);
+        CourseCard currentCard = new CourseCard(currentCourse, semesterValues);
         currentCard.setParent(this);
         currentCard.summaryCard.setCourseType(currentCourse.getType());
         observableCard.add(currentCard);
-        return currentCard;
     }
 
     public void addCard(CourseCard newCard){
         newCard.getParent().removeCard(newCard);
         newCard.setParent(this);
         newCard.getCurrentCourse().setType(type);
+        newCard.updateType();
         newCard.summaryCard.setCourseType(type);
 
         if(type == Course.CourseType.OPTIONAL || observableCard.size() < 1)

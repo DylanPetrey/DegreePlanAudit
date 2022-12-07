@@ -12,19 +12,25 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class IntroController {
-
     @FXML private AnchorPane basePane;
     @FXML private Button createButton;
     @FXML private Button uploadButton;
 
+
+    /**
+     * Button functionality to create a blank audit form
+     */
     @FXML
     protected void onCreateButtonClick() throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("CreateScreen.fxml"));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("CreateScreen.fxml")));
         Stage stage = (Stage) createButton.getScene().getWindow();
         Scene currentStage = basePane.getScene();
         stage.setScene(new Scene(root, currentStage.getWidth(), currentStage.getHeight()));
     }
 
+    /**
+     * Button functionality to upload a transcript
+     */
     @FXML
     protected void onUploadButtonClick() throws IOException {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("UploadScreen.fxml")));
