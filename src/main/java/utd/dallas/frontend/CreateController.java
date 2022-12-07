@@ -164,7 +164,9 @@ public class CreateController {
 
         try {
             new Form(currentStudent).print(file.getAbsolutePath());
-        } catch (Exception ignore) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
         new Audit(currentStudent);
 

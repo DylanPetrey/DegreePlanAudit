@@ -141,7 +141,6 @@ public class Audit {
         List<Course> coreRequirements = getMissingCourses(Course.CourseType.CORE);
 
         System.out.println(coreRequirements.toString());
-        System.out.println(currentSemester.toString());
     }
 
     public List<Course> getMissingCourses(Course.CourseType type){

@@ -232,9 +232,9 @@ public class CourseCard {
         ComboBox<String> gradeBox = createGradeBox();
 
         StackPane transWaive = new StackPane();
-
         transferField = createTransferField();
         waiverCheckBox = createWaiverBox();
+        HBox.setHgrow(transWaive, Priority.ALWAYS);
 
         updateType();
 

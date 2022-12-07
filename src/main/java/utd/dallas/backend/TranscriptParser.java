@@ -150,10 +150,8 @@ public class TranscriptParser {
                 transfer_text = "";
                 continue;
             }
-
             if(!graduateCourse)
                 continue;
-
 
             // Regex to check for semester
             if(checkRegex(transcript[i], "([0-9]{4}.+Spring)|([0-9]{4}.+Summer)|([0-9]{4}.+Fall)")){

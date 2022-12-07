@@ -16,6 +16,7 @@ public class FlowObject {
     ObservableList<CourseCard> observableCard;
     Course.CourseType type;
     ObservableList<String> semesterValues;
+    int numAuditPdf;
 
 
     FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues){
@@ -27,35 +28,48 @@ public class FlowObject {
         flowPane.setPrefHeight(100);
         this.semesterValues = semesterValues;
 
+        addCardListeners();
+    }
 
+    FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues, int numAuditPdf){
+        this.type = type;
+        this.parent = parent;
+        this.numAuditPdf = numAuditPdf;
+        this.semesterValues = semesterValues;
+
+        flowPane = new FlowPane();
+        flowPane.setHgap(0);
+        flowPane.setAlignment(Pos.CENTER);
+        flowPane.setPrefHeight(100);
+
+        addCardListeners();
+    }
+
+    public void addCardListeners(){
         observableCard = FXCollections.observableArrayList(new ArrayList<CourseCard>());
 
         observableCard.addListener(new ListChangeListener<CourseCard>() {
             @Override
             public void onChanged(Change<? extends CourseCard> change) {
-                updateFlowPane();
+                flowPane.getChildren().clear();
+                ObservableList<Node> flowOrder = FXCollections.observableArrayList();
+
+                observableCard.forEach(CourseCard ->{
+                    if(!flowOrder.contains(CourseCard.getCard()))
+                        flowOrder.add(CourseCard.getCard());
+                });
+
+                flowPane.getChildren().addAll(flowOrder);
+
+                if(getObservableCard().size() == 0) {
+                    flowPane.setMinHeight(150);
+                    flowPane.setPrefHeight(150);
+                }else {
+                    flowPane.setMinHeight(Region.USE_COMPUTED_SIZE);
+                    flowPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
+                }
             }
         });
-    }
-
-    public void updateFlowPane(){
-        flowPane.getChildren().clear();
-        ObservableList<Node> flowOrder = FXCollections.observableArrayList();
-
-        observableCard.forEach(CourseCard ->{
-            if(!flowOrder.contains(CourseCard.getCard()))
-                flowOrder.add(CourseCard.getCard());
-        });
-
-        flowPane.getChildren().addAll(flowOrder);
-
-        if(getObservableCard().size() == 0) {
-            flowPane.setMinHeight(150);
-            flowPane.setPrefHeight(150);
-        }else {
-            flowPane.setMinHeight(Region.USE_COMPUTED_SIZE);
-            flowPane.setPrefHeight(Region.USE_COMPUTED_SIZE);
-        }
     }
 
     public void addCard(StudentCourse currentCourse){

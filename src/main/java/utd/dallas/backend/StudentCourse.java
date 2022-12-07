@@ -125,6 +125,7 @@ public class StudentCourse extends Course {
         earned = newCourse.getEarned();
         letterGrade = newCourse.getLetterGrade();
         isWaived = newCourse.isWaived();
+        transfer = newCourse.getTransfer();
         fromTranscript = newCourse.isFromTranscript();
     }
 }
