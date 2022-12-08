@@ -125,14 +125,14 @@ public class Form {
             if (index >= 0) {
                 StudentCourse studentCourse = courseList.get(index);
                 fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
-                if(studentCourse.getType() == CourseType.PRE)
-                    fillField(acroForm, typeString + "." + i + ".3" + boolToInt(studentCourse.isWaived()), "Waived");
-                else
+                if(studentCourse.getType() == CourseType.PRE && studentCourse.isWaived())
+                    fillField(acroForm, typeString + "." + i + ".3", "Waived");
+                else if(studentCourse.getType() != CourseType.PRE)
                     fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
                 courseList.remove(index);
-                i++;
             }
+            i++;
         }
         if(type == CourseType.PRE)
             fillRest(type, courseList, i);
