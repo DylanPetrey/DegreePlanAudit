@@ -128,8 +128,8 @@ public class Form {
                 fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
                 courseList.remove(index);
-                i++;
             }
+            i++;
         }
         if(type == CourseType.PRE)
             fillRest(type, courseList, i);
