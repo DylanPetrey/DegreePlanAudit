@@ -125,7 +125,10 @@ public class Form {
             if (index >= 0) {
                 StudentCourse studentCourse = courseList.get(index);
                 fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
-                fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
+                if(studentCourse.getType() == CourseType.PRE)
+                    fillField(acroForm, typeString + "." + i + ".3" + boolToInt(studentCourse.isWaived()), "Waived");
+                else
+                    fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
                 courseList.remove(index);
                 i++;

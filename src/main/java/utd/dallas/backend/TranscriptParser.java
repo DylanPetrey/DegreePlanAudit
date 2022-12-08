@@ -156,6 +156,10 @@ public class TranscriptParser {
             // Regex to check for semester
             if(checkRegex(transcript[i], "([0-9]{4}.+Spring)|([0-9]{4}.+Summer)|([0-9]{4}.+Fall)")){
                 semester = transcript[i].substring(2,4) + transcript[i].substring(5,7).toUpperCase();
+                if(semester.equals("Su"))
+                    semester = "U";
+                if(semester.equals("Sp"))
+                    semester = "S";
                 if(semester.indexOf('F') == 2)
                     semester = semester.substring(0, 3);
                 continue;

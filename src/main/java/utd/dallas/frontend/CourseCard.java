@@ -32,7 +32,7 @@ public class CourseCard {
     TextField transferField;
     CheckBox waiverCheckBox;
     ObservableList<String>
-            gradeValues = FXCollections.observableArrayList("Grade", "A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "I", "CR", "NC", "W", "WL"),
+            gradeValues = FXCollections.observableArrayList("Grade", "A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F", "I", "P", "CR", "NC", "W", "WL"),
             semesterValues = FXCollections.observableArrayList();
 
 
