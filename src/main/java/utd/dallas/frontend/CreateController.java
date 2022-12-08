@@ -50,6 +50,8 @@ public class CreateController {
     @FXML private Button printButton;
     @FXML private Button CSButton;
     @FXML private Button SEButton;
+    @FXML private VBox NonAuditVBox;
+    @FXML private VBox AuditVBox;
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
@@ -75,6 +77,9 @@ public class CreateController {
 
         DDHandler = new DragDropHandler();
         semesterValues.addAll(getSemesterValues());
+
+        NonAuditVBox.prefHeightProperty().bind(OptionalPane.heightProperty());
+        AuditVBox.prefHeightProperty().bind(CorePane.heightProperty());
 
         Platform.runLater(() -> {
             double maxWidth = 0;
@@ -121,7 +126,7 @@ public class CreateController {
 
 
         int currentYear = year % 2000;
-        String[] semesters = new String[]{"SP", "SU", "F"};
+        String[] semesters = new String[]{"S", "U", "F"};
         int currentSemester = (int) (day / (366.0/3));
 
         for(double i = currentYear + (currentSemester+1)/3.0; i > currentYear-10; i = i - 1/3.0){

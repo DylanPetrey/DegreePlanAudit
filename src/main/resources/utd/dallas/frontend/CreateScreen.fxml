@@ -20,7 +20,7 @@
    <children>
       <BorderPane style="-fx-background-color: #154734;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #154734;" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
                <children>
                   <HBox alignment="CENTER" minHeight="-Infinity" prefHeight="50.0" spacing="100.0">
                      <children>
@@ -120,7 +120,7 @@
             </VBox>
          </top>
          <bottom>
-            <BorderPane maxWidth="600.0" style="-fx-background-color: #154734;" BorderPane.alignment="CENTER">
+            <BorderPane maxWidth="600.0" BorderPane.alignment="CENTER">
                <right>
                       <Button fx:id="printButton" mnemonicParsing="false" onMouseClicked="#onPrintButtonClick" style="-fx-background-color: #ffffff;" text="Print" BorderPane.alignment="CENTER">
                      <BorderPane.margin>
@@ -129,6 +129,9 @@
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                </right>
                <left>
@@ -139,6 +142,9 @@
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                </left>
                <padding>
@@ -147,11 +153,11 @@
             </BorderPane>
          </bottom>
          <center>
-            <SplitPane fx:id="primarySplitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+            <SplitPane fx:id="primarySplitPane" dividerPositions="0.5" style="-fx-background-color: #ffffff;" BorderPane.alignment="CENTER">
                <items>
-                  <ScrollPane fx:id="OptionalPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
+                  <ScrollPane fx:id="OptionalPane" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" style="-fx-background-color: #ffffff;">
                      <content>
-                        <VBox spacing="2.0" style="-fx-background-color: #ffffff;">
+                        <VBox fx:id="NonAuditVBox" spacing="2.0" style="-fx-background-color: #ffffff;">
                            <children>
                               <HBox alignment="CENTER">
                                  <children>
@@ -206,15 +212,12 @@
                                  </children>
                               </HBox>
                            </children>
-                           <padding>
-                              <Insets bottom="5.0" top="5.0" />
-                           </padding>
                         </VBox>
                      </content>
                   </ScrollPane>
-                  <ScrollPane fx:id="CorePane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0">
+                  <ScrollPane fx:id="CorePane" fitToWidth="true" hbarPolicy="NEVER" hmax="0.0" style="-fx-background-color: #ffffff;">
                      <content>
-                        <VBox spacing="2.0" style="-fx-background-color: #ffffff;">
+                        <VBox fx:id="AuditVBox" spacing="2.0" style="-fx-background-color: #ffffff;">
                            <children>
                               <HBox alignment="BOTTOM_CENTER">
                                  <children>
@@ -321,9 +324,6 @@
                                  </children>
                               </HBox>
                            </children>
-                           <padding>
-                              <Insets bottom="5.0" top="5.0" />
-                           </padding>
                         </VBox>
                      </content>
                   </ScrollPane>
