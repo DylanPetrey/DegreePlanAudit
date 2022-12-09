@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ public class Audit {
     // Student variables
     private final Student currentStudent;
     private final List<StudentCourse> filledCourses;
+    private static final DecimalFormat df = new DecimalFormat("0.00");
 
 
     // List of courses divided up by type
@@ -53,28 +55,26 @@ public class Audit {
         this.currentStudent = currentStudent;
         this.filePath = filePath;
         this.filledCourses = currentStudent.getCleanCourseList();
-        calculateGPAValues();
+        fillStudentPlanCourses();
         fillReplacementValues();
     }
 
     /**
      * This function calculates the core, elective, and cumulative GPA values
      */
-    private void calculateGPAValues(){
+    private void fillStudentPlanCourses(){
         filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
                 .forEach(coreList::add);
-        coreGPA = calcGPA(coreList);
-
         filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL)
                 .forEach(electList::add);
-        electiveGPA = calcGPA(electList);
-
         filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.PRE)
                 .forEach(preList::add);
 
+        coreGPA = calcGPA(coreList);
+        electiveGPA = calcGPA(electList);
         combinedGPA = calcGPA(filledCourses);
     }
 
@@ -127,6 +127,48 @@ public class Audit {
         return Math.round(GPA * scale) / scale;
     }
 
+    private double calcOverallGPA(List<StudentCourse> courseList, int hours){
+        final double A_GRADEPTS = 4.000;
+        final double A_MINUS_GRADEPTS = 3.670;
+        final double B_PLUS_GRADEPTS = 3.330;
+        final double B_GRADEPTS = 3.000;
+        final double B_MINUS_GRADEPTS = 2.670;
+        final double C_PLUS_GRADEPTS = 2.330;
+        final double C_GRADEPTS = 2.000;
+        final double F_GRADEPTS = 0.000;
+        AtomicReference<Double> totalPoints = new AtomicReference<>((double) 0);
+        AtomicReference<Double> totalHours = new AtomicReference<>((double) 0);
+
+        courseList.forEach(studentCourse -> {
+            String letterGrade = studentCourse.getLetterGrade();
+            int finalCurrentHour = Integer.parseInt(studentCourse.getHours());
+            if (letterGrade.equalsIgnoreCase("A") || letterGrade.equalsIgnoreCase("A+"))
+                totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("A-"))
+                totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B+"))
+                totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B"))
+                totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("B-"))
+                totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("C+"))
+                totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("C"))
+                totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*finalCurrentHour)));
+            else if (letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
+                totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*finalCurrentHour)));
+            else
+                return;
+
+            totalHours.updateAndGet(v -> (v+finalCurrentHour));
+        });
+
+        double GPA = totalPoints.get() / hours;
+        double scale = Math.pow(10, 3);
+        return Math.round(GPA * scale) / scale;
+    }
+
 
     /**
      * Prints the GPA as seen on the sample audit
@@ -134,11 +176,47 @@ public class Audit {
 
 
     public String getOutstanding(){
-        String res = "Student must pass ";
-        fillCurrentSemester();
-        res += printCourses(currentSemester);
+        String res = "";
+
+        int coreHours = getTotalHours(coreList);
+        int electHours = getTotalHours(currentStudent.getCourseType(Course.CourseType.ELECTIVE));
+        if(coreHours < REQUIRED_CORE_HOURS) {
+            int dif = REQUIRED_CORE_HOURS - coreHours;
+            double target = getNeededGPA(coreGPA, coreHours, MIN_CORE_GPA, REQUIRED_CORE_HOURS);
+            if(target <= 0)
+                res += "The student must pass " + printCourses(currentSemester) + "\n";
+            else
+                res += "The student needs a GPA >= " + df.format(target) + " in the remaining courses\n";
+        }
+        if(electHours < REQUIRED_ELECTIVE_HOURS){
+            int dif = 15 - electHours;
+            double target = getNeededGPA(electiveGPA, electHours, MIN_ELECT_GPA, REQUIRED_ELECTIVE_HOURS);
+            if(target <= 0)
+                res += "The student must pass " + printCourses(currentSemester) + "\n";
+            else
+                res += "The student needs a GPA >= " + String.valueOf(target) + " in the remaining courses\n";
+        }
+        if(getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL)) < 3)
+            res += "The student needs 3 hours of an additional elective credit\n";
+
         return res;
+
+
     }
+
+    private double getNeededGPA(double currentGPA, double currentHours, double targetGPA, int totalHours){
+        return ((targetGPA*totalHours)-(currentGPA*currentHours))/(totalHours - currentHours);
+    }
+
+    public int getTotalHours(List<StudentCourse> courseList){
+        int total = 0;
+        for(StudentCourse c : courseList){
+            if(!c.getSemester().isEmpty() && isPassingGrade(c.getLetterGrade()))
+                total += Integer.parseInt(c.getHours());
+        }
+        return total;
+    }
+
 
     private void fillCurrentSemester(){
         for(StudentCourse s : currentStudent.getCourseList()) {
@@ -195,7 +273,7 @@ public class Audit {
 
         WordReplace.put("coregpa", String.valueOf(calcGPA(coreList)));
         WordReplace.put("electivegpa", String.valueOf(calcGPA(electList)));
-        WordReplace.put("combinedgpa", String.valueOf(calcGPA(filledCourses)));
+        WordReplace.put("combinedgpa", String.valueOf(combinedGPA));
 
         WordReplace.put("corelist", printCourses(coreList));
         WordReplace.put("electivelist", printCourses(electList));
@@ -232,6 +310,7 @@ public class Audit {
                     }
                 }
                 doc.write(new FileOutputStream(filePath));
+                doc.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
