@@ -1,14 +1,10 @@
 package utd.dallas.backend;
 
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,6 +18,7 @@ public class Audit {
     // Student variables
     private final Student currentStudent;
     private final List<StudentCourse> filledCourses;
+
 
     // List of courses divided up by type
     private final List<StudentCourse> coreList = new ArrayList<>();
@@ -44,6 +41,7 @@ public class Audit {
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
     HashMap<String, String> WordReplace = new HashMap<>();
+    String filePath;
 
 
     /**
@@ -51,13 +49,12 @@ public class Audit {
      *
      * @param currentStudent current student object
      */
-    public Audit(Student currentStudent){
-
+    public Audit(Student currentStudent, String filePath){
         this.currentStudent = currentStudent;
+        this.filePath = filePath;
         this.filledCourses = currentStudent.getCleanCourseList();
         calculateGPAValues();
-        printGPA();
-        findAndReplace();
+        fillReplacementValues();
     }
 
     /**
@@ -134,27 +131,7 @@ public class Audit {
     /**
      * Prints the GPA as seen on the sample audit
      */
-    public void printGPA(){
-        WordReplace.put("$$name$$", currentStudent.getStudentName());
-        WordReplace.put("$$id$$", currentStudent.getStudentId());
-        WordReplace.put("$$plan$$", "Master") ;
-        WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
-        WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString().replace('-', ' '));
 
-        String coreGPAString = String.valueOf(calcGPA(coreList));
-        String electiveGPAString = String.valueOf(calcGPA(electList));
-        String combinedGPAString = String.valueOf(calcGPA(filledCourses));
-
-        WordReplace.put("coregpa", coreGPAString);
-        WordReplace.put("electivegpa", electiveGPAString);
-        WordReplace.put("combinedgpa", combinedGPAString);
-
-        WordReplace.put("corelist", printCourses(coreList));
-        WordReplace.put("electivelist", printCourses(electList));
-
-        WordReplace.put("prelist", printPre());
-        WordReplace.put("outstandingreq", getOutstanding());
-    }
 
     public String getOutstanding(){
         String res = "Student must pass ";
@@ -200,7 +177,6 @@ public class Audit {
             res += "N/A";
         for(StudentCourse course : preList)
             res += printPrereq(course) + "\n";
-        System.out.println(res);
         return res;
     }
 
@@ -208,6 +184,26 @@ public class Audit {
         Pattern stringPattern = Pattern.compile("(^[A-C].?)|P|CR");
         Matcher m = stringPattern.matcher(grade);
         return m.find();
+    }
+
+    public void fillReplacementValues(){
+        WordReplace.put("$$name$$", currentStudent.getStudentName());
+        WordReplace.put("$$id$$", currentStudent.getStudentId());
+        WordReplace.put("$$plan$$", "Master") ;
+        WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
+        WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString().replace('-', ' '));
+
+        WordReplace.put("coregpa", String.valueOf(calcGPA(coreList)));
+        WordReplace.put("electivegpa", String.valueOf(calcGPA(electList)));
+        WordReplace.put("combinedgpa", String.valueOf(calcGPA(filledCourses)));
+
+        WordReplace.put("corelist", printCourses(coreList));
+        WordReplace.put("electivelist", printCourses(electList));
+
+        WordReplace.put("prelist", printPre());
+        WordReplace.put("outstandingreq", getOutstanding());
+
+        findAndReplace();
     }
 
     private void findAndReplace() {
@@ -218,8 +214,7 @@ public class Audit {
             String tempPath = System.getenv("TEMP") + "\\temp.docx";
             Path dirOrigem = Paths.get(pathOriginal + templateDoc);
             Path dirDestino = Paths.get(tempPath);
-            Files.copy(dirOrigem, dirDestino, StandardCopyOption.REPLACE_EXISTING); // copy the template to temporary
-            // directory
+            Files.copy(dirOrigem, dirDestino, StandardCopyOption.REPLACE_EXISTING);
 
             try (XWPFDocument doc = new XWPFDocument(OPCPackage.open(tempPath))) {
                 for (XWPFParagraph p : doc.getParagraphs()) {
@@ -228,19 +223,15 @@ public class Audit {
                         for (String key : WordReplace.keySet()) {
                             for (XWPFRun r : runs) {
                                 String text = r.getText(0);
-                                System.out.println(text);
                                 if (text != null && text.contains(key)) {
-                                    System.out.println(text);
                                     text = text.replace(key, WordReplace.getOrDefault(key, " "));
-                                    System.out.println(text);
                                     r.setText(text, 0);
                                 }
                             }
                         }
                     }
                 }
-                doc.write(new FileOutputStream(pathOriginal + currentStudent.getStudentName().replace(" ", "") + "AuditReport.docx"));
-                doc.close();
+                doc.write(new FileOutputStream(filePath));
             } catch (Exception e) {
                 e.printStackTrace();
             }

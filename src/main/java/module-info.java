@@ -11,6 +11,7 @@ module utd.dallas {
     requires json.simple;
     requires json.path;
     requires org.apache.poi.ooxml;
+    requires java.desktop;
 
     opens utd.dallas.frontend to javafx.fxml;
     exports utd.dallas.frontend;

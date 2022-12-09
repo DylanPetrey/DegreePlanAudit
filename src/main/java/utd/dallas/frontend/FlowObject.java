@@ -16,7 +16,7 @@ public class FlowObject {
     ObservableList<CourseCard> observableCard;
     Course.CourseType type;
     ObservableList<String> semesterValues;
-    int numAuditPdf;
+    int cardLimit;
 
 
     FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues){
@@ -31,10 +31,10 @@ public class FlowObject {
         addCardListeners();
     }
 
-    FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues, int numAuditPdf){
+    FlowObject(Course.CourseType type, VBox parent, ObservableList<String> semesterValues, int cardLimit){
         this.type = type;
         this.parent = parent;
-        this.numAuditPdf = numAuditPdf;
+        this.cardLimit = cardLimit;
         this.semesterValues = semesterValues;
 
         flowPane = new FlowPane();

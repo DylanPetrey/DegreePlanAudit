@@ -201,4 +201,8 @@ public class Form {
         return clone;
     }
 
+    public PDAcroForm getAcroForm(){
+        return acroForm;
+    }
+
 }

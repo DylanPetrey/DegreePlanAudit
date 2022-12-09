@@ -1,5 +1,6 @@
 package utd.dallas.frontend;
 
+import javafx.application.HostServices;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -21,12 +22,15 @@ import utd.dallas.backend.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.spec.ECField;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import java.awt.Desktop;
+import static org.apache.poi.sl.usermodel.PresetColor.Desktop;
 import static utd.dallas.frontend.CourseCard.inHierarchy;
 
 public class CreateController {
@@ -164,24 +168,66 @@ public class CreateController {
 
     @FXML
     protected void onPrintButtonClick() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save As");
-        fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
-        fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DP.pdf");
-        
-        Stage stage = (Stage) printButton.getScene().getWindow();
-        File file = fileChooser.showSaveDialog(stage);
+        printAuditPDF();
+        printAuditReport();
+    }
 
+    public void printAuditPDF(){
         try {
-            new Form(currentStudent).print(file.getAbsolutePath());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save As");
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
+            fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DegreePlan.pdf");
 
-        
-        new Audit(currentStudent);
+            Stage stage = (Stage) printButton.getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            File file = fileChooser.showSaveDialog(stage);
+            stage.setAlwaysOnTop(false);
 
+            Form AuditPDF = new Form(currentStudent);
+            AuditPDF.print(file.getAbsolutePath());
+
+            openFile(file.getAbsolutePath());
+        } catch (Exception e) {}
+    }
+
+    public void printAuditReport(){
+        try {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Save As");
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.getExtensionFilters().addAll(new ExtensionFilter("WORD docs", "*.docx"), new ExtensionFilter("WORD doc", "*.doc"));
+            fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_AuditReport.docx");
+
+            Stage stage = (Stage) printButton.getScene().getWindow();
+            stage.setAlwaysOnTop(true);
+            File file = fileChooser.showSaveDialog(stage);
+            stage.setAlwaysOnTop(false);
+
+            Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
+
+            try {
+                openFile(file.getAbsolutePath());
+            } catch (Exception e) {
+            }
+
+        } catch (Exception e) {}
+
+    }
+
+    private boolean openFile(String filePath){
+        try{
+            String os = System.getProperty("os.name").toLowerCase();
+            if(os.contains("win")){
+                Runtime.getRuntime().exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", filePath});
+                return true;
+            } else if(os.contains("nux") || os.contains("nix") || os.contains("mac")){
+                Runtime.getRuntime().exec(new String[]{"/usr/bin/open", filePath});
+                return true;
+            }
+        } catch (Exception ignore) { }
+        return false;
     }
 
     @FXML
@@ -210,19 +256,21 @@ public class CreateController {
 
     private void resetAllVBox(){
         ListOfFlowObjects = new ArrayList<>();
-        resetVbox(coreVBox, Course.CourseType.CORE);
-        resetVbox(approvedVBox, Course.CourseType.ELECTIVE);
-        resetVbox(additionalVBox, Course.CourseType.ADDITIONAL);
-        resetVbox(preReqVBox, Course.CourseType.PRE);
-        resetVbox(optionalVBox, Course.CourseType.OPTIONAL);
-        resetVbox(transcriptVBox, Course.CourseType.OTHER);
+        int[] limits = new int[]{ 5,5,3,8,0,0};
+
+        resetVbox(coreVBox, Course.CourseType.CORE, limits[0]);
+        resetVbox(approvedVBox, Course.CourseType.ELECTIVE, limits[1]);
+        resetVbox(additionalVBox, Course.CourseType.ADDITIONAL, limits[2]);
+        resetVbox(preReqVBox, Course.CourseType.PRE, limits[3]);
+        resetVbox(optionalVBox, Course.CourseType.OPTIONAL, limits[4]);
+        resetVbox(transcriptVBox, Course.CourseType.OTHER, limits[5]);
     }
 
 
-    private void resetVbox(VBox current, Course.CourseType t){
+    private void resetVbox(VBox current, Course.CourseType t, int lim){
         // Replace old flow pane
         current.getChildren().remove(current.lookup("FlowPane"));
-        FlowObject currentFlow = new FlowObject(t, current, semesterValues);
+        FlowObject currentFlow = new FlowObject(t, current, semesterValues, lim);
         ListOfFlowObjects.add(currentFlow);
 
         // Add empty courses to modify

@@ -15,7 +15,5 @@ public class Main {
 
         
         System.out.println(Arrays.toString(curr.getCurrentPlan().getUtdCatalogCourseNums().toArray()));
-
-        new Audit(curr);
     }
 }
