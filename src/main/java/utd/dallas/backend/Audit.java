@@ -139,21 +139,21 @@ public class Audit {
         WordReplace.put("$$id$$", currentStudent.getStudentId());
         WordReplace.put("$$plan$$", "Master") ;
         WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
-        WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString());
+        WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString().replace('-', ' '));
 
         String coreGPAString = String.valueOf(calcGPA(coreList));
         String electiveGPAString = String.valueOf(calcGPA(electList));
         String combinedGPAString = String.valueOf(calcGPA(filledCourses));
 
-        WordReplace.put("$$coregpa$$", coreGPAString);
-        WordReplace.put("$$electivegpa$$", electiveGPAString);
-        WordReplace.put("$$combinedgpa$$", combinedGPAString);
+        WordReplace.put("coregpa", coreGPAString);
+        WordReplace.put("electivegpa", electiveGPAString);
+        WordReplace.put("combinedgpa", combinedGPAString);
 
-        WordReplace.put("$$core$$", printCourses(coreList));
-        WordReplace.put("$$elective$$", printCourses(electList));
+        WordReplace.put("corelist", printCourses(coreList));
+        WordReplace.put("electivelist", printCourses(electList));
 
-        WordReplace.put("$$prereq$$", printPre());
-        WordReplace.put("$$outstanding$$", getOutstanding());
+        WordReplace.put("prelist", printPre());
+        WordReplace.put("outstandingreq", getOutstanding());
     }
 
     public String getOutstanding(){
@@ -225,21 +225,21 @@ public class Audit {
                 for (XWPFParagraph p : doc.getParagraphs()) {
                     List<XWPFRun> runs = p.getRuns();
                     if (runs != null) {
-                        for (XWPFRun r : runs) {
-                            for (String key : WordReplace.keySet()) {
-                                try {
-                                    String text = r.getText(0);
-                                    if (text != null && text.contains(key)) {
-                                        text = text.replace(key, WordReplace.getOrDefault(key, ""));//your content
-                                        System.out.println(text);
-                                        r.setText(text, 0);
-                                    }
-                                } catch (Exception notFound) { }
+                        for (String key : WordReplace.keySet()) {
+                            for (XWPFRun r : runs) {
+                                String text = r.getText(0);
+                                System.out.println(text);
+                                if (text != null && text.contains(key)) {
+                                    System.out.println(text);
+                                    text = text.replace(key, WordReplace.getOrDefault(key, " "));
+                                    System.out.println(text);
+                                    r.setText(text, 0);
+                                }
                             }
                         }
                     }
                 }
-                doc.write(new FileOutputStream(pathOriginal + currentStudent.getStudentName().replace(" ", "") + templateDoc));
+                doc.write(new FileOutputStream(pathOriginal + currentStudent.getStudentName().replace(" ", "") + "AuditReport.docx"));
                 doc.close();
             } catch (Exception e) {
                 e.printStackTrace();
