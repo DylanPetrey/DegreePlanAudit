@@ -1,5 +1,18 @@
 package utd.dallas.backend;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -14,7 +27,7 @@ public class Audit {
     private final List<StudentCourse> coreList = new ArrayList<>();
     private final List<StudentCourse> electList = new ArrayList<>();
     private final List<StudentCourse> preList = new ArrayList<>();
-    List<Course> currentSemester = new ArrayList<>();
+    List<StudentCourse> currentSemester = new ArrayList<>();
 
 
     // GPA Variables
@@ -30,17 +43,21 @@ public class Audit {
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
+    HashMap<String, String> WordReplace = new HashMap<>();
+
+
     /**
      * Performs the audit when created
      *
      * @param currentStudent current student object
      */
     public Audit(Student currentStudent){
+
         this.currentStudent = currentStudent;
         this.filledCourses = currentStudent.getCleanCourseList();
         calculateGPAValues();
         printGPA();
-        evaluateRequirements();
+        findAndReplace();
     }
 
     /**
@@ -118,47 +135,32 @@ public class Audit {
      * Prints the GPA as seen on the sample audit
      */
     public void printGPA(){
-        currentStudent.printStudentInformation();
+        WordReplace.put("$$name$$", currentStudent.getStudentName());
+        WordReplace.put("$$id$$", currentStudent.getStudentId());
+        WordReplace.put("$$plan$$", "Master") ;
+        WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
+        WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString());
 
-        System.out.println("Core GPA: " + coreGPA);
-        System.out.println("Elective GPA: " + electiveGPA);
-        System.out.println("Combined GPA: " + combinedGPA);
-        System.out.println();
+        String coreGPAString = String.valueOf(calcGPA(coreList));
+        String electiveGPAString = String.valueOf(calcGPA(electList));
+        String combinedGPAString = String.valueOf(calcGPA(filledCourses));
 
-        System.out.print("Core: ");
-        printCourses(coreList);
-        System.out.print("Elective: ");
-        printCourses(electList);
+        WordReplace.put("$$coregpa$$", coreGPAString);
+        WordReplace.put("$$electivegpa$$", electiveGPAString);
+        WordReplace.put("$$combinedgpa$$", combinedGPAString);
 
-        System.out.println();
-        if(preList.size() == 0)
-            System.out.println("N/A");
-        preList.forEach(studentCourse -> printPrereq(studentCourse));
-        System.out.println();
+        WordReplace.put("$$core$$", printCourses(coreList));
+        WordReplace.put("$$elective$$", printCourses(electList));
+
+        WordReplace.put("$$prereq$$", printPre());
+        WordReplace.put("$$outstanding$$", getOutstanding());
     }
 
-    public void evaluateRequirements(){
+    public String getOutstanding(){
+        String res = "Student must pass ";
         fillCurrentSemester();
-        System.out.println(currentSemester.toString());
-    }
-
-    private List<Course> getMissingCourses(Course.CourseType type){
-        List<Course> missing = new ArrayList<>();
-        for(Course c : currentStudent.getCurrentPlan().getCourseOfType(type)){
-            boolean contains = false;
-            for(StudentCourse s : currentStudent.getCourseType(type)){
-                if(s.getCourseNumber().equals(s.getCourseNumber()) && !s.getSemester().isEmpty()) {
-                    contains = true;
-                    String letterGrade = s.getLetterGrade();
-
-                    if(isPassingGrade(letterGrade))
-                        contains = false;
-                }
-            }
-            if(!contains)
-                missing.add(c);
-        }
-        return missing;
+        res += printCourses(currentSemester);
+        return res;
     }
 
     private void fillCurrentSemester(){
@@ -168,30 +170,82 @@ public class Audit {
         }
     }
 
-    private void printPrereq(StudentCourse pre){
+    private String printPrereq(StudentCourse pre){
+        String res = "";
         if(pre.isWaived())
-            System.out.println(pre.getCourseNumber() + " - " + "Waived");
+            res = pre.getCourseNumber() + " - " + "Waived";
         else if(!pre.getSemester().isEmpty() && isPassingGrade(pre.getLetterGrade())){
-            System.out.println(pre.getCourseNumber() + " - " + pre.getSemester());
+            res = pre.getCourseNumber() + " - " + pre.getSemester();
         }
         else
-            System.out.println(pre.getCourseNumber() + " - " + "Not satisfied");
-
+            res = pre.getCourseNumber() + " - " + "Not satisfied";
+        return res;
     }
 
-    private void printCourses(List<StudentCourse> courseList){
+    private String printCourses(List<StudentCourse> courseList){
+        String res = "";
         for(int i = 0; i < courseList.size(); i++){
-            System.out.print(courseList.get(i));
+            res += courseList.get(i);
             if(i < courseList.size()-1)
-                System.out.print(", ");
+                res += ", ";
             else
-                System.out.println();
+                res += "\n";
         }
+        return res;
+    }
+
+    private String printPre(){
+        String res = "";
+        if(preList.size() == 0)
+            res += "N/A";
+        for(StudentCourse course : preList)
+            res += printPrereq(course) + "\n";
+        System.out.println(res);
+        return res;
     }
 
     private boolean isPassingGrade(String grade){
         Pattern stringPattern = Pattern.compile("(^[A-C].?)|P|CR");
         Matcher m = stringPattern.matcher(grade);
         return m.find();
+    }
+
+    private void findAndReplace() {
+        String pathOriginal = "src/main/resources/utd/dallas/backend/SampleAudit/";
+        String templateDoc = "EmptyReport.docx";
+        try {
+            // finds the path of the operating system temp folder to create a temporary file
+            String tempPath = System.getenv("TEMP") + "\\temp.docx";
+            Path dirOrigem = Paths.get(pathOriginal + templateDoc);
+            Path dirDestino = Paths.get(tempPath);
+            Files.copy(dirOrigem, dirDestino, StandardCopyOption.REPLACE_EXISTING); // copy the template to temporary
+            // directory
+
+            try (XWPFDocument doc = new XWPFDocument(OPCPackage.open(tempPath))) {
+                for (XWPFParagraph p : doc.getParagraphs()) {
+                    List<XWPFRun> runs = p.getRuns();
+                    if (runs != null) {
+                        for (XWPFRun r : runs) {
+                            for (String key : WordReplace.keySet()) {
+                                try {
+                                    String text = r.getText(0);
+                                    if (text != null && text.contains(key)) {
+                                        text = text.replace(key, WordReplace.getOrDefault(key, ""));//your content
+                                        System.out.println(text);
+                                        r.setText(text, 0);
+                                    }
+                                } catch (Exception notFound) { }
+                            }
+                        }
+                    }
+                }
+                doc.write(new FileOutputStream(pathOriginal + currentStudent.getStudentName().replace(" ", "") + templateDoc));
+                doc.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
