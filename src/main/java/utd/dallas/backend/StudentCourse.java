@@ -84,17 +84,7 @@ public class StudentCourse extends Course {
      */
     @Override
     public String toString() {
-        String transferText;
-        if(isWaived)
-            transferText = "Waived";
-        else
-            transferText = transfer;
-        return  getCourseNumber() + " " +
-                getCourseTitle() + " " +
-                getHours() + " " +
-                semester + " " +
-                transferText + " " +
-                letterGrade;
+        return  getCourseNumber();
     }
 
     public boolean isEmpty(){

@@ -1,5 +1,6 @@
 package utd.dallas.frontend;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -10,8 +11,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,7 +33,6 @@ public class UploadController {
     @FXML private Button backButton;
     @FXML private Button continueButton;
     @FXML private Group fileWindow;
-    @FXML private Label continueErrorLabel;
     @FXML private Rectangle uploadFileBox;
     @FXML private Label uploadButtonLabel;
 
@@ -41,17 +44,37 @@ public class UploadController {
 
     @FXML
     protected void initialize() {
+        Platform.runLater(() -> {
+            double maxWidth = continueButton.getLayoutBounds().getWidth() + 10;
+            double maxHeight = continueButton.getLayoutBounds().getHeight() + 10;
+            continueButton.setPrefWidth(maxWidth);
+            continueButton.setPrefHeight(maxHeight);
+            backButton.setPrefWidth(maxWidth);
+            backButton.setPrefHeight(maxHeight);
+        });
+
+        initalizeDragDrop();
+
+        // Mouse Over colors
+        uploadButtonLabel.setOnMouseEntered(event -> uploadButtonLabel.setStyle("-fx-background-color: #c6c6c6; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius: 5"));
+        uploadButtonLabel.setOnMouseExited(event -> uploadButtonLabel.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius: 5"));
+        continueButton.setOnMouseEntered(event -> continueButton.setStyle("-fx-background-color: #c6c6c6"));
+        continueButton.setOnMouseExited(event -> continueButton.setStyle("-fx-background-color: #ffffff"));
+        backButton.setOnMouseEntered(event -> backButton.setStyle("-fx-background-color: #c6c6c6"));
+        backButton.setOnMouseExited(event -> backButton.setStyle("-fx-background-color: #ffffff"));
+    }
+
+    private void initalizeDragDrop(){
         // Extensions that are valid to be drag-n-dropped
         List<String> validExtensions = Arrays.asList("pdf");
-
 
         uploadButtonLabel.heightProperty().addListener((observable, oldValue, newValue) -> {
             try {
                 uploadButtonLabel.setAlignment(Pos.CENTER);
                 double diff = uploadFileBox.getY()+(uploadFileBox.getHeight() - newValue.doubleValue()) / 2;
                 uploadButtonLabel.setLayoutY(diff);
-
                 filenameText.setLayoutX(uploadButtonLabel.getWidth()+5);
+                filenameText.setLayoutY(uploadButtonLabel.getLayoutY());
                 filenameText.setWrappingWidth(uploadFileBox.getWidth()-uploadButtonLabel.getWidth()-10);
 
             } catch (Exception e){
@@ -90,7 +113,6 @@ public class UploadController {
             boolean success = false;
             if (event.getGestureSource() != fileWindow && event.getDragboard().hasFiles()) {
                 try {
-                    continueErrorLabel.setVisible(false);
                     uploadFileBox.setFill(Paint.valueOf("#f5f5f5"));
                     inputFile = event.getDragboard().getFiles().get(0);
                     filenameText.setText(inputFile.getName());
@@ -106,10 +128,6 @@ public class UploadController {
             event.setDropCompleted(success);
             event.consume();
         });
-
-
-        uploadButtonLabel.setOnMouseEntered(event -> uploadButtonLabel.setStyle("-fx-background-color: #c6c6c6; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
-        uploadButtonLabel.setOnMouseExited(event -> uploadButtonLabel.setStyle("-fx-background-color: #ffffff; -fx-text-fill: black; -fx-background-radius: 5; -fx-border-color: black; -fx-border-radius:  5"));
     }
 
 
@@ -117,7 +135,6 @@ public class UploadController {
     @FXML
     protected void onFileButtonClick() {
         try {
-            continueErrorLabel.setVisible(false);
             uploadFileBox.setFill(Paint.valueOf("#f5f5f5"));
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PDFs", "*.pdf"));
@@ -150,7 +167,8 @@ public class UploadController {
     @FXML
     protected void onOkButtonClick() throws Exception {
         if(parser == null) {
-            continueErrorLabel.setVisible(true);
+            uploadFileBox.setFill(Paint.valueOf("#ff8080"));
+            filenameText.setText("Upload a valid transcript");
             return;
         }
 

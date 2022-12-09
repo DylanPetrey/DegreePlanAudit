@@ -125,11 +125,14 @@ public class Form {
             if (index >= 0) {
                 StudentCourse studentCourse = courseList.get(index);
                 fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
-                fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
+                if(studentCourse.getType() == CourseType.PRE && studentCourse.isWaived())
+                    fillField(acroForm, typeString + "." + i + ".3", "Waived");
+                else if(studentCourse.getType() != CourseType.PRE)
+                    fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
                 fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
                 courseList.remove(index);
-                i++;
             }
+            i++;
         }
         if(type == CourseType.PRE)
             fillRest(type, courseList, i);
@@ -156,7 +159,10 @@ public class Form {
             fillField(acroForm, typeString + "." + i + ".0", studentCourse.getCourseTitle());
             fillField(acroForm, typeString + "." + i + ".1", studentCourse.getCourseNumber());
             fillField(acroForm, typeString + "." + i + ".2", studentCourse.getSemester());
-            fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
+            if(studentCourse.getType() == CourseType.PRE && studentCourse.isWaived())
+                fillField(acroForm, typeString + "." + i + ".3", "Waived");
+            else if(studentCourse.getType() != CourseType.PRE)
+                fillField(acroForm, typeString + "." + i + ".3", studentCourse.getTransfer());
             fillField(acroForm, typeString + "." + i + ".4", studentCourse.getLetterGrade());
             i++;
         }

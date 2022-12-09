@@ -194,16 +194,20 @@ public class Student {
      */
     public void printStudentInformation(){
         System.out.println(studentName);
+        System.out.println("Master");
+
         System.out.println(studentId);
         System.out.println(startDate);
         System.out.println(currentMajor);
+        System.out.println(currentPlan.getConcentration().toString());
+        System.out.println();
 
-        courseList.forEach(StudentCourse-> {
+        /*courseList.forEach(StudentCourse-> {
             if(!StudentCourse.isEmpty()) {
                 System.out.print(StudentCourse.toString());
                 System.out.println(" " + StudentCourse.getType());
             }
-        });
+        });*/
     }
 
     /**
