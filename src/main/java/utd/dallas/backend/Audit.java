@@ -5,14 +5,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
- * TODO:
- *   1. Evaluate requirements still needed to graduate
- *        - Find remaining classes in plan
- *        - Average GPA needed in remaining classes to meet minimum GPA
- *   2. Configure to include repeated courses (Need to make a custom transcript for this)
- */
-
 public class Audit {
     // Student variables
     private final Student currentStudent;
@@ -127,43 +119,79 @@ public class Audit {
      */
     public void printGPA(){
         currentStudent.printStudentInformation();
-        System.out.println();
-        System.out.println("Core: " + coreList.toString());
-        System.out.println("Elective: " + electList.toString());
-        System.out.println("Pre: " + preList.toString());
-        System.out.println();
+
         System.out.println("Core GPA: " + coreGPA);
         System.out.println("Elective GPA: " + electiveGPA);
         System.out.println("Combined GPA: " + combinedGPA);
+        System.out.println();
+
+        System.out.print("Core: ");
+        printCourses(coreList);
+        System.out.print("Elective: ");
+        printCourses(electList);
+
+        System.out.println();
+        if(preList.size() == 0)
+            System.out.println("N/A");
+        preList.forEach(studentCourse -> printPrereq(studentCourse));
+        System.out.println();
     }
 
     public void evaluateRequirements(){
-        List<Course> coreRequirements = getMissingCourses(Course.CourseType.CORE);
-
-        System.out.println(coreRequirements.toString());
+        fillCurrentSemester();
+        System.out.println(currentSemester.toString());
     }
 
-    public List<Course> getMissingCourses(Course.CourseType type){
+    private List<Course> getMissingCourses(Course.CourseType type){
         List<Course> missing = new ArrayList<>();
         for(Course c : currentStudent.getCurrentPlan().getCourseOfType(type)){
             boolean contains = false;
-
             for(StudentCourse s : currentStudent.getCourseType(type)){
-                if(c.getCourseNumber().equals(s.getCourseNumber()) && !s.getSemester().isEmpty()) {
+                if(s.getCourseNumber().equals(s.getCourseNumber()) && !s.getSemester().isEmpty()) {
                     contains = true;
                     String letterGrade = s.getLetterGrade();
-                    if(s.getLetterGrade().isEmpty())
-                        currentSemester.add(s);
-                    if(letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
+
+                    if(isPassingGrade(letterGrade))
                         contains = false;
-                    break;
                 }
             }
             if(!contains)
                 missing.add(c);
         }
-
         return missing;
+    }
 
-    };
+    private void fillCurrentSemester(){
+        for(StudentCourse s : currentStudent.getCourseList()) {
+            if(!s.getSemester().isEmpty() && s.getLetterGrade().isEmpty())
+                currentSemester.add(s);
+        }
+    }
+
+    private void printPrereq(StudentCourse pre){
+        if(pre.isWaived())
+            System.out.println(pre.getCourseNumber() + " - " + "Waived");
+        else if(!pre.getSemester().isEmpty() && isPassingGrade(pre.getLetterGrade())){
+            System.out.println(pre.getCourseNumber() + " - " + pre.getSemester());
+        }
+        else
+            System.out.println(pre.getCourseNumber() + " - " + "Not satisfied");
+
+    }
+
+    private void printCourses(List<StudentCourse> courseList){
+        for(int i = 0; i < courseList.size(); i++){
+            System.out.print(courseList.get(i));
+            if(i < courseList.size()-1)
+                System.out.print(", ");
+            else
+                System.out.println();
+        }
+    }
+
+    private boolean isPassingGrade(String grade){
+        Pattern stringPattern = Pattern.compile("(^[A-C].?)|P|CR");
+        Matcher m = stringPattern.matcher(grade);
+        return m.find();
+    }
 }
