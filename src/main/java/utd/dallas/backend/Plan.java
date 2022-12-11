@@ -1,8 +1,8 @@
 package utd.dallas.backend;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.*;
 
 import com.jayway.jsonpath.DocumentContext;
@@ -36,9 +36,9 @@ public class Plan {
 
     };
 
-    private final File utdCatalogJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/utd_catalog.json").getAbsoluteFile();
+    private final String utdCatalogJSON = "JSONobjects/utd_catalog.json";
     private Set<String> utdCatalogCourseNums = new HashSet<>();
-    private final File degreeRequirementsJSON = new File("src/main/resources/utd/dallas/backend/JSONobjects/degreeRequirements.json").getAbsoluteFile();
+    private final String degreeRequirementsJSON = "JSONobjects/degreeRequirements.json";
     private DocumentContext CatalogFile;
     private Concentration concentration;
 
@@ -54,13 +54,18 @@ public class Plan {
      * Initializes empty plan object
      */
     Plan() {
-        try {
-            CatalogFile = JsonPath.parse(utdCatalogJSON);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        CatalogFile = JsonPath.parse(getInputStream(utdCatalogJSON));
         utdCatalogCourseNums = getAllCourseNums();
+    }
+
+    private InputStream getInputStream(String fileName) {
+        InputStream inputStream = null;
+        try {
+            inputStream =  Plan.class.getResourceAsStream(fileName);
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+        return inputStream;
     }
 
     /**
@@ -71,11 +76,8 @@ public class Plan {
     Plan(Concentration concentration) {
         setConcentration(concentration);
 
-        try {
-            CatalogFile = JsonPath.parse(utdCatalogJSON);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        CatalogFile = JsonPath.parse(getInputStream(utdCatalogJSON));
+
 
         utdCatalogCourseNums = getAllCourseNums();
     }
@@ -135,7 +137,7 @@ public class Plan {
         this.concentration = plan;
         JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader(degreeRequirementsJSON));
+            Object obj = parser.parse(new InputStreamReader(getInputStream(degreeRequirementsJSON)));
 
             JSONObject jsonObject = (JSONObject) obj;
             JSONObject jsonCurrentPlan = (JSONObject) jsonObject.get(plan.toString());
@@ -248,7 +250,7 @@ public class Plan {
     private Set<String> getAllCourseNums(){
         JSONParser parser = new JSONParser();
         try {
-            Object obj = parser.parse(new FileReader(utdCatalogJSON));
+            Object obj = parser.parse(new InputStreamReader(getInputStream(utdCatalogJSON)));
 
             JSONObject jsonObject = (JSONObject) obj;
             return (Set<String>) jsonObject.keySet();

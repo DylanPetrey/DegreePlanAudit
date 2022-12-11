@@ -2,7 +2,7 @@ package utd.dallas.backend;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLDecoder;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,9 +43,7 @@ public class Form {
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
 
         try {
-            String fileName = new String("Forms/DP-" + plan.getConcentration().toString() + ".pdf");
-            loc = URLDecoder.decode(Form.class.getResource(fileName).getFile(), "UTF-8");
-            pdfDocument = PDDocument.load(new File(loc));
+            pdfDocument = PDDocument.load(getInputStream("Forms/DP-" + plan.getConcentration().toString() + ".pdf"));
         } catch (NullPointerException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -86,6 +84,16 @@ public class Form {
         } catch (IOException e) {}
     }
 
+
+    private InputStream getInputStream(String fileName) {
+        InputStream inputStream = null;
+        try {
+            inputStream =  Plan.class.getResourceAsStream(fileName);
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+        return inputStream;
+    }
 
     /**
      * The fillField function fills the field with the given value.
