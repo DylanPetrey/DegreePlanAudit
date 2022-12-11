@@ -208,13 +208,9 @@ public class CreateController {
             Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
             try {
                 openFile(file.getAbsolutePath());
-            } catch (Exception e) {
+            } catch (Exception e) { }
 
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
 
     }
 

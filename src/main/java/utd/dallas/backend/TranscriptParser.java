@@ -5,6 +5,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,7 @@ public class TranscriptParser {
 
         // Fill the course information
         fillCourseInformation(currentStudent, transcript);
+        setSemesterAdmit();
 
         if(currentStudent.getTranscriptList().size() == 0)
             throw new IOException();
@@ -155,11 +157,13 @@ public class TranscriptParser {
 
             // Regex to check for semester
             if(checkRegex(transcript[i], "([0-9]{4}.+Spring)|([0-9]{4}.+Summer)|([0-9]{4}.+Fall)")){
-                semester = transcript[i].substring(2,4) + transcript[i].substring(5,7).toUpperCase();
-                semester.replace("SP", "S");
-                semester.replace("SU", "U");
-                if(semester.indexOf('F') == 2)
-                    semester = semester.substring(0, 3);
+                semester = transcript[i].substring(2,4);
+                if(transcript[i].contains("Spring"))
+                    semester += "S";
+                else if(transcript[i].contains("Summer"))
+                    semester += "U";
+                else if(transcript[i].contains("Fall"))
+                    semester += "F";
                 continue;
             }
 
@@ -169,6 +173,44 @@ public class TranscriptParser {
             }
         }
     }
+
+    private void setSemesterAdmit(){
+        List<StudentCourse> courseList = currentStudent.getTranscriptList();
+        String semester = courseList.get(0).getSemester();
+        for(StudentCourse current : courseList){
+            if(isEarlier(semester, current.getSemester()))
+                semester = current.getSemester();
+        }
+        currentStudent.setStartDate(semester);
+    }
+
+    private boolean isEarlier(String current, String target){
+        int currentYear = Integer.parseInt(current.substring(0,2));
+        int newYear = Integer.parseInt(target.substring(0,2));
+
+        if(newYear < currentYear)
+            return  true;
+
+        int currentSem = classify(current.substring(2));
+        int newSem = classify(target.substring(2));
+        if(newSem < currentSem && newSem != 0)
+            return true;
+
+        return false;
+    }
+
+    private int classify(String str){
+        if(str.equals("S")){
+            return 1;
+        } else if(str.equals("U")){
+            return 2;
+        } else if(str.equals("F")){
+            return 3;
+        }
+        return 0;
+    }
+
+
 
     /**
      * Accessor methods to be used outside the class.
