@@ -10,6 +10,7 @@ public class Student {
     private String studentId;
     private String startDate;
     private String currentMajor;
+    private String currentTrack;
     private String graduation;
     private boolean fastTrack;
     private boolean thesis;
@@ -188,6 +189,15 @@ public class Student {
         return cleanCourses;
     }
 
+    public void dropEmpty(){
+        List<StudentCourse> emptyCourses = new ArrayList<>();
+        for(StudentCourse course : courseList)
+            if(course.isEmpty())
+                emptyCourses.add(course);
+        courseList.removeAll(emptyCourses);
+    }
+
+
     /**
      * Prints all the information in a similar style to how it will
      * be displayed the final Audit PDF.
@@ -208,6 +218,16 @@ public class Student {
                 System.out.println(" " + StudentCourse.getType());
             }
         });*/
+    }
+
+    public List<StudentCourse> getThesisCourses(){
+        List<StudentCourse> thesisList = new ArrayList<>();
+        for (StudentCourse course: courseList) {
+            if(course.getCourseNumber().contains("6V81") || course.getCourseNumber().contains("6V98")){
+                thesisList.add(course);
+            }
+        }
+        return thesisList;
     }
 
     /**
