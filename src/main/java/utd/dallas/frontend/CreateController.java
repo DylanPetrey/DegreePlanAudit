@@ -184,7 +184,8 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-
+            Mediator.getInstance().setDefaultDirectory(file.getParent());
+            
             Form AuditPDF = new Form(currentStudent);
             AuditPDF.print(file.getAbsolutePath());
 
@@ -204,7 +205,7 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-
+            Mediator.getInstance().setDefaultDirectory(file.getParent());
             Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
             try {
                 openFile(file.getAbsolutePath());
