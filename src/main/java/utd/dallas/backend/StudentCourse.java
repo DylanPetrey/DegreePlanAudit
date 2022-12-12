@@ -49,6 +49,19 @@ public class StudentCourse extends Course {
         processInput(input);
     }
 
+    public void setCourseVariables(StudentCourse newCourse){
+        setCourseNumber(newCourse.getCourseNumber());
+        setHours(newCourse.getHours());
+        semester = newCourse.getSemester();
+        attempted = newCourse.getAttempted();
+        points = newCourse.getPoints();
+        earned = newCourse.getEarned();
+        letterGrade = newCourse.getLetterGrade();
+        isWaived = newCourse.isWaived();
+        transfer = newCourse.getTransfer();
+        fromTranscript = newCourse.isFromTranscript();
+    }
+
     /**
      * Parses through the text and fills in the course information into the object.
      *
@@ -106,16 +119,5 @@ public class StudentCourse extends Course {
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
     public void setWaived(boolean waived) { this.isWaived = waived; }
 
-    public void setCourseVariables(StudentCourse newCourse){
-        setCourseNumber(newCourse.getCourseNumber());
-        setHours(newCourse.getHours());
-        semester = newCourse.getSemester();
-        attempted = newCourse.getAttempted();
-        points = newCourse.getPoints();
-        earned = newCourse.getEarned();
-        letterGrade = newCourse.getLetterGrade();
-        isWaived = newCourse.isWaived();
-        transfer = newCourse.getTransfer();
-        fromTranscript = newCourse.isFromTranscript();
-    }
+
 }

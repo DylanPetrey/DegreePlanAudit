@@ -105,7 +105,10 @@ public class TranscriptParser {
             // Checks for the first major start date
             if(checkRegex(transcript[i], "Active in Program") && checkRegex(transcript[i-1], "Master")) {
                 startDate = transcript[i].substring(0, 10);      // The date format in the transcript is 10 characters long
-                currentMajor = transcript[i-1].substring(9);
+                if(transcript[i+1].contains("Computer Science"))
+                    currentMajor = "Computer Science";
+                else if(transcript[i+1].contains("Software Engineering"))
+                    currentMajor = "Software Engineering";
             }
         }
 
@@ -169,6 +172,8 @@ public class TranscriptParser {
 
             // Check for class number in the line
             if(checkRegex(transcript[i], "(\\s[0-9]{4}\\s)|(\\s[0-9][vV]([0-9]{2})\\s)|(\\s[0-9]-{3}\\s)")){
+                if(transcript[i].contains("6V98") && transcript[i].contains("THESIS"))
+                    currentStudent.setThesis(true);
                 currentStudent.addCourse(transcript[i], semester, transfer_text);
             }
         }

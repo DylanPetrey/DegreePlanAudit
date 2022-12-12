@@ -61,6 +61,7 @@ public class CreateController {
     DragDropHandler DDHandler;
     double cardWidth;
 
+
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
                     "Traditional Computer Science", "Network Telecommunications", "Intelligent Systems", "Interactive Computing", "Systems", "Data Science", "Cyber Security"),
@@ -250,12 +251,14 @@ public class CreateController {
             currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
         }
 
+        evaluateThesis();
         resetAllVBox();
     }
 
     private void resetAllVBox(){
         ListOfFlowObjects = new ArrayList<>();
-        int[] limits = new int[]{ 5,5,3,8,0,0};
+        int[] limits = new int[]{5,5,3,8,0,0};
+
 
         resetVbox(coreVBox, Course.CourseType.CORE, limits[0]);
         resetVbox(approvedVBox, Course.CourseType.ELECTIVE, limits[1]);
@@ -424,6 +427,11 @@ public class CreateController {
 
         thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
             currentStudent.setThesis(thesis.isSelected());
+
+            evaluateThesis();
+
+            currentStudent.dropEmpty();
+            resetAllVBox();
         });
 
         CSButton.setOnMouseEntered(event -> CSButton.setStyle("-fx-background-color: #c6c6c6"));
@@ -436,8 +444,72 @@ public class CreateController {
         backButton.setOnMouseExited(event -> backButton.setStyle("-fx-background-color: #ffffff"));
         trackBox.setOnMouseEntered(event -> trackBox.setStyle("-fx-background-color: #c6c6c6"));
         trackBox.setOnMouseExited(event -> trackBox.setStyle("-fx-background-color: #ffffff"));
+    }
+
+    public void evaluateThesis(){
+        if(currentStudent.isThesis())
+            addThesisCourses();
+        else
+            removeThesisCourses();
+    }
+
+    public void addThesisCourses() {
+        boolean hasCore = false;
+        boolean hasElective = false;
+        boolean hasAdditional = false;
+
+        String prefix = "";
+        if(currentStudent.getCurrentMajor().equals("Software Engineering"))
+            prefix = "SE ";
+        else if(currentStudent.getCurrentMajor().equals("Computer Science"))
+            prefix = "CS ";
+
+        List<StudentCourse> thesisCourses = currentStudent.getThesisCourses();
+        for (StudentCourse course: thesisCourses) {
+            if (course.getCourseNumber().equals(prefix + "6V81") && course.getType() == Course.CourseType.OTHER && !hasCore) {
+                course.setType(Course.CourseType.CORE);
+                hasCore = true;
+            }
+            else if (course.getCourseNumber().equals(prefix + "6V98") && course.getType() == Course.CourseType.OTHER && !hasElective) {
+                course.setType(Course.CourseType.ELECTIVE);
+                hasElective = true;
+            } else if (course.getCourseNumber().equals(prefix + "6V98") && course.getType() == Course.CourseType.OTHER && !hasAdditional) {
+                course.setType(Course.CourseType.ADDITIONAL);
+                hasAdditional = true;
+            }
+        }
+
+        if(!hasCore)
+            currentStudent.addCourse(new StudentCourse(prefix + "6V81", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V81"),"", Course.CourseType.CORE));
+        if(!hasElective)
+            currentStudent.addCourse(new StudentCourse(prefix + "6V98", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V98"),"", Course.CourseType.ELECTIVE));
+        if(!hasAdditional)
+            currentStudent.addCourse(new StudentCourse(prefix + "6V98", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V98"),"", Course.CourseType.ADDITIONAL));
 
     }
+
+    public void removeThesisCourses() {
+        List<StudentCourse> removeList = new ArrayList<>();
+        for (StudentCourse course : currentStudent.getCourseList()) {
+            if (course.getCourseNumber().contains("6V81") && course.getType() == Course.CourseType.CORE)
+                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
+                    removeList.add(course);
+                else
+                    course.setType(Course.CourseType.OTHER);
+            else if (course.getCourseNumber().contains("6V98") && course.getType() == Course.CourseType.ELECTIVE)
+                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
+                    removeList.add(course);
+                else
+                    course.setType(Course.CourseType.OTHER);
+            else if (course.getCourseNumber().contains("6V98") && course.getType() == Course.CourseType.ADDITIONAL)
+                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
+                    removeList.add(course);
+                else
+                    course.setType(Course.CourseType.OTHER);
+        }
+        currentStudent.getCourseList().removeAll(removeList);
+    }
+
 
     @FXML
     protected void onBackButtonClick() throws IOException {
