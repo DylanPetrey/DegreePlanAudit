@@ -1,5 +1,7 @@
 package utd.dallas.backend;
 
+import javafx.util.Pair;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,6 +16,9 @@ public class Student {
     private String graduation;
     private boolean fastTrack;
     private boolean thesis;
+
+    Pair<Boolean, StudentCourse>[] thesisCourses = new Pair[3];
+
 
 
     // Student objects
@@ -89,12 +94,14 @@ public class Student {
      * @param concentration New degree plan that the student is switching to
      */
     public void setCurrentPlan(Plan.Concentration concentration) {
-        this.currentPlan.setConcentration(concentration);
+        this.currentPlan.setConcentration(concentration, thesis);
 
         resetCourseList();
         fillFromTranscript();
         setInitialCourseTypes();
     }
+
+
 
     /**
      * Resets the courseList values and fills in courses from the degreePlan
@@ -105,58 +112,62 @@ public class Student {
             courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
         });
         currentPlan.getCourseOfType(Course.CourseType.OPTIONAL).forEach(course -> {
-            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), Course.CourseType.OPTIONAL));
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
+        });
+        currentPlan.getCourseOfType(Course.CourseType.ELECTIVE).forEach(course -> {
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
+        });
+        currentPlan.getCourseOfType(Course.CourseType.ADDITIONAL).forEach(course -> {
+            courseList.add(new StudentCourse(course.getCourseNumber(), course.getCourseTitle(), course.getHours(), course.getType()));
         });
     }
 
     /**
      * Fills in courses from the transcript
      */
-    public void fillFromTranscript(){
-        transcriptList.forEach(studentCourse -> {
-            if (courseList.contains(studentCourse))
-                setFormListValue(studentCourse);
+    public void fillFromTranscript() {
+        HashMap<String, List<String>> filledCourses = new HashMap<>();
+        for (StudentCourse trans : transcriptList) {
+            if(!filledCourses.getOrDefault(trans.getCourseNumber(), new ArrayList<>()).contains(trans.getSemester())){
+                fillCourse(filledCourses, trans);
+                filledCourses.compute(trans.getCourseNumber(), (id, sem) -> sem != null ? sem : new ArrayList<>())
+                        .add(trans.getSemester());
+            }
+        }
+    }
+
+    private void setInitialCourseTypes() {
+        for (Course course : courseList) {
+            if (currentPlan.isCore(course))
+                course.setType(Course.CourseType.CORE);
+            else if (currentPlan.isOpt(course))
+                course.setType(Course.CourseType.OPTIONAL);
+            else if (currentPlan.isElect(course))
+                course.setType(Course.CourseType.ELECTIVE);
+            else if (currentPlan.isAdd(course))
+                course.setType(Course.CourseType.ADDITIONAL);
+            else if (currentPlan.isPre(course) || currentPlan.isTrack(course))
+                course.setType(Course.CourseType.PRE);
             else
-                courseList.add(studentCourse);
-        });
+                course.setType(Course.CourseType.OTHER);
+        }
     }
 
     /**
      * Fills in existing values of the courseList from the transcript
      */
-    public void setFormListValue(StudentCourse value){
-        courseList.forEach(studentCourse -> {
-            if (studentCourse.equals(value))
-                studentCourse.setCourseVariables(value);
-        });
-    }
-
-    /**
-     * Assigns default course types from transcript based on degree plan
-     */
-    private void setInitialCourseTypes(){
-        for(Course course : courseList) {
-            if (currentPlan.isCore(course))
-                setCourseType(course, Course.CourseType.CORE);
-            else if (currentPlan.isOpt(course))
-                setCourseType(course, Course.CourseType.OPTIONAL);
-            else if (currentPlan.isPre(course) || currentPlan.isTrack(course))
-                setCourseType(course, Course.CourseType.PRE);
-            else
-                setCourseType(course, Course.CourseType.OTHER);
+    private void fillCourse(HashMap<String, List<String>> filledCourses, StudentCourse trans) {
+        boolean found = false;
+        for (StudentCourse course : courseList) {
+            if (course.equals(trans) && !filledCourses.getOrDefault(course.getCourseNumber(), new ArrayList<>()).contains(course.getSemester())) {
+                course.setCourseVariables(trans);
+                found = true;
+                break;
+            }
         }
-    }
-
-    /**
-     * Modifies the courseType of a course in the courseList
-     *
-     * @param course course to modify
-     * @param type new course type for the course
-     */
-    public void setCourseType(Course course, Course.CourseType type){
-        for (StudentCourse studentCourse : courseList)
-            if (studentCourse.equals(course))
-                studentCourse.setType(type);
+        if (!found) {
+            courseList.add(trans);
+        }
     }
 
     /**
@@ -211,13 +222,6 @@ public class Student {
         System.out.println(currentMajor);
         System.out.println(currentPlan.getConcentration().toString());
         System.out.println();
-
-        /*courseList.forEach(StudentCourse-> {
-            if(!StudentCourse.isEmpty()) {
-                System.out.print(StudentCourse.toString());
-                System.out.println(" " + StudentCourse.getType());
-            }
-        });*/
     }
 
     public List<StudentCourse> getThesisCourses(){
@@ -264,6 +268,63 @@ public class Student {
     public void setStartDate(String startDate){ this.startDate = startDate; }
     public void setCurrentMajor(String currentMajor) { this.currentMajor = currentMajor; }
     public void setGraduation(String graduation) { this.graduation = graduation;}
-    public void setThesis(boolean thesis) { this.thesis = thesis;}
+    // Set thesis from transcript
+    public void setThesis(boolean thesis) {
+        this.thesis = thesis;
+    }
+
+    // Set thesis from UI and populate into plan class
+    public void setThesis(boolean thesis, Course core, Course elect, Course add) {
+        this.thesis = thesis;
+
+        if(thesis) {
+            removeThesis(core, elect, add);
+            addThesis(core, elect, add);
+        } else {
+            removeThesis(core, elect, add);
+        }
+    }
+    private void addThesis(Course core, Course elect, Course add){
+        currentPlan.addThesisCourse(core, elect, add);
+        thesisCourses[0] = needsToBeAdded(Course.CourseType.OTHER, core, Course.CourseType.CORE);
+        thesisCourses[1] = needsToBeAdded(Course.CourseType.OTHER, elect, Course.CourseType.ELECTIVE);
+        thesisCourses[2] = needsToBeAdded(Course.CourseType.OTHER, add, Course.CourseType.ADDITIONAL);
+        for(int i = 0; i< thesisCourses.length; i++)
+            if(thesisCourses[i].getKey())
+                courseList.add(thesisCourses[i].getValue());
+    }
+
+    private Pair<Boolean, StudentCourse> needsToBeAdded(Course.CourseType initial, Course course, Course.CourseType target) {
+        for (StudentCourse targetCourse : courseList) {
+            if (targetCourse.getType().equals(initial) && targetCourse.getCourseNumber().equals(course.getCourseNumber())) {
+                targetCourse.setType(target);
+                return new Pair<>(false, targetCourse);
+            }
+        }
+        return new Pair<>(true, new StudentCourse(course, target));
+    }
+
+    private void removeThesis(Course core, Course elect, Course add){
+        currentPlan.removeThesisCourse(core, elect, add);
+        List<StudentCourse> removeList = new ArrayList<>();
+        for(int i = 0; i< thesisCourses.length; i++) {
+            try {
+                if (needsToBeRemoved(thesisCourses[i].getValue()))
+                    removeList.add(thesisCourses[i].getValue());
+            } catch (NullPointerException ignore) {}
+        }
+        courseList.removeAll(removeList);
+    }
+
+    private boolean needsToBeRemoved(Course course) {
+        for (StudentCourse targetCourse : courseList) {
+            if (targetCourse.getCourseNumber().equals(course.getCourseNumber()) && !targetCourse.getSemester().isEmpty()) {
+                targetCourse.setType(Course.CourseType.OTHER);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void setFastTrack(boolean fastTrack) { this.fastTrack = fastTrack;}
 }

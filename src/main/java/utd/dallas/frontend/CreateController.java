@@ -59,8 +59,10 @@ public class CreateController {
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
-    double cardWidth;
 
+    Course coreThesis = new Course();
+    Course electThesis = new Course();
+    Course addThesis = new Course();
 
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
@@ -118,7 +120,9 @@ public class CreateController {
             onSWEButtonClick();
         else
             onCSButtonClick();
-
+        
+        thesis.setSelected(currentStudent.isThesis());
+        createThesisListener();
     }
 
     private List<String> getSemesterValues(){
@@ -148,23 +152,26 @@ public class CreateController {
         studentID.setText(currentStudent.getStudentId());
         studentSemAdmitted.setText(currentStudent.getStartDate());
         fastTrack.setSelected(currentStudent.isFastTrack());
-        thesis.setSelected(currentStudent.isThesis());
     }
 
 
 
     @FXML
     protected void onSWEButtonClick() {
+        currentStudent.setCurrentMajor("Software Engineering");
+        updateThesisCourses();
+
         trackBox.setItems(FXCollections.observableArrayList(softwareTracks));
         trackBox.setValue(softwareTracks.get(0));
-        currentStudent.setCurrentMajor("Software Engineering");
     }
 
     @FXML
     protected void onCSButtonClick() {
+        currentStudent.setCurrentMajor("Computer Science");
+        updateThesisCourses();
+
         trackBox.setItems(FXCollections.observableArrayList(csTracks));
         trackBox.setValue(csTracks.get(0));
-        currentStudent.setCurrentMajor("Computer Science");
     }
 
     @FXML
@@ -251,14 +258,14 @@ public class CreateController {
             currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
         }
 
-        evaluateThesis();
+        currentStudent.setThesis(currentStudent.isThesis(), coreThesis, electThesis, addThesis);
         resetAllVBox();
     }
 
     private void resetAllVBox(){
         ListOfFlowObjects = new ArrayList<>();
         int[] limits = new int[]{5,5,3,8,0,0};
-
+        currentStudent.dropEmpty();
 
         resetVbox(coreVBox, Course.CourseType.CORE, limits[0]);
         resetVbox(approvedVBox, Course.CourseType.ELECTIVE, limits[1]);
@@ -425,14 +432,7 @@ public class CreateController {
             currentStudent.setFastTrack(fastTrack.isSelected());
         });
 
-        thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            currentStudent.setThesis(thesis.isSelected());
 
-            evaluateThesis();
-
-            currentStudent.dropEmpty();
-            resetAllVBox();
-        });
 
         CSButton.setOnMouseEntered(event -> CSButton.setStyle("-fx-background-color: #c6c6c6"));
         CSButton.setOnMouseExited(event -> CSButton.setStyle("-fx-background-color: #ffffff"));
@@ -446,68 +446,33 @@ public class CreateController {
         trackBox.setOnMouseExited(event -> trackBox.setStyle("-fx-background-color: #ffffff"));
     }
 
-    public void evaluateThesis(){
-        if(currentStudent.isThesis())
-            addThesisCourses();
+    public void createThesisListener(){
+        updateThesisCourses();
+
+        thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            currentStudent.setThesis(newValue, coreThesis, electThesis, addThesis);
+
+            resetAllVBox();
+        });
+    }
+
+    private void updateThesisCourses(){
+        String prefix = getPrefix();
+        String courseNum = prefix + "6V81";
+        coreThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.CORE);
+
+
+        courseNum = prefix + "6V98";
+        electThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.ELECTIVE);
+        addThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.ADDITIONAL);
+
+    }
+
+    private String getPrefix() {
+        if (currentStudent.getCurrentMajor().equals("Software Engineering"))
+            return "SE ";
         else
-            removeThesisCourses();
-    }
-
-    public void addThesisCourses() {
-        boolean hasCore = false;
-        boolean hasElective = false;
-        boolean hasAdditional = false;
-
-        String prefix = "";
-        if(currentStudent.getCurrentMajor().equals("Software Engineering"))
-            prefix = "SE ";
-        else if(currentStudent.getCurrentMajor().equals("Computer Science"))
-            prefix = "CS ";
-
-        List<StudentCourse> thesisCourses = currentStudent.getThesisCourses();
-        for (StudentCourse course: thesisCourses) {
-            if (course.getCourseNumber().equals(prefix + "6V81") && course.getType() == Course.CourseType.OTHER && !hasCore) {
-                course.setType(Course.CourseType.CORE);
-                hasCore = true;
-            }
-            else if (course.getCourseNumber().equals(prefix + "6V98") && course.getType() == Course.CourseType.OTHER && !hasElective) {
-                course.setType(Course.CourseType.ELECTIVE);
-                hasElective = true;
-            } else if (course.getCourseNumber().equals(prefix + "6V98") && course.getType() == Course.CourseType.OTHER && !hasAdditional) {
-                course.setType(Course.CourseType.ADDITIONAL);
-                hasAdditional = true;
-            }
-        }
-
-        if(!hasCore)
-            currentStudent.addCourse(new StudentCourse(prefix + "6V81", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V81"),"", Course.CourseType.CORE));
-        if(!hasElective)
-            currentStudent.addCourse(new StudentCourse(prefix + "6V98", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V98"),"", Course.CourseType.ELECTIVE));
-        if(!hasAdditional)
-            currentStudent.addCourse(new StudentCourse(prefix + "6V98", currentStudent.getCurrentPlan().getCourseTitle(prefix + "6V98"),"", Course.CourseType.ADDITIONAL));
-
-    }
-
-    public void removeThesisCourses() {
-        List<StudentCourse> removeList = new ArrayList<>();
-        for (StudentCourse course : currentStudent.getCourseList()) {
-            if (course.getCourseNumber().contains("6V81") && course.getType() == Course.CourseType.CORE)
-                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
-                    removeList.add(course);
-                else
-                    course.setType(Course.CourseType.OTHER);
-            else if (course.getCourseNumber().contains("6V98") && course.getType() == Course.CourseType.ELECTIVE)
-                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
-                    removeList.add(course);
-                else
-                    course.setType(Course.CourseType.OTHER);
-            else if (course.getCourseNumber().contains("6V98") && course.getType() == Course.CourseType.ADDITIONAL)
-                if(course.getSemester().isEmpty() && course.getLetterGrade().isEmpty())
-                    removeList.add(course);
-                else
-                    course.setType(Course.CourseType.OTHER);
-        }
-        currentStudent.getCourseList().removeAll(removeList);
+            return "CS ";
     }
 
 

@@ -3,6 +3,7 @@ package utd.dallas.backend;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class StudentCourse extends Course {
     private String letterGrade = "";
@@ -34,6 +35,13 @@ public class StudentCourse extends Course {
         this.type = type;
     }
 
+    public StudentCourse(Course course, CourseType type) {
+        setCourseNumber(course.getCourseNumber());
+        setCourseTitle(course.getCourseTitle());
+        setHours(course.getHours());
+        this.type = type;
+    }
+
     public StudentCourse(String id, String title, String hours, CourseType type) {
         setCourseNumber(id);
         setCourseTitle(title);
@@ -60,6 +68,7 @@ public class StudentCourse extends Course {
         isWaived = newCourse.isWaived();
         transfer = newCourse.getTransfer();
         fromTranscript = newCourse.isFromTranscript();
+        type = newCourse.getType();
     }
 
     /**
