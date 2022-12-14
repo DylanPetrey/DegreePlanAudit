@@ -7,6 +7,8 @@ import java.util.*;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -46,9 +48,14 @@ public class Plan {
     private long numOptional = 0;
     private List<Course> requiredCore = new ArrayList<Course>();
     private List<Course> optionalCore = new ArrayList<Course>();
+    private List<Course> electives = new ArrayList<Course>();
+    private List<Course> additional = new ArrayList<Course>();
     private List<Course> admissionPrerequisites = new ArrayList<Course>();
     private List<Course> trackPrerequisites = new ArrayList<Course>();
     private List<String> excludedElectives = new ArrayList<String>();
+    Course coreThesis = new Course();
+    Course electThesis = new Course();
+    Course addThesis = new Course();
 
     /**
      * Initializes empty plan object
@@ -59,24 +66,6 @@ public class Plan {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        utdCatalogCourseNums = getAllCourseNums();
-    }
-
-    /**
-     * Initializes the plan object and sets the objects to the initial value
-     *
-     * @param concentration List of courses
-     */
-    Plan(Concentration concentration) {
-        setConcentration(concentration);
-
-        try {
-            CatalogFile = JsonPath.parse(utdCatalogJSON);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         utdCatalogCourseNums = getAllCourseNums();
     }
 
@@ -131,9 +120,10 @@ public class Plan {
      *
      * @param plan the current plan to parse from the JSON
      */
-    public void setConcentration(Concentration plan) {
-        this.concentration = plan;
+    public void setConcentration(Concentration plan, boolean thesis) {
         JSONParser parser = new JSONParser();
+        this.concentration = plan;
+
         try {
             Object obj = parser.parse(new FileReader(degreeRequirementsJSON));
 
@@ -146,6 +136,9 @@ public class Plan {
 
             JSONArray optionalCore = (JSONArray) jsonCurrentPlan.get("optionalCore");
             this.optionalCore = toList(optionalCore, Course.CourseType.OPTIONAL);
+
+            this.electives = new ArrayList<>();
+            this.additional = new ArrayList<>();
 
             JSONArray admissionPrerequisite = (JSONArray) jsonCurrentPlan.get("admissionPrerequisites");
             this.admissionPrerequisites = toList(admissionPrerequisite, Course.CourseType.PRE);
@@ -160,6 +153,47 @@ public class Plan {
             e.printStackTrace();
         }
     }
+
+    public void addThesisCourse(Course core, Course elect, Course add){
+        if(core == null || elect == null || add == null)
+            return;
+        if(!requiredCore.contains(core)) {
+            coreThesis = core;
+            this.requiredCore.add(core);
+        }
+        if(!electives.contains(elect)) {
+            electThesis = elect;
+            this.electives.add(elect);
+        }
+        if(!additional.contains(add)) {
+            addThesis = add;
+            this.additional.add(add);
+        }
+    }
+
+    public void removeThesisCourse(Course core, Course elect, Course add){
+        if(core == null || elect == null || add == null)
+            return;
+        if(requiredCore.contains(core))
+            this.requiredCore.remove(core);
+        if(requiredCore.contains(elect))
+            this.requiredCore.remove(elect);
+        if(requiredCore.contains(add))
+            this.requiredCore.remove(add);
+    }
+
+
+    private String getPrefix() {
+        try {
+            if (concentration.toString().equals("Software-Engineering"))
+                return "SE ";
+            else
+                return "CS ";
+        }catch (Exception e){
+            return "CS ";
+        }
+    }
+
 
     /**
      * Retrieves a new course object if it is an optional course in the degree plan
@@ -197,6 +231,34 @@ public class Plan {
      */
     public boolean isOpt(Course course) {
         for (Course currentClass : optionalCore) {
+            if (course.equals(currentClass))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a course is an optional core course
+     *
+     * @param course Course to check in plan
+     * @return true/false if the course is an optional core course
+     */
+    public boolean isElect(Course course) {
+        for (Course currentClass : electives) {
+            if (course.equals(currentClass))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a course is an optional core course
+     *
+     * @param course Course to check in plan
+     * @return true/false if the course is an optional core course
+     */
+    public boolean isAdd(Course course) {
+        for (Course currentClass : additional) {
             if (course.equals(currentClass))
                 return true;
         }
@@ -321,6 +383,10 @@ public class Plan {
                 return requiredCore;
             case OPTIONAL:
                 return optionalCore;
+            case ELECTIVE:
+                return electives;
+            case ADDITIONAL:
+                return additional;
             case PRE:
                 List<Course> prereq = new ArrayList<>();
                 prereq.addAll(admissionPrerequisites);
@@ -341,7 +407,6 @@ public class Plan {
     public List<Course> getTrackPrerequisites() { return trackPrerequisites; }
     public List<String> getExcludedElectives() { return excludedElectives; }
     public Concentration getConcentration() { return concentration; }
-
     public Set<String> getUtdCatalogCourseNums() {
         return utdCatalogCourseNums;
     }
