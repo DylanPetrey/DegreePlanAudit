@@ -172,35 +172,6 @@ public class Plan {
         }
     }
 
-    public void addThesisCourse(Course core, Course elect, Course add){
-        if(core == null || elect == null || add == null)
-            return;
-        if(!requiredCore.contains(core)) {
-            coreThesis = core;
-            this.requiredCore.add(core);
-        }
-        if(!electives.contains(elect)) {
-            electThesis = elect;
-            this.electives.add(elect);
-        }
-        if(!additional.contains(add)) {
-            addThesis = add;
-            this.additional.add(add);
-        }
-    }
-
-    public void removeThesisCourse(Course core, Course elect, Course add){
-        if(core == null || elect == null || add == null)
-            return;
-        if(requiredCore.contains(core))
-            this.requiredCore.remove(core);
-        if(requiredCore.contains(elect))
-            this.requiredCore.remove(elect);
-        if(requiredCore.contains(add))
-            this.requiredCore.remove(add);
-    }
-
-
     private String getPrefix() {
         try {
             if (concentration.toString().equals("Software-Engineering"))

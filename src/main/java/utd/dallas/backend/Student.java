@@ -94,7 +94,7 @@ public class Student {
      * @param concentration New degree plan that the student is switching to
      */
     public void setCurrentPlan(Plan.Concentration concentration) {
-        this.currentPlan.setConcentration(concentration, thesis);
+        this.currentPlan.setConcentration(concentration);
 
         resetCourseList();
         fillFromTranscript();
@@ -306,24 +306,15 @@ public class Student {
 
     private void removeThesis(Course core, Course elect, Course add){
         currentPlan.removeThesisCourse(core, elect, add);
-        List<StudentCourse> removeList = new ArrayList<>();
         for(int i = 0; i< thesisCourses.length; i++) {
             try {
-                if (needsToBeRemoved(thesisCourses[i].getValue()))
-                    removeList.add(thesisCourses[i].getValue());
-            } catch (NullPointerException ignore) {}
+                StudentCourse current = thesisCourses[i].getValue();
+                if (current.getType() != Course.CourseType.OTHER && current.getSemester().isEmpty())
+                    courseList.remove(current);
+                else
+                    current.setType(Course.CourseType.OTHER);
+            }catch (NullPointerException ignore) { }
         }
-        courseList.removeAll(removeList);
-    }
-
-    private boolean needsToBeRemoved(Course course) {
-        for (StudentCourse targetCourse : courseList) {
-            if (targetCourse.getCourseNumber().equals(course.getCourseNumber()) && !targetCourse.getSemester().isEmpty()) {
-                targetCourse.setType(Course.CourseType.OTHER);
-                return false;
-            }
-        }
-        return true;
     }
 
     public void setFastTrack(boolean fastTrack) { this.fastTrack = fastTrack;}
