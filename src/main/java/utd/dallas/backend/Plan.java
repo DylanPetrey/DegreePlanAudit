@@ -206,10 +206,10 @@ public class Plan {
             return;
         if(requiredCore.contains(core))
             this.requiredCore.remove(core);
-        if(requiredCore.contains(elect))
-            this.requiredCore.remove(elect);
-        if(requiredCore.contains(add))
-            this.requiredCore.remove(add);
+        if(electives.contains(elect))
+            this.electives.remove(elect);
+        if(additional.contains(add))
+            this.additional.remove(add);
     }
 
 
@@ -235,7 +235,7 @@ public class Plan {
      */
     public boolean isCore(Course course) {
         for (Course currentClass : requiredCore) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -249,7 +249,7 @@ public class Plan {
      */
     public boolean isOpt(Course course) {
         for (Course currentClass : optionalCore) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -263,7 +263,7 @@ public class Plan {
      */
     public boolean isElect(Course course) {
         for (Course currentClass : electives) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -277,7 +277,7 @@ public class Plan {
      */
     public boolean isAdd(Course course) {
         for (Course currentClass : additional) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -291,7 +291,7 @@ public class Plan {
      */
     public boolean isTrack(Course course) {
         for (Course currentClass : trackPrerequisites) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -305,7 +305,7 @@ public class Plan {
      */
     public boolean isPre(Course course) {
         for (Course currentClass : admissionPrerequisites) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;

@@ -41,6 +41,7 @@ public class Course {
         this.courseNumber = another.courseNumber;
         this.courseTitle = another.courseTitle;
         this.type = another.type;
+
     }
 
     /**
@@ -89,6 +90,11 @@ public class Course {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(courseNumber);
+    }
+
     /**
      * Accessor methods to be used outside the class.
      */
@@ -98,7 +104,6 @@ public class Course {
     public String getCourseTitle() { return courseTitle; }
     public String getDescription() { return description; }
     public String getHours() { return hours; }
-
 
     /**
      * Mutator methods to be used outside the class.

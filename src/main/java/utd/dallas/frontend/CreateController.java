@@ -350,7 +350,6 @@ public class CreateController {
             DDHandler.createDragListener(card);
             currentScene.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
                 if (inHierarchy(evt.getPickResult().getIntersectedNode(), card.summaryCard.getDeleteButton())) {
-                    String courseNum = card.getCurrentCourse().getCourseNumber();
                     currentStudent.getCourseList().remove(card.getCurrentCourse());
                     card.getParent().getObservableCard().remove(card);
 

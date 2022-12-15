@@ -159,7 +159,7 @@ public class Student {
     private void fillCourse(HashMap<String, List<String>> filledCourses, StudentCourse trans) {
         boolean found = false;
         for (StudentCourse course : courseList) {
-            if (course.equals(trans) && !filledCourses.getOrDefault(course.getCourseNumber(), new ArrayList<>()).contains(course.getSemester())) {
+            if (course.getCourseNumber().equals(trans.getCourseNumber()) && !filledCourses.getOrDefault(course.getCourseNumber(), new ArrayList<>()).contains(course.getSemester())) {
                 course.setCourseVariables(trans);
                 found = true;
                 break;

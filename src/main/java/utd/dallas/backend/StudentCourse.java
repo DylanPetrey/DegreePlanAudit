@@ -7,13 +7,14 @@ import java.util.Objects;
 
 public class StudentCourse extends Course {
     private String letterGrade = "";
-    private String semester = "";
     private double attempted = 0;
     private double earned = 0;
     private double points = 0;
     private String transfer = "";
     private boolean isWaived = false;
     private boolean fromTranscript = false;
+    private String semester = "";
+
 
     public StudentCourse(){
     }
@@ -32,14 +33,14 @@ public class StudentCourse extends Course {
     } 
 
     public StudentCourse(CourseType type){
-        this.type = type;
+        this.setType(type);
     }
 
     public StudentCourse(Course course, CourseType type) {
         setCourseNumber(course.getCourseNumber());
         setCourseTitle(course.getCourseTitle());
         setHours(course.getHours());
-        this.type = type;
+        this.setType(type);
     }
 
     public StudentCourse(String id, String title, String hours, CourseType type) {
@@ -58,9 +59,9 @@ public class StudentCourse extends Course {
     }
 
     public void setCourseVariables(StudentCourse newCourse){
-        setCourseNumber(newCourse.getCourseNumber());
-        setHours(newCourse.getHours());
-        semester = newCourse.getSemester();
+        this.setCourseNumber(newCourse.getCourseNumber());
+        this.setHours(newCourse.getHours());
+        this.semester = newCourse.getSemester();
         attempted = newCourse.getAttempted();
         points = newCourse.getPoints();
         earned = newCourse.getEarned();
@@ -99,6 +100,20 @@ public class StudentCourse extends Course {
         points = Double.parseDouble(tokens[tokens.length - 1]);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StudentCourse)) return false;
+        if (!super.equals(o)) return false;
+        StudentCourse course = (StudentCourse) o;
+        return getCourseNumber().equals(course.getCourseNumber()) && Objects.equals(semester, course.getSemester());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCourseNumber(), semester);
+    }
+
     /**
      * Creates a string of the course similar to how it will look on the final audit pdf
      *
@@ -123,10 +138,9 @@ public class StudentCourse extends Course {
 
 
 
-    public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
     public void setWaived(boolean waived) { this.isWaived = waived; }
 
-
+    public void setSemester(String semester) { this.semester = semester; }
 }
