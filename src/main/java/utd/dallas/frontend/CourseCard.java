@@ -65,8 +65,10 @@ public class CourseCard {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-                    summary.setStyle("-fx-border-color: black; -fx-border-radius:  5;  -fx-padding: 5");
-                    card.setVisible(true);
+                    if(mouseEvent.getClickCount() == 2){
+                        summary.setStyle("-fx-border-color: black; -fx-border-radius:  5;  -fx-padding: 5");
+                        card.setVisible(true);
+                    }
                 }
             }
         });

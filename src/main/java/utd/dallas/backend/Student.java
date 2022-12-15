@@ -82,7 +82,8 @@ public class Student {
         StudentCourse newCourse = new StudentCourse(line, semester, transfer);
         try {
             newCourse.setCourseTitle(currentPlan.getCourseTitle(newCourse.getCourseNumber()));
-            newCourse.setHours(currentPlan.getCourseHours(newCourse.getCourseNumber()));
+            if(newCourse.getHours().isEmpty() || newCourse.getHours().equals("0") || newCourse.getHours() == null)
+                newCourse.setHours(currentPlan.getCourseHours(newCourse.getCourseNumber()));
         } catch (Exception ignore){ }
 
         transcriptList.add(newCourse);

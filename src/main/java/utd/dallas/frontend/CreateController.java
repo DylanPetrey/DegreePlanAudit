@@ -336,6 +336,8 @@ public class CreateController {
             String num = target.currentCourse.getCourseNumber();
             String title = currentStudent.getCurrentPlan().getCourseTitle(num);
             String hours = currentStudent.getCurrentPlan().getCourseHours(num);
+            if(hours.isEmpty() || hours.equals("0"))
+                hours = target.currentCourse.getHours();
             target.getCurrentCourse().setCourseTitle(title);
             target.getCourseTitleField().setText(title);
             target.getCurrentCourse().setHours(hours);
