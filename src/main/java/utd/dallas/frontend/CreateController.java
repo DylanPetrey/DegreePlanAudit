@@ -120,7 +120,7 @@ public class CreateController {
             onSWEButtonClick();
         else
             onCSButtonClick();
-        
+
         thesis.setSelected(currentStudent.isThesis());
         createThesisListener();
     }
@@ -193,7 +193,7 @@ public class CreateController {
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
             Mediator.getInstance().setDefaultDirectory(file.getParent());
-            
+
             Form AuditPDF = new Form(currentStudent);
             AuditPDF.print(file.getAbsolutePath());
 
