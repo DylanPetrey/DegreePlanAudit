@@ -278,6 +278,7 @@ public class Audit {
                     if (runs != null) {
                         for (String key : WordReplace.keySet()) {
                             for (XWPFRun r : runs) {
+                                r.setFontFamily("Calibri");
                                 String text = r.getText(0);
                                 if (text != null && text.contains(key)) {
                                     text = text.replace(key, WordReplace.getOrDefault(key, " "));
