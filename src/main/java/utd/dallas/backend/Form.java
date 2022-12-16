@@ -1,6 +1,7 @@
 package utd.dallas.backend;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.commons.io.FilenameUtils;
 
 import utd.dallas.backend.Course.CourseType;
 
@@ -18,11 +20,13 @@ public class Form {
 
     private PDAcroForm acroForm;
     private Student student;
+
     private Plan plan;
+    private String filePath;
 
     /**
      * Constructs a Form object for the given student
-     * 
+     *
      * @param student
      */
     public Form(Student student) {
@@ -37,7 +41,7 @@ public class Form {
      * @return Nothing
      */ 
     public void print(String filePath) {
-
+        this.filePath = filePath;
         String loc = "";
         PDDocument pdfDocument = null;
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -83,7 +87,6 @@ public class Form {
             pdfDocument.close();
         } catch (IOException e) {}
     }
-
 
     private InputStream getInputStream(String fileName) {
         InputStream inputStream = null;
@@ -212,5 +215,8 @@ public class Form {
     public PDAcroForm getAcroForm(){
         return acroForm;
     }
+
+    public String getFilePath(){ return filePath; }
+
 
 }

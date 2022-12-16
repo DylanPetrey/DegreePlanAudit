@@ -46,9 +46,14 @@ public class Plan {
     private long numOptional = 0;
     private List<Course> requiredCore = new ArrayList<Course>();
     private List<Course> optionalCore = new ArrayList<Course>();
+    private List<Course> electives = new ArrayList<Course>();
+    private List<Course> additional = new ArrayList<Course>();
     private List<Course> admissionPrerequisites = new ArrayList<Course>();
     private List<Course> trackPrerequisites = new ArrayList<Course>();
     private List<String> excludedElectives = new ArrayList<String>();
+    Course coreThesis = new Course();
+    Course electThesis = new Course();
+    Course addThesis = new Course();
 
     /**
      * Initializes empty plan object
@@ -136,6 +141,7 @@ public class Plan {
     public void setConcentration(Concentration plan) {
         this.concentration = plan;
         JSONParser parser = new JSONParser();
+
         try {
             Object obj = parser.parse(new InputStreamReader(getInputStream(degreeRequirementsJSON)));
 
@@ -148,6 +154,9 @@ public class Plan {
 
             JSONArray optionalCore = (JSONArray) jsonCurrentPlan.get("optionalCore");
             this.optionalCore = toList(optionalCore, Course.CourseType.OPTIONAL);
+
+            this.electives = new ArrayList<>();
+            this.additional = new ArrayList<>();
 
             JSONArray admissionPrerequisite = (JSONArray) jsonCurrentPlan.get("admissionPrerequisites");
             this.admissionPrerequisites = toList(admissionPrerequisite, Course.CourseType.PRE);
@@ -162,6 +171,47 @@ public class Plan {
             e.printStackTrace();
         }
     }
+
+    private String getPrefix() {
+        try {
+            if (concentration.toString().equals("Software-Engineering"))
+                return "SE ";
+            else
+                return "CS ";
+        }catch (Exception e){
+            return "CS ";
+        }
+    }
+
+
+    public void addThesisCourse(Course core, Course elect, Course add){
+        if(core == null || elect == null || add == null)
+            return;
+        if(!requiredCore.contains(core)) {
+            coreThesis = core;
+            this.requiredCore.add(core);
+        }
+        if(!electives.contains(elect)) {
+            electThesis = elect;
+            this.electives.add(elect);
+        }
+        if(!additional.contains(add)) {
+            addThesis = add;
+            this.additional.add(add);
+        }
+    }
+
+    public void removeThesisCourse(Course core, Course elect, Course add){
+        if(core == null || elect == null || add == null)
+            return;
+        if(requiredCore.contains(core))
+            this.requiredCore.remove(core);
+        if(electives.contains(elect))
+            this.electives.remove(elect);
+        if(additional.contains(add))
+            this.additional.remove(add);
+    }
+
 
     /**
      * Retrieves a new course object if it is an optional course in the degree plan
@@ -185,7 +235,7 @@ public class Plan {
      */
     public boolean isCore(Course course) {
         for (Course currentClass : requiredCore) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -199,7 +249,35 @@ public class Plan {
      */
     public boolean isOpt(Course course) {
         for (Course currentClass : optionalCore) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a course is an optional core course
+     *
+     * @param course Course to check in plan
+     * @return true/false if the course is an optional core course
+     */
+    public boolean isElect(Course course) {
+        for (Course currentClass : electives) {
+            if (currentClass.equals(course))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a course is an optional core course
+     *
+     * @param course Course to check in plan
+     * @return true/false if the course is an optional core course
+     */
+    public boolean isAdd(Course course) {
+        for (Course currentClass : additional) {
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -213,7 +291,7 @@ public class Plan {
      */
     public boolean isTrack(Course course) {
         for (Course currentClass : trackPrerequisites) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -227,7 +305,7 @@ public class Plan {
      */
     public boolean isPre(Course course) {
         for (Course currentClass : admissionPrerequisites) {
-            if (course.equals(currentClass))
+            if (currentClass.equals(course))
                 return true;
         }
         return false;
@@ -323,6 +401,10 @@ public class Plan {
                 return requiredCore;
             case OPTIONAL:
                 return optionalCore;
+            case ELECTIVE:
+                return electives;
+            case ADDITIONAL:
+                return additional;
             case PRE:
                 List<Course> prereq = new ArrayList<>();
                 prereq.addAll(admissionPrerequisites);
@@ -339,11 +421,13 @@ public class Plan {
     public long getNumOptional() { return numOptional; }
     public List<Course> getCore() { return requiredCore; }
     public List<Course> getOptionalCore() { return optionalCore; }
+
+    public List<Course> getElectives() { return electives; }
+    public List<Course> getAdditional() { return additional; }
     public List<Course> getAdmissionPrerequisites() { return admissionPrerequisites; }
     public List<Course> getTrackPrerequisites() { return trackPrerequisites; }
     public List<String> getExcludedElectives() { return excludedElectives; }
     public Concentration getConcentration() { return concentration; }
-
     public Set<String> getUtdCatalogCourseNums() {
         return utdCatalogCourseNums;
     }

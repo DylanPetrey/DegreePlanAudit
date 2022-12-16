@@ -1,14 +1,15 @@
 package utd.dallas.backend;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
+
+import java.io.*;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -19,15 +20,13 @@ public class Audit {
     // Student variables
     private final Student currentStudent;
     private final List<StudentCourse> filledCourses;
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+    private static final DecimalFormat df = new DecimalFormat("0.000");
 
 
     // List of courses divided up by type
     private final List<StudentCourse> coreList = new ArrayList<>();
     private final List<StudentCourse> electList = new ArrayList<>();
     private final List<StudentCourse> preList = new ArrayList<>();
-    List<StudentCourse> currentSemester = new ArrayList<>();
-
 
     // GPA Variables
     private double combinedGPA = 0;
@@ -42,8 +41,8 @@ public class Audit {
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
-    HashMap<String, String> WordReplace = new HashMap<>();
-    String filePath;
+    private HashMap<String, String> WordReplace = new HashMap<>();
+    private String filePath;
 
 
     /**
@@ -51,7 +50,7 @@ public class Audit {
      *
      * @param currentStudent current student object
      */
-    public Audit(Student currentStudent, String filePath){
+    public Audit(Student currentStudent, String filePath) {
         this.currentStudent = currentStudent;
         this.filePath = filePath;
         this.filledCourses = currentStudent.getCleanCourseList();
@@ -59,15 +58,26 @@ public class Audit {
         fillReplacementValues();
     }
 
+    private InputStream getInputStream(String fileName) {
+        InputStream inputStream = null;
+        try {
+            inputStream =  Plan.class.getResourceAsStream(fileName);
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+        return inputStream;
+    }
+
+
     /**
      * This function calculates the core, elective, and cumulative GPA values
      */
-    private void fillStudentPlanCourses(){
+    private void fillStudentPlanCourses() {
         filledCourses.stream()
-                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE)
+                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.CORE && !studentCourse.getSemester().isEmpty())
                 .forEach(coreList::add);
         filledCourses.stream()
-                .filter(studentCourse -> studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL)
+                .filter(studentCourse -> (studentCourse.getType() == Course.CourseType.ELECTIVE || studentCourse.getType() == Course.CourseType.ADDITIONAL) && !studentCourse.getSemester().isEmpty())
                 .forEach(electList::add);
         filledCourses.stream()
                 .filter(studentCourse -> studentCourse.getType() == Course.CourseType.PRE)
@@ -85,7 +95,7 @@ public class Audit {
      * @param courseList list of courses to get the GPA from
      * @return gpa value rounded to 3 digits
      */
-    private double calcGPA(List<StudentCourse> courseList){
+    private double calcGPA(List<StudentCourse> courseList) {
         final double A_GRADEPTS = 4.000;
         final double A_MINUS_GRADEPTS = 3.670;
         final double B_PLUS_GRADEPTS = 3.330;
@@ -101,182 +111,295 @@ public class Audit {
             String letterGrade = studentCourse.getLetterGrade();
             int finalCurrentHour = Integer.parseInt(studentCourse.getHours());
             if (letterGrade.equalsIgnoreCase("A") || letterGrade.equalsIgnoreCase("A+"))
-                totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (A_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("A-"))
-                totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (A_MINUS_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("B+"))
-                        totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (B_PLUS_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("B"))
-                        totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (B_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("B-"))
-                        totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (B_MINUS_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("C+"))
-                totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (C_PLUS_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("C"))
-                totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (C_GRADEPTS * finalCurrentHour)));
             else if (letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
-                totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*finalCurrentHour)));
+                totalPoints.updateAndGet(v -> (v + (F_GRADEPTS * finalCurrentHour)));
             else
                 return;
 
-            totalHours.updateAndGet(v -> (v+finalCurrentHour));
+            totalHours.updateAndGet(v -> (v + finalCurrentHour));
         });
 
         double GPA = totalPoints.get() / totalHours.get();
-        double scale = Math.pow(10, 3);
-        return Math.round(GPA * scale) / scale;
-    }
-
-    private double calcOverallGPA(List<StudentCourse> courseList, int hours){
-        final double A_GRADEPTS = 4.000;
-        final double A_MINUS_GRADEPTS = 3.670;
-        final double B_PLUS_GRADEPTS = 3.330;
-        final double B_GRADEPTS = 3.000;
-        final double B_MINUS_GRADEPTS = 2.670;
-        final double C_PLUS_GRADEPTS = 2.330;
-        final double C_GRADEPTS = 2.000;
-        final double F_GRADEPTS = 0.000;
-        AtomicReference<Double> totalPoints = new AtomicReference<>((double) 0);
-        AtomicReference<Double> totalHours = new AtomicReference<>((double) 0);
-
-        courseList.forEach(studentCourse -> {
-            String letterGrade = studentCourse.getLetterGrade();
-            int finalCurrentHour = Integer.parseInt(studentCourse.getHours());
-            if (letterGrade.equalsIgnoreCase("A") || letterGrade.equalsIgnoreCase("A+"))
-                totalPoints.updateAndGet(v -> (v+(A_GRADEPTS* finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("A-"))
-                totalPoints.updateAndGet(v -> (v+(A_MINUS_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("B+"))
-                totalPoints.updateAndGet(v -> (v+(B_PLUS_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("B"))
-                totalPoints.updateAndGet(v -> (v+(B_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("B-"))
-                totalPoints.updateAndGet(v -> (v+(B_MINUS_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("C+"))
-                totalPoints.updateAndGet(v -> (v+(C_PLUS_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("C"))
-                totalPoints.updateAndGet(v -> (v+(C_GRADEPTS*finalCurrentHour)));
-            else if (letterGrade.equalsIgnoreCase("F") || letterGrade.equalsIgnoreCase("D+") || letterGrade.equalsIgnoreCase("D") || letterGrade.equalsIgnoreCase("D-"))
-                totalPoints.updateAndGet(v -> (v+(F_GRADEPTS*finalCurrentHour)));
-            else
-                return;
-
-            totalHours.updateAndGet(v -> (v+finalCurrentHour));
-        });
-
-        double GPA = totalPoints.get() / hours;
-        double scale = Math.pow(10, 3);
-        return Math.round(GPA * scale) / scale;
+        return GPA;
     }
 
 
     /**
      * Prints the GPA as seen on the sample audit
      */
-
-
-    public String getOutstanding(){
+    public String getOutstanding() {
         String res = "";
 
-        int coreHours = getTotalHours(coreList);
-        int electHours = getTotalHours(currentStudent.getCourseType(Course.CourseType.ELECTIVE));
-        if(coreHours < REQUIRED_CORE_HOURS) {
-            int dif = REQUIRED_CORE_HOURS - coreHours;
-            double target = getNeededGPA(coreGPA, coreHours, MIN_CORE_GPA, REQUIRED_CORE_HOURS);
-            if(target <= 0)
-                res += "The student must pass " + printCourses(currentSemester) + "\n";
-            else
-                res += "The student needs a GPA >= " + df.format(target) + " in the remaining courses\n";
-        }
-        if(electHours < REQUIRED_ELECTIVE_HOURS){
-            int dif = 15 - electHours;
-            double target = getNeededGPA(electiveGPA, electHours, MIN_ELECT_GPA, REQUIRED_ELECTIVE_HOURS);
-            if(target <= 0)
-                res += "The student must pass " + printCourses(currentSemester) + "\n";
-            else
-                res += "The student needs a GPA >= " + String.valueOf(target) + " in the remaining courses\n";
-        }
-        if(getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL)) < 3)
-            res += "The student needs 3 hours of an additional elective credit\n";
+        int coreHours = getCompletedHours(coreList);
+        int electHours = getCompletedHours(currentStudent.getCourseType(Course.CourseType.ELECTIVE));
+        int addHours = getCompletedHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL));
+
+        if (coreHours < REQUIRED_CORE_HOURS)
+            res += printCoreRequirements(coreHours);
+
+        if (electHours < REQUIRED_ELECTIVE_HOURS)
+            res += printElectRequirements(electHours);
+
+        if (addHours < MIN_ADD_ELECTIVE_HOURS)
+            res += printAdditionalRequirements();
+
+        if (res.isEmpty())
+            res = "None";
 
         return res;
+    }
 
+    public String printCoreRequirements(int coreHours) {
+        StringBuilder res = new StringBuilder();
+        double targetGPA = getNeededGPA(coreGPA, coreHours, MIN_CORE_GPA, REQUIRED_CORE_HOURS);
+
+        if (targetGPA <= 0)
+            res.append(printPass(coreList));
+        else
+            res.append(printOutstandingGPA(targetGPA, coreList, currentStudent.getCurrentPlan().getCore()));
+
+        int numOptional = getNumOptional(coreList);
+        if (numOptional > 0)
+            res.append(printOptional(numOptional));
+
+        if (!res.toString().isEmpty())
+            res.append(".\n");
+
+        return res.toString();
+    }
+
+    public String printElectRequirements(int electHours) {
+        StringBuilder res = new StringBuilder();
+        double targetGPA = getNeededGPA(electiveGPA, electHours, MIN_ELECT_GPA, REQUIRED_ELECTIVE_HOURS - thesisHours());
+
+        List<StudentCourse> electives = currentStudent.getCourseType(Course.CourseType.ELECTIVE);
+
+        if (targetGPA <= 0)
+            res.append(printPass(electives));
+        else
+            res.append(printOutstandingGPA(targetGPA, electives, currentStudent.getCurrentPlan().getElectives()));
+
+        int remainingHours = getTotalHours(electList) - electHours;
+
+        if (remainingHours > 0) {
+            res.append(" and ").append(remainingHours).append("  approved elective credit");
+            if (remainingHours != 1)
+                res.append("s");
+        }
+
+        if (!res.toString().isEmpty())
+            res.append(".\n");
+
+        return res.toString();
+    }
+
+    public String printAdditionalRequirements() {
+        StringBuilder res = new StringBuilder();
+
+        int remaining = MIN_ADD_ELECTIVE_HOURS - getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL));
+
+        res.append(printOutstandingAdditional(remaining));
+
+        return res.toString();
+    }
+
+    public String printPass(List<StudentCourse> courseList) {
+        List<StudentCourse> currentSemester = getCurrentSemesterCourses(courseList);
+        if (currentSemester.size() == 0)
+            return "";
+
+        return "The student must pass " + printCourses(currentSemester, false);
+    }
+
+    public String printOutstandingGPA(double target, List<StudentCourse> courseList, List<Course> plan) {
+        List<Course> outstandingCore = getOutstandingFromPlan(plan, courseList);
+        outstandingCore.addAll(getCurrentSemesterCourses(courseList));
+
+        String courseString = "";
+        if (outstandingCore.size() != 0)
+            courseString = printCourses(outstandingCore, false) + " ";
+
+        return "The student needs a GPA >= " + df.format(target) + " in" + courseString;
+    }
+
+    private String printOutstandingAdditional(int remainingHours) {
+        List<Course> outstanding = getOutstandingFromPlan(currentStudent.getCurrentPlan().getAdditional(), filledCourses);
+        outstanding.addAll(getCurrentSemesterCourses(currentStudent.getCourseType(Course.CourseType.ADDITIONAL)));
+
+        if (outstanding.size() == 0)
+            return printRemainingHours(remainingHours, false);
+        else
+            return "The student must complete " + printCourses(outstanding, false) + printRemainingHours(remainingHours, true);
 
     }
 
-    private double getNeededGPA(double currentGPA, double currentHours, double targetGPA, int totalHours){
-        return ((targetGPA*totalHours)-(currentGPA*currentHours))/(totalHours - currentHours);
+    private String printRemainingHours(int remainingHours, boolean hasCourses) {
+        String res = "";
+
+        if (remainingHours <= 0)
+            return res;
+
+        if (hasCourses)
+            res = " and ";
+        else
+            res = "The student needs ";
+
+        if (remainingHours == 1)
+            res += remainingHours + " hour of additional elective credit.";
+        else if (remainingHours > 1)
+            res += remainingHours + " hours of additional elective credits.";
+
+        return res;
     }
 
-    public int getTotalHours(List<StudentCourse> courseList){
+    private List<StudentCourse> getCurrentSemesterCourses(List<StudentCourse> courseList) {
+        List<StudentCourse> current = new ArrayList<>();
+        // Get
+        for (StudentCourse s : courseList) {
+            if (!s.getSemester().isEmpty() && s.getLetterGrade().isEmpty())
+                current.add(s);
+        }
+
+        return current;
+    }
+
+
+    private List<Course> getOutstandingFromPlan(List<Course> plan, List<StudentCourse> student) {
+        List<Course> out = new ArrayList<>();
+
+        for (Course course : plan) {
+            if (!student.contains(course))
+                out.add(course);
+        }
+
+        return out;
+    }
+
+    public String printOptional(int numOptional) {
+        List<Course> outstanding = getOutstandingFromPlan(currentStudent.getCurrentPlan().getOptionalCore(), filledCourses);
+        if (outstanding.size() == 0)
+            return "";
+
+        return " and " + numOptional + " of " + printCourses(outstanding, false);
+    }
+
+    private int getNumOptional(List<StudentCourse> courseList) {
+        int num = (int) currentStudent.getCurrentPlan().getNumOptional();
+
+        for (StudentCourse course : courseList) {
+            if (currentStudent.getCurrentPlan().isOpt(course))
+                num--;
+        }
+
+        return num;
+    }
+
+
+    private double getNeededGPA(double currentGPA, double currentHours, double targetGPA, int totalHours) {
+        return ((targetGPA * totalHours) - (currentGPA * currentHours)) / (totalHours - currentHours);
+    }
+
+
+    /**
+     * Method to get the number of hours in for thesis courses in the current semester
+     *
+     * @return
+     */
+    private int thesisHours() {
+        int hours = 0;
+        for (StudentCourse course : electList) {
+            if (course.getCourseNumber().contains("6V98") && !course.getSemester().isEmpty() && course.getLetterGrade().isEmpty() && course.getType() == Course.CourseType.ELECTIVE) {
+                hours += Integer.parseInt(course.getHours());
+            }
+        }
+        return hours;
+    }
+
+    public int getCompletedHours(List<StudentCourse> courseList) {
         int total = 0;
-        for(StudentCourse c : courseList){
-            if(!c.getSemester().isEmpty() && isPassingGrade(c.getLetterGrade()))
+        for (StudentCourse c : courseList) {
+            if (!c.getSemester().isEmpty() && isPassingGrade(c.getLetterGrade()))
                 total += Integer.parseInt(c.getHours());
         }
         return total;
     }
 
-
-    private void fillCurrentSemester(){
-        for(StudentCourse s : currentStudent.getCourseList()) {
-            if(!s.getSemester().isEmpty() && s.getLetterGrade().isEmpty())
-                currentSemester.add(s);
+    public int getTotalHours(List<StudentCourse> courseList) {
+        int total = 0;
+        for (StudentCourse c : courseList) {
+            if (!c.getSemester().isEmpty() && !c.getHours().isEmpty())
+                total += Integer.parseInt(c.getHours());
         }
+        return total;
     }
 
-    private String printPrereq(StudentCourse pre){
-        String res = "";
-        if(pre.isWaived())
-            res = pre.getCourseNumber() + " - " + "Waived";
-        else if(!pre.getSemester().isEmpty() && isPassingGrade(pre.getLetterGrade())){
-            res = pre.getCourseNumber() + " - " + pre.getSemester();
+    private String printCourses(List<? extends Course> courseList, boolean newline) {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < courseList.size(); i++) {
+            res.append(courseList.get(i));
+            if (i < courseList.size() - 1)
+                res.append(", ");
+            else if (newline)
+                res.append("\n");
         }
+        return res.toString();
+    }
+
+
+    private String printPre() {
+        StringBuilder res = new StringBuilder();
+        if (preList.size() == 0)
+            res.append("None");
+        for (StudentCourse course : preList)
+            res.append(printPrereq(course)).append("\n");
+        return res.toString();
+    }
+
+    private String printPrereq(StudentCourse pre) {
+        String res = "";
+        if (pre.isWaived())
+            res = pre.getCourseNumber() + " - " + "Waived";
+        else if (!pre.getSemester().isEmpty() && isPassingGrade(pre.getLetterGrade()))
+            res = pre.getCourseNumber() + " - " + pre.getSemester();
+        else if (!pre.getSemester().isEmpty())
+            res = pre.getCourseNumber() + " - " + "In progress";
         else
             res = pre.getCourseNumber() + " - " + "Not satisfied";
         return res;
     }
 
-    private String printCourses(List<StudentCourse> courseList){
-        String res = "";
-        for(int i = 0; i < courseList.size(); i++){
-            res += courseList.get(i);
-            if(i < courseList.size()-1)
-                res += ", ";
-            else
-                res += "\n";
-        }
-        return res;
-    }
-
-    private String printPre(){
-        String res = "";
-        if(preList.size() == 0)
-            res += "N/A";
-        for(StudentCourse course : preList)
-            res += printPrereq(course) + "\n";
-        return res;
-    }
-
-    private boolean isPassingGrade(String grade){
+    private boolean isPassingGrade(String grade) {
         Pattern stringPattern = Pattern.compile("(^[A-C].?)|P|CR");
         Matcher m = stringPattern.matcher(grade);
         return m.find();
     }
 
-    public void fillReplacementValues(){
+    public void fillReplacementValues() {
         WordReplace.put("$$name$$", currentStudent.getStudentName());
         WordReplace.put("$$id$$", currentStudent.getStudentId());
-        WordReplace.put("$$plan$$", "Master") ;
+        WordReplace.put("$$plan$$", "Master");
         WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
         WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString().replace('-', ' '));
 
-        WordReplace.put("coregpa", String.valueOf(calcGPA(coreList)));
-        WordReplace.put("electivegpa", String.valueOf(calcGPA(electList)));
-        WordReplace.put("combinedgpa", String.valueOf(combinedGPA));
+        WordReplace.put("coregpa", df.format(calcGPA(coreList)));
+        WordReplace.put("electivegpa", df.format(calcGPA(electList)));
+        WordReplace.put("combinedgpa", df.format(combinedGPA));
 
-        WordReplace.put("corelist", printCourses(coreList));
-        WordReplace.put("electivelist", printCourses(electList));
+        WordReplace.put("corelist", printCourses(coreList, true));
+        WordReplace.put("electivelist", printCourses(electList, true));
 
         WordReplace.put("prelist", printPre());
         WordReplace.put("outstandingreq", getOutstanding());
@@ -284,15 +407,22 @@ public class Audit {
         findAndReplace();
     }
 
+    public static void copyInputStreamToFile(InputStream input, File file) {
+        try (OutputStream output = new FileOutputStream(file)) {
+            input.transferTo(output);
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+    }
     private void findAndReplace() {
-        String pathOriginal = "src/main/resources/utd/dallas/backend/SampleAudit/";
-        String templateDoc = "EmptyReport.docx";
+
+        String pathOriginal = "AuditDocument/EmptyReport.docx";
+
         try {
             // finds the path of the operating system temp folder to create a temporary file
             String tempPath = System.getenv("TEMP") + "\\temp.docx";
-            Path dirOrigem = Paths.get(pathOriginal + templateDoc);
             Path dirDestino = Paths.get(tempPath);
-            Files.copy(dirOrigem, dirDestino, StandardCopyOption.REPLACE_EXISTING);
+            copyInputStreamToFile(Plan.class.getResourceAsStream(pathOriginal), dirDestino.toFile());
 
             try (XWPFDocument doc = new XWPFDocument(OPCPackage.open(tempPath))) {
                 for (XWPFParagraph p : doc.getParagraphs()) {
@@ -300,22 +430,29 @@ public class Audit {
                     if (runs != null) {
                         for (String key : WordReplace.keySet()) {
                             for (XWPFRun r : runs) {
+                                r.setFontFamily("Calibri");
                                 String text = r.getText(0);
                                 if (text != null && text.contains(key)) {
                                     text = text.replace(key, WordReplace.getOrDefault(key, " "));
-                                    r.setText(text, 0);
+                                    String[] textArray = text.split("\n");
+                                    r.setText(textArray[0], 0);
+                                    for (int i = 1; i < textArray.length; i++) {
+                                        r.addBreak();
+                                        r.setText(textArray[i]);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                doc.write(new FileOutputStream(filePath));
-                doc.close();
+                FileOutputStream fos = new FileOutputStream(filePath);
+                doc.write(fos);
+                fos.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

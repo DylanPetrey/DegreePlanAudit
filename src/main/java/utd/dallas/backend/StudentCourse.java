@@ -3,16 +3,18 @@ package utd.dallas.backend;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class StudentCourse extends Course {
     private String letterGrade = "";
-    private String semester = "";
     private double attempted = 0;
     private double earned = 0;
     private double points = 0;
     private String transfer = "";
     private boolean isWaived = false;
     private boolean fromTranscript = false;
+    private String semester = "";
+
 
     public StudentCourse(){
     }
@@ -31,7 +33,14 @@ public class StudentCourse extends Course {
     } 
 
     public StudentCourse(CourseType type){
-        this.type = type;
+        this.setType(type);
+    }
+
+    public StudentCourse(Course course, CourseType type) {
+        setCourseNumber(course.getCourseNumber());
+        setCourseTitle(course.getCourseTitle());
+        setHours(course.getHours());
+        this.setType(type);
     }
 
     public StudentCourse(String id, String title, String hours, CourseType type) {
@@ -47,6 +56,20 @@ public class StudentCourse extends Course {
         this.fromTranscript = true;
 
         processInput(input);
+    }
+
+    public void setCourseVariables(StudentCourse newCourse){
+        this.setCourseNumber(newCourse.getCourseNumber());
+        this.setHours(newCourse.getHours());
+        this.semester = newCourse.getSemester();
+        attempted = newCourse.getAttempted();
+        points = newCourse.getPoints();
+        earned = newCourse.getEarned();
+        letterGrade = newCourse.getLetterGrade();
+        isWaived = newCourse.isWaived();
+        transfer = newCourse.getTransfer();
+        fromTranscript = newCourse.isFromTranscript();
+        type = newCourse.getType();
     }
 
     /**
@@ -77,19 +100,33 @@ public class StudentCourse extends Course {
         points = Double.parseDouble(tokens[tokens.length - 1]);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Course) {
+            if (obj instanceof StudentCourse){
+                return super.equals(obj) && semester == ((StudentCourse) obj).getSemester();
+            } else
+                return super.equals(obj);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCourseNumber(), semester);
+    }
+
     /**
      * Creates a string of the course similar to how it will look on the final audit pdf
      *
      * @return returns a string of the course
      */
-    @Override
-    public String toString() {
-        return  getCourseNumber();
-    }
+
 
     public boolean isEmpty(){
-        return getCourseNumber().equals("");
+        return getCourseNumber().isEmpty()&& semester.isEmpty();
     }
+
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
     public double getAttempted() { return attempted; }
@@ -101,21 +138,9 @@ public class StudentCourse extends Course {
 
 
 
-    public void setSemester(String semester) { this.semester = semester; }
     public void setTransfer(String transfer) { this.transfer = transfer; }
     public void setLetterGrade(String letterGrade) { this.letterGrade = letterGrade; }
     public void setWaived(boolean waived) { this.isWaived = waived; }
 
-    public void setCourseVariables(StudentCourse newCourse){
-        setCourseNumber(newCourse.getCourseNumber());
-        setHours(newCourse.getHours());
-        semester = newCourse.getSemester();
-        attempted = newCourse.getAttempted();
-        points = newCourse.getPoints();
-        earned = newCourse.getEarned();
-        letterGrade = newCourse.getLetterGrade();
-        isWaived = newCourse.isWaived();
-        transfer = newCourse.getTransfer();
-        fromTranscript = newCourse.isFromTranscript();
-    }
+    public void setSemester(String semester) { this.semester = semester; }
 }

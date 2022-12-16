@@ -41,6 +41,7 @@ public class Course {
         this.courseNumber = another.courseNumber;
         this.courseTitle = another.courseTitle;
         this.type = another.type;
+
     }
 
     /**
@@ -61,18 +62,6 @@ public class Course {
     }
 
     /**
-     * Creates a string of the course similar to how it will look on the final audit
-     * pdf
-     *
-     * @return returns a string of the course
-     */
-    @Override
-    public String toString() {
-        return courseNumber + " " +
-                courseTitle + " ";
-    }
-
-    /**
      * Compares if two objects are courses and have the same course num
      *
      * @param obj Object to compare to
@@ -89,6 +78,15 @@ public class Course {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(courseNumber);
+    }
+
+    @Override
+    public String toString() { return getCourseNumber(); }
+
+
     /**
      * Accessor methods to be used outside the class.
      */
@@ -98,7 +96,6 @@ public class Course {
     public String getCourseTitle() { return courseTitle; }
     public String getDescription() { return description; }
     public String getHours() { return hours; }
-
 
     /**
      * Mutator methods to be used outside the class.

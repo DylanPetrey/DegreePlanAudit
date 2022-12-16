@@ -8,6 +8,7 @@ module utd.dallas {
     requires javafx.controls;
     requires org.controlsfx.controls;
     requires org.apache.pdfbox;
+    requires org.apache.commons.io;
     requires json.simple;
     requires json.path;
     requires org.apache.poi.ooxml;

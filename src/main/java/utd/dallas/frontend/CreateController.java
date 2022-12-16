@@ -59,7 +59,10 @@ public class CreateController {
     public Student currentStudent;
     List<FlowObject> ListOfFlowObjects = new ArrayList<>();
     DragDropHandler DDHandler;
-    double cardWidth;
+
+    Course coreThesis = new Course();
+    Course electThesis = new Course();
+    Course addThesis = new Course();
 
     ObservableList<String>
             csTracks = FXCollections.observableArrayList(
@@ -118,6 +121,8 @@ public class CreateController {
         else
             onCSButtonClick();
 
+        thesis.setSelected(currentStudent.isThesis());
+        createThesisListener();
     }
 
     private List<String> getSemesterValues(){
@@ -147,23 +152,26 @@ public class CreateController {
         studentID.setText(currentStudent.getStudentId());
         studentSemAdmitted.setText(currentStudent.getStartDate());
         fastTrack.setSelected(currentStudent.isFastTrack());
-        thesis.setSelected(currentStudent.isThesis());
     }
 
 
 
     @FXML
     protected void onSWEButtonClick() {
+        currentStudent.setCurrentMajor("Software Engineering");
+        updateThesisCourses();
+
         trackBox.setItems(FXCollections.observableArrayList(softwareTracks));
         trackBox.setValue(softwareTracks.get(0));
-        currentStudent.setCurrentMajor("Software Engineering");
     }
 
     @FXML
     protected void onCSButtonClick() {
+        currentStudent.setCurrentMajor("Computer Science");
+        updateThesisCourses();
+
         trackBox.setItems(FXCollections.observableArrayList(csTracks));
         trackBox.setValue(csTracks.get(0));
-        currentStudent.setCurrentMajor("Computer Science");
     }
 
     @FXML
@@ -176,7 +184,7 @@ public class CreateController {
         try {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save As");
-            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDownloadDirectory());
             fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
             fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DegreePlan.pdf");
 
@@ -184,20 +192,22 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-            Mediator.getInstance().setDefaultDirectory(file.getParent());
-            
+            Mediator.getInstance().setDownloadDirectory(file.getParent());
+
             Form AuditPDF = new Form(currentStudent);
             AuditPDF.print(file.getAbsolutePath());
 
             openFile(file.getAbsolutePath());
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void printAuditReport(){
         try {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save As");
-            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDownloadDirectory());
             fileChooser.getExtensionFilters().addAll(new ExtensionFilter("WORD docs", "*.docx"), new ExtensionFilter("WORD doc", "*.doc"));
             fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_AuditReport.docx");
 
@@ -205,17 +215,11 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-            Mediator.getInstance().setDefaultDirectory(file.getParent());
+            Mediator.getInstance().setDownloadDirectory(file.getParent());
             Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
-            try {
-                openFile(file.getAbsolutePath());
-            } catch (Exception e) {
 
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            openFile(file.getAbsolutePath());
+        } catch (Exception e) {}
 
     }
 
@@ -254,12 +258,14 @@ public class CreateController {
             currentStudent.setCurrentPlan(Plan.Concentration.SOFTWARE);
         }
 
+        currentStudent.setThesis(currentStudent.isThesis(), coreThesis, electThesis, addThesis);
         resetAllVBox();
     }
 
     private void resetAllVBox(){
         ListOfFlowObjects = new ArrayList<>();
-        int[] limits = new int[]{ 5,5,3,8,0,0};
+        int[] limits = new int[]{5,5,3,8,0,0};
+        currentStudent.dropEmpty();
 
         resetVbox(coreVBox, Course.CourseType.CORE, limits[0]);
         resetVbox(approvedVBox, Course.CourseType.ELECTIVE, limits[1]);
@@ -330,6 +336,8 @@ public class CreateController {
             String num = target.currentCourse.getCourseNumber();
             String title = currentStudent.getCurrentPlan().getCourseTitle(num);
             String hours = currentStudent.getCurrentPlan().getCourseHours(num);
+            if(hours.isEmpty() || hours.equals("0"))
+                hours = target.currentCourse.getHours();
             target.getCurrentCourse().setCourseTitle(title);
             target.getCourseTitleField().setText(title);
             target.getCurrentCourse().setHours(hours);
@@ -344,7 +352,6 @@ public class CreateController {
             DDHandler.createDragListener(card);
             currentScene.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
                 if (inHierarchy(evt.getPickResult().getIntersectedNode(), card.summaryCard.getDeleteButton())) {
-                    String courseNum = card.getCurrentCourse().getCourseNumber();
                     currentStudent.getCourseList().remove(card.getCurrentCourse());
                     card.getParent().getObservableCard().remove(card);
 
@@ -426,9 +433,7 @@ public class CreateController {
             currentStudent.setFastTrack(fastTrack.isSelected());
         });
 
-        thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            currentStudent.setThesis(thesis.isSelected());
-        });
+
 
         CSButton.setOnMouseEntered(event -> CSButton.setStyle("-fx-background-color: #c6c6c6"));
         CSButton.setOnMouseExited(event -> CSButton.setStyle("-fx-background-color: #ffffff"));
@@ -440,8 +445,37 @@ public class CreateController {
         backButton.setOnMouseExited(event -> backButton.setStyle("-fx-background-color: #ffffff"));
         trackBox.setOnMouseEntered(event -> trackBox.setStyle("-fx-background-color: #c6c6c6"));
         trackBox.setOnMouseExited(event -> trackBox.setStyle("-fx-background-color: #ffffff"));
+    }
+
+    public void createThesisListener(){
+        updateThesisCourses();
+
+        thesis.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            currentStudent.setThesis(newValue, coreThesis, electThesis, addThesis);
+
+            resetAllVBox();
+        });
+    }
+
+    private void updateThesisCourses(){
+        String prefix = getPrefix();
+        String courseNum = prefix + "6V81";
+        coreThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.CORE);
+
+
+        courseNum = prefix + "6V98";
+        electThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.ELECTIVE);
+        addThesis = new Course(courseNum, currentStudent.getCurrentPlan().getCourseTitle(courseNum), "", Course.CourseType.ADDITIONAL);
 
     }
+
+    private String getPrefix() {
+        if (currentStudent.getCurrentMajor().equals("Software Engineering"))
+            return "SE ";
+        else
+            return "CS ";
+    }
+
 
     @FXML
     protected void onBackButtonClick() throws IOException {
