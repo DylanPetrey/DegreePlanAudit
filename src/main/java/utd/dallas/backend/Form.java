@@ -20,6 +20,7 @@ public class Form {
 
     private PDAcroForm acroForm;
     private Student student;
+
     private Plan plan;
     private String filePath;
 
@@ -82,40 +83,9 @@ public class Form {
 
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         try {
-            try {
-                pdfDocument.save(filePath);
-            }catch (FileNotFoundException e) {
-                saveIncremented(pdfDocument, filePath);
-            }
-
+            pdfDocument.save(new File(filePath));
             pdfDocument.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Increments the filename until valid
-     *
-     * @param pdf
-     * @param filePath
-     */
-    private void saveIncremented(PDDocument pdf, String filePath) {
-        File file = new File(filePath);
-        String newFilePath = filePath;
-        for (int i = 1; file.exists(); i++) {
-            String extension = FilenameUtils.getExtension(newFilePath);
-            String increment = String.format("(%d)." + extension, i);
-            newFilePath = FilenameUtils.removeExtension(filePath) + increment;
-            try {
-                pdf.save(newFilePath);
-                this.filePath = newFilePath;
-                break;
-            } catch (FileNotFoundException e) {
-                continue;
-            } catch (Exception ignore) {}
-            break;
-        }
+        } catch (IOException e) {}
     }
 
     private InputStream getInputStream(String fileName) {

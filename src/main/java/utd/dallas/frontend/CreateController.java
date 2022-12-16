@@ -197,7 +197,7 @@ public class CreateController {
             Form AuditPDF = new Form(currentStudent);
             AuditPDF.print(file.getAbsolutePath());
 
-            openFile(AuditPDF.getFilePath());
+            openFile(file.getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -217,10 +217,8 @@ public class CreateController {
             stage.setAlwaysOnTop(false);
             Mediator.getInstance().setDownloadDirectory(file.getParent());
             Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
-            try {
-                openFile(Audit.getFilePath());
-            } catch (Exception e) { }
 
+            openFile(file.getAbsolutePath());
         } catch (Exception e) {}
 
     }
