@@ -196,7 +196,7 @@ public class Student {
     public List<StudentCourse> getCleanCourseList(){
         List<StudentCourse> cleanCourses = new ArrayList<>();
         for(StudentCourse course : courseList)
-            if(!course.isEmpty())
+            if(!course.isEmpty() && !course.getSemester().isEmpty())
                 cleanCourses.add(course);
         return cleanCourses;
     }

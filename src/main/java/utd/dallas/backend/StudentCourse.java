@@ -101,12 +101,14 @@ public class StudentCourse extends Course {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof StudentCourse)) return false;
-        if (!super.equals(o)) return false;
-        StudentCourse course = (StudentCourse) o;
-        return getCourseNumber().equals(course.getCourseNumber()) && Objects.equals(semester, course.getSemester());
+    public boolean equals(Object obj) {
+        if (obj instanceof Course) {
+            if (obj instanceof StudentCourse){
+                return super.equals(obj) && semester == ((StudentCourse) obj).getSemester();
+            } else
+                return super.equals(obj);
+        }
+        return false;
     }
 
     @Override
@@ -119,14 +121,12 @@ public class StudentCourse extends Course {
      *
      * @return returns a string of the course
      */
-    @Override
-    public String toString() {
-        return  getCourseNumber();
-    }
+
 
     public boolean isEmpty(){
-        return getCourseNumber().equals("");
+        return getCourseNumber().isEmpty()&& semester.isEmpty();
     }
+
     public String getSemester() { return semester; }
     public String getLetterGrade() { return letterGrade; }
     public double getAttempted() { return attempted; }

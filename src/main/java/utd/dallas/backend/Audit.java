@@ -1,10 +1,15 @@
 package utd.dallas.backend;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +24,7 @@ public class Audit {
     // Student variables
     private final Student currentStudent;
     private final List<StudentCourse> filledCourses;
-    private static final DecimalFormat df = new DecimalFormat("0.00");
+    private static final DecimalFormat df = new DecimalFormat("0.000");
 
 
     // List of courses divided up by type
@@ -40,8 +45,8 @@ public class Audit {
     private final int REQUIRED_ELECTIVE_HOURS = 15;
     private final int MIN_ADD_ELECTIVE_HOURS = 3;
 
-    HashMap<String, String> WordReplace = new HashMap<>();
-    String filePath;
+    private HashMap<String, String> WordReplace = new HashMap<>();
+    private String filePath;
 
 
     /**
@@ -121,8 +126,7 @@ public class Audit {
         });
 
         double GPA = totalPoints.get() / totalHours.get();
-        double scale = Math.pow(10, 3);
-        return Math.round(GPA * scale) / scale;
+        return GPA;
     }
 
 
@@ -132,55 +136,192 @@ public class Audit {
     public String getOutstanding(){
         String res = "";
 
-        int coreHours = getTotalHours(coreList);
-        int electHours = getTotalHours(currentStudent.getCourseType(Course.CourseType.ELECTIVE));
+        int coreHours = getCompletedHours(coreList);
+        int electHours = getCompletedHours(currentStudent.getCourseType(Course.CourseType.ELECTIVE));
+        int addHours = getCompletedHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL));
 
-        if(coreHours < REQUIRED_CORE_HOURS) {
-            double target = getNeededGPA(coreGPA, coreHours, MIN_CORE_GPA, REQUIRED_CORE_HOURS);
-            res += printRequirements(target, Course.CourseType.CORE);
-        }
-        if(electHours < REQUIRED_ELECTIVE_HOURS){
-            double target = getNeededGPA(electiveGPA, electHours, MIN_ELECT_GPA, REQUIRED_ELECTIVE_HOURS);
-            res += printRequirements(target, Course.CourseType.ELECTIVE);
-        }
-        if(getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL)) < 3)
-            res += printRequirements();
+        if(coreHours < REQUIRED_CORE_HOURS)
+            res += printCoreRequirements(coreHours);
+
+        if(electHours < REQUIRED_ELECTIVE_HOURS)
+            res += printElectRequirements(electHours);
+
+        if(addHours < MIN_ADD_ELECTIVE_HOURS)
+            res += printAdditionalRequirements();
+
+        if(res.isEmpty())
+            res = "None";
 
         return res;
     }
 
-    /**
-     * String for additional requirements
-     */
-    public String printRequirements() {
-        int remaining = 3 - getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL));
-        if(remaining <= 0)
-            return printRequirements(0, Course.CourseType.ADDITIONAL);
+    public String printCoreRequirements(int coreHours) {
+        StringBuilder res = new StringBuilder();
+        double targetGPA = getNeededGPA(coreGPA, coreHours, MIN_CORE_GPA, REQUIRED_CORE_HOURS);
+
+        if(targetGPA <= 0)
+            res.append(printPass(coreList));
         else
-            if(remaining == 1)
-                return "The student needs " + remaining + " hour of additional elective credit.";
-            else
-                return "The student needs " + remaining + " hours of additional elective credit.";
+            res.append(printOutstandingGPA(targetGPA, coreList, currentStudent.getCurrentPlan().getCore()));
+
+        int numOptional = getNumOptional(coreList);
+        if(numOptional > 0)
+            res.append(printOptional(numOptional));
+
+        if(!res.toString().isEmpty())
+            res.append("\n");
+
+        return res.toString();
+    }
+
+    public String printElectRequirements(int electHours) {
+        StringBuilder res = new StringBuilder();
+        double targetGPA = getNeededGPA(electiveGPA, electHours, MIN_ELECT_GPA, REQUIRED_ELECTIVE_HOURS - thesisHours());
+
+        List<StudentCourse> electives = currentStudent.getCourseType(Course.CourseType.ELECTIVE);
+
+        if(targetGPA <= 0)
+            res.append(printPass(electives));
+        else
+            res.append(printOutstandingGPA(targetGPA, electives, currentStudent.getCurrentPlan().getElectives()));
+
+        int remainingHours = getTotalHours(electList) - electHours;
+
+        if(remainingHours > 0){
+            res.append("and ").append(remainingHours).append(" more approved elective credit");
+            if(remainingHours != 1)
+                res.append("s");
+        }
+
+        if(!res.toString().isEmpty())
+            res.append("\n");
+
+        return res.toString();
+    }
+
+    public String printAdditionalRequirements() {
+        StringBuilder res = new StringBuilder();
+
+        int remaining = MIN_ADD_ELECTIVE_HOURS - getTotalHours(currentStudent.getCourseType(Course.CourseType.ADDITIONAL));
+
+        res.append(printOutstandingAdditional(remaining));
+
+        return res.toString();
+    }
+
+    public String printPass(List<StudentCourse> courseList){
+        List<StudentCourse> currentSemester = getCurrentSemesterCourses(courseList);
+        if(currentSemester.size() == 0)
+            return "";
+
+        return "The student must pass " + printCourses(currentSemester, false);
+    }
+
+    public String printOutstandingGPA(double target, List<StudentCourse> courseList, List<Course> plan){
+        List<Course> outstandingCore = getOutstandingFromPlan(plan, courseList);
+        outstandingCore.addAll(getCurrentSemesterCourses(courseList));
+
+        String courseString = "";
+        if(outstandingCore.size() != 0)
+            courseString = printCourses(outstandingCore, false) + " ";
+
+        return  "The student needs a GPA >= " + df.format(target) + " in " + courseString;
+    }
+
+    private String printOutstandingAdditional(int remainingHours){
+        List<Course> outstanding = getOutstandingFromPlan(currentStudent.getCurrentPlan().getAdditional(), filledCourses);
+        outstanding.addAll(getCurrentSemesterCourses(currentStudent.getCourseType(Course.CourseType.ADDITIONAL)));
+
+        if(outstanding.size() == 0)
+            return printRemainingHours(remainingHours, false);
+        else
+            return "The student must complete " + printCourses(outstanding, false) + printRemainingHours(remainingHours, true);
 
     }
 
-
-    public String printRequirements(double target, Course.CourseType type){
+    private String printRemainingHours(int remainingHours, boolean hasCourses){
         String res = "";
-        if(target <= 0 || type == Course.CourseType.ADDITIONAL) {
-            List<StudentCourse> currentSemester = getCurrentSemesterCourses(currentStudent.getCourseType(type));
-            if(!currentSemester.isEmpty())
-                res += "The student must pass " + printCourses(currentSemester) + "\n";
-        } else
-            res += "The student needs a GPA >= " + df.format(target) + " in the remaining courses\n";
+
+        if(remainingHours == 0)
+            return res;
+
+        if(hasCourses)
+            res = " and ";
+        else
+            res = "The student needs ";
+
+        if(remainingHours == 1)
+            res += remainingHours + " hour of additional elective credit.";
+        else if (remainingHours > 1)
+            res += remainingHours + " hours of additional elective credits.";
+
         return res;
     }
+
+    private List<StudentCourse> getCurrentSemesterCourses(List<StudentCourse> courseList){
+        List<StudentCourse> current = new ArrayList<>();
+        // Get
+        for(StudentCourse s : courseList) {
+            if(!s.getSemester().isEmpty() && s.getLetterGrade().isEmpty())
+                current.add(s);
+        }
+
+        return current;
+    }
+
+
+    private List<Course> getOutstandingFromPlan(List<Course> plan, List<StudentCourse> student){
+        List<Course> out = new ArrayList<>();
+
+        for(Course course : plan) {
+            if(!student.contains(course))
+                out.add(course);
+        }
+
+        return out;
+    }
+
+    public String printOptional(int numOptional){
+        List<Course> outstanding = getOutstandingFromPlan(currentStudent.getCurrentPlan().getOptionalCore(), filledCourses);
+        if(outstanding.size() == 0)
+            return "";
+
+        return " and " + numOptional + " of " + printCourses(outstanding, false);
+    }
+
+    private int getNumOptional(List<StudentCourse> courseList){
+        int num = (int) currentStudent.getCurrentPlan().getNumOptional();
+
+        for(StudentCourse course : courseList) {
+            if(currentStudent.getCurrentPlan().isOpt(course))
+                num--;
+        }
+
+        return num;
+    }
+
 
     private double getNeededGPA(double currentGPA, double currentHours, double targetGPA, int totalHours){
         return ((targetGPA*totalHours)-(currentGPA*currentHours))/(totalHours - currentHours);
     }
 
-    public int getTotalHours(List<StudentCourse> courseList){
+
+    /**
+     * Method to get the number of hours in for thesis courses in the current semester
+     *
+     * @return
+     */
+    private int thesisHours(){
+        int hours = 0;
+        for(StudentCourse course : electList){
+            if(course.getCourseNumber().contains("6V98") && !course.getSemester().isEmpty() && course.getLetterGrade().isEmpty() && course.getType() == Course.CourseType.ELECTIVE){
+                hours += Integer.parseInt(course.getHours());
+            }
+        }
+        return hours;
+    }
+
+    public int getCompletedHours(List<StudentCourse> courseList){
         int total = 0;
         for(StudentCourse c : courseList){
             if(!c.getSemester().isEmpty() && isPassingGrade(c.getLetterGrade()))
@@ -189,38 +330,35 @@ public class Audit {
         return total;
     }
 
-
-    private List<StudentCourse> getCurrentSemesterCourses(List<StudentCourse> courseList){
-        List<StudentCourse> current = new ArrayList<>();
-        for(StudentCourse s : courseList) {
-            if(!s.getSemester().isEmpty() && !isPassingGrade(s.getLetterGrade()))
-                current.add(s);
+    public int getTotalHours(List<StudentCourse> courseList){
+        int total = 0;
+        for(StudentCourse c : courseList){
+            if(!c.getSemester().isEmpty() && !c.getHours().isEmpty())
+                total += Integer.parseInt(c.getHours());
         }
-
-        return current;
+        return total;
     }
 
-
-
-    private String printCourses(List<StudentCourse> courseList){
-        String res = "";
+    private String printCourses(List<? extends Course> courseList, boolean newline){
+        StringBuilder res = new StringBuilder();
         for(int i = 0; i < courseList.size(); i++){
-            res += courseList.get(i);
+            res.append(courseList.get(i));
             if(i < courseList.size()-1)
-                res += ", ";
-            else
-                res += "\n";
+                res.append(", ");
+            else if(newline)
+                res.append("\n");
         }
-        return res;
+        return res.toString();
     }
+
 
     private String printPre(){
-        String res = "";
+        StringBuilder res = new StringBuilder();
         if(preList.size() == 0)
-            res += "N/A";
+            res.append("None");
         for(StudentCourse course : preList)
-            res += printPrereq(course) + "\n";
-        return res;
+            res.append(printPrereq(course)).append("\n");
+        return res.toString();
     }
 
     private String printPrereq(StudentCourse pre){
@@ -249,12 +387,12 @@ public class Audit {
         WordReplace.put("$$major$$", currentStudent.getCurrentMajor());
         WordReplace.put("$$track$$", currentStudent.getCurrentPlan().getConcentration().toString().replace('-', ' '));
 
-        WordReplace.put("coregpa", String.valueOf(calcGPA(coreList)));
-        WordReplace.put("electivegpa", String.valueOf(calcGPA(electList)));
-        WordReplace.put("combinedgpa", String.valueOf(combinedGPA));
+        WordReplace.put("coregpa", df.format(calcGPA(coreList)));
+        WordReplace.put("electivegpa", df.format(calcGPA(electList)));
+        WordReplace.put("combinedgpa", df.format(combinedGPA));
 
-        WordReplace.put("corelist", printCourses(coreList));
-        WordReplace.put("electivelist", printCourses(electList));
+        WordReplace.put("corelist", printCourses(coreList,true));
+        WordReplace.put("electivelist", printCourses(electList, true));
 
         WordReplace.put("prelist", printPre());
         WordReplace.put("outstandingreq", getOutstanding());
@@ -291,17 +429,56 @@ public class Audit {
                                 }
                             }
                         }
-
                     }
                 }
-                FileOutputStream fos = new FileOutputStream(filePath);
-                doc.write(fos);
-                fos.close();
+                try{
+                    FileOutputStream fos = new FileOutputStream(filePath);
+                    doc.write(fos);
+                    fos.close();
+                } catch (FileNotFoundException e){
+                    saveIncremented(doc, filePath);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
+
+    /**
+     * Increments the filename until valid
+     *
+     * @param doc
+     * @param filePath
+     */
+    private void saveIncremented(XWPFDocument doc, String filePath) throws IOException {
+        File file = new File(filePath);
+        String newFilePath = filePath;
+
+        for (int i = 1; file.exists(); i++) {
+            if(i != 1){
+                String extension = FilenameUtils.getExtension(newFilePath);
+                String increment = String.format("(%d)." + extension, i);
+                newFilePath = FilenameUtils.removeExtension(filePath) + increment;
+            }
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(newFilePath);
+                doc.write(fos);
+                this.filePath = newFilePath;
+                break;
+            } catch (FileNotFoundException e) {
+                if(fos != null)
+                    fos.close();
+                continue;
+            } catch (Exception ignore) {}
+            finally {
+                if(fos != null)
+                    fos.close();
+            }
+            break;
+        }
+    }
+    public String getFilePath(){ return filePath; }
 }

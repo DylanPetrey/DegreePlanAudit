@@ -62,18 +62,6 @@ public class Course {
     }
 
     /**
-     * Creates a string of the course similar to how it will look on the final audit
-     * pdf
-     *
-     * @return returns a string of the course
-     */
-    @Override
-    public String toString() {
-        return courseNumber + " " +
-                courseTitle + " ";
-    }
-
-    /**
      * Compares if two objects are courses and have the same course num
      *
      * @param obj Object to compare to
@@ -94,6 +82,10 @@ public class Course {
     public int hashCode() {
         return Objects.hash(courseNumber);
     }
+
+    @Override
+    public String toString() { return getCourseNumber(); }
+
 
     /**
      * Accessor methods to be used outside the class.

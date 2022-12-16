@@ -1,6 +1,7 @@
 package utd.dallas.backend;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.List;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.commons.io.FilenameUtils;
 
 import utd.dallas.backend.Course.CourseType;
 
@@ -19,10 +21,11 @@ public class Form {
     private PDAcroForm acroForm;
     private Student student;
     private Plan plan;
+    private String filePath;
 
     /**
      * Constructs a Form object for the given student
-     * 
+     *
      * @param student
      */
     public Form(Student student) {
@@ -37,7 +40,7 @@ public class Form {
      * @return Nothing
      */ 
     public void print(String filePath) {
-
+        this.filePath = filePath;
         String loc = "";
         PDDocument pdfDocument = null;
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -79,11 +82,41 @@ public class Form {
 
         pdfDocument.getDocumentCatalog().setAcroForm(acroForm);
         try {
-            pdfDocument.save(new File(filePath));
+            try {
+                pdfDocument.save(filePath);
+            }catch (FileNotFoundException e) {
+                saveIncremented(pdfDocument, filePath);
+            }
+
             pdfDocument.close();
-        } catch (IOException e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * Increments the filename until valid
+     *
+     * @param pdf
+     * @param filePath
+     */
+    private void saveIncremented(PDDocument pdf, String filePath) {
+        File file = new File(filePath);
+        String newFilePath = filePath;
+        for (int i = 1; file.exists(); i++) {
+            String extension = FilenameUtils.getExtension(newFilePath);
+            String increment = String.format("(%d)." + extension, i);
+            newFilePath = FilenameUtils.removeExtension(filePath) + increment;
+            try {
+                pdf.save(newFilePath);
+                this.filePath = newFilePath;
+                break;
+            } catch (FileNotFoundException e) {
+                continue;
+            } catch (Exception ignore) {}
+            break;
+        }
+    }
 
     private InputStream getInputStream(String fileName) {
         InputStream inputStream = null;
@@ -212,5 +245,8 @@ public class Form {
     public PDAcroForm getAcroForm(){
         return acroForm;
     }
+
+    public String getFilePath(){ return filePath; }
+
 
 }

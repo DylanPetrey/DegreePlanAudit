@@ -184,7 +184,7 @@ public class CreateController {
         try {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save As");
-            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDownloadDirectory());
             fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
             fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_DegreePlan.pdf");
 
@@ -192,20 +192,22 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-            Mediator.getInstance().setDefaultDirectory(file.getParent());
+            Mediator.getInstance().setDownloadDirectory(file.getParent());
 
             Form AuditPDF = new Form(currentStudent);
             AuditPDF.print(file.getAbsolutePath());
 
-            openFile(file.getAbsolutePath());
-        } catch (Exception e) {}
+            openFile(AuditPDF.getFilePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void printAuditReport(){
         try {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Save As");
-            fileChooser.setInitialDirectory(Mediator.getInstance().getDefaultDirectory());
+            fileChooser.setInitialDirectory(Mediator.getInstance().getDownloadDirectory());
             fileChooser.getExtensionFilters().addAll(new ExtensionFilter("WORD docs", "*.docx"), new ExtensionFilter("WORD doc", "*.doc"));
             fileChooser.setInitialFileName(currentStudent.getSimpleName()+"_AuditReport.docx");
 
@@ -213,10 +215,10 @@ public class CreateController {
             stage.setAlwaysOnTop(true);
             File file = fileChooser.showSaveDialog(stage);
             stage.setAlwaysOnTop(false);
-            Mediator.getInstance().setDefaultDirectory(file.getParent());
+            Mediator.getInstance().setDownloadDirectory(file.getParent());
             Audit Audit = new Audit(currentStudent, file.getAbsolutePath());
             try {
-                openFile(file.getAbsolutePath());
+                openFile(Audit.getFilePath());
             } catch (Exception e) { }
 
         } catch (Exception e) {}

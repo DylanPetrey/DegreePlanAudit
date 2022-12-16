@@ -421,6 +421,9 @@ public class Plan {
     public long getNumOptional() { return numOptional; }
     public List<Course> getCore() { return requiredCore; }
     public List<Course> getOptionalCore() { return optionalCore; }
+
+    public List<Course> getElectives() { return electives; }
+    public List<Course> getAdditional() { return additional; }
     public List<Course> getAdmissionPrerequisites() { return admissionPrerequisites; }
     public List<Course> getTrackPrerequisites() { return trackPrerequisites; }
     public List<String> getExcludedElectives() { return excludedElectives; }

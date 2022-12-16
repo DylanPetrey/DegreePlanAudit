@@ -12,6 +12,7 @@ public class Mediator {
     private static Mediator INSTANCE;
     private Student student;
     private File defaultDirectory;
+    private File downloadDirectory;
 
     /**
      * Gets the current mediator object in the program
@@ -51,9 +52,25 @@ public class Mediator {
     public File getDefaultDirectory() { return defaultDirectory; }
     public void setDefaultDirectory(String defaultDirectory) {
         File f = new File(defaultDirectory);
-        if(f.isDirectory())
+        if(f.isDirectory()) {
             this.defaultDirectory = f;
+            if(downloadDirectory == null){
+                downloadDirectory = f;
+            }
+        }
     }
+
+    public File getDownloadDirectory() { return downloadDirectory; }
+    public void setDownloadDirectory(String downloadDirectory) {
+        File f = new File(downloadDirectory);
+        if(f.isDirectory()) {
+            this.downloadDirectory = f;
+            if(defaultDirectory == null){
+                defaultDirectory = f;
+            }
+        }
+    }
+
 
 
 
