@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="basePane" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: #154734;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="utd.dallas.frontend.IntroController">
+   <children>
+      <VBox alignment="CENTER" minHeight="400.0" prefHeight="583.0" prefWidth="600.0" spacing="150.0" style="-fx-background-color: #154734;" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #154734;">
+               <children>
+                  <ImageView fitHeight="287.0" fitWidth="347.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@images/main_1d.gif" />
+                     </image>
+                  </ImageView>
+               </children>
+            </VBox>
+            <HBox alignment="CENTER" spacing="150.0">
+               <children>
+                    <Button fx:id="createButton" mnemonicParsing="false" onAction="#onCreateButtonClick" style="-fx-background-color: #ffffff;" text="Create" textFill="#154734">
+                     <font>
+                        <Font size="21.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                    <Button fx:id="uploadButton" mnemonicParsing="false" onAction="#onUploadButtonClick" style="-fx-background-color: #ffffff;" text="Upload" textFill="#154734">
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                     <font>
+                        <Font size="21.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
